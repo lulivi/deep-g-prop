@@ -73,13 +73,14 @@ def latex(c, report_name=default_report_name):
 
 
 @task(latex)
-def pdf(c, report_name=default_report_name):
+def pdf(c, report_name=default_report_name, bibtex=True):
     """Create pdf file."""
     print("Building pdf through pdflatex ...")
     pdflatex_arg = "-shell-escape {}.tex".format(report_name)
     with Sultan.load(cwd="docs/report") as s:
         s.pdflatex(pdflatex_arg).run(quiet=True)
-        s.bibtex("{}.aux".format(report_name)).run(quiet=True)
+        if bibtex:
+            s.bibtex("{}.aux".format(report_name)).run(quiet=True)
         s.pdflatex(pdflatex_arg).run(quiet=True)
         s.pdflatex(pdflatex_arg).run(quiet=True)
 
