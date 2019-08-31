@@ -45,6 +45,24 @@ gestor de paquetes que se prefiera.
 
 ## Utilización
 
+Para poder construir la documentacíón se puede ejecutar lo siguiente:
+
+```python
+inv docs.pdf
+```
+
+Para ejecutar los tests:
+
+```python
+inv tests.run
+```
+
+Para obtener otras opciones posibles con invoke:
+
+```python
+inv -l
+```
+
 ## Desarrollo
 
 En este proyecto se usa un metodología de desarrollo basada en tests.
@@ -63,6 +81,9 @@ GNU](https://www.gnu.org/software/emacs/manual/html_node/emacs/Format-of-ChangeL
 -   [DEAP](https://deap.readthedocs.io/en/master/) - librería de construcción
     de algoritmos evolutivos. Se utilizará ésta para optimizar los parámetros
     de las redes neuronales.
+
+En la documentación se podrá encontrar una comparativa detallada con otras
+bibliotecas similares y el por qué de la elección de éstas.
 
 ## Utilidades
 
