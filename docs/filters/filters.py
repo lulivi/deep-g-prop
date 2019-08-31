@@ -3,7 +3,11 @@ import panflute as pf
 
 def remove_environments(elem, doc):
     """Remove code and math blocks."""
-    if isinstance(elem, pf.CodeBlock) or isinstance(elem, pf.Math):
+    if (
+        isinstance(elem, pf.CodeBlock)
+        or isinstance(elem, pf.Math)
+        or (isinstance(elem, pf.Str) and (elem.text == "image"))
+    ):
         return []
 
 

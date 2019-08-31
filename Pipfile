@@ -5,7 +5,8 @@ verify_ssl = true
 
 [dev-packages]
 pytest = "*"
-pypdf = "*"
+PyPDF2 = "*"
+panflute = "*"
 
 [packages]
 invoke = "*"

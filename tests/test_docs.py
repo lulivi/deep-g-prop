@@ -12,7 +12,7 @@ class ReportTests(unittest.TestCase):
     """Run some report tests."""
 
     def test_report_spelling(self):
-        "Run aspell and check if there is any misspelled word."
+        """Run aspell and check if there is any misspelled word."""
         with Sultan.load(cwd=REPO_ROOT, logging=False) as s:
             result = (
                 s.cat(self.output_report_path)
@@ -27,7 +27,9 @@ class ReportTests(unittest.TestCase):
 
     def test_pdf_pages_number(self):
         """Check if report has the minimun number of pages."""
-        with open(REPO_ROOT.joinpath("docs", "report", "proyecto.pdf")) as f:
+        with open(
+            REPO_ROOT.joinpath("docs", "report", "proyecto.pdf"), "r"
+        ) as f:
             pdf = PdfFileReader(f)
             number_of_pages = pdf.getNumPages()
 
@@ -39,10 +41,9 @@ class ReportTests(unittest.TestCase):
     def setUpClass(cls):
         """Create proper environment to check report spelling.
 
-        Firstly, search for the latex report. If it does not exist not, compile
-        it with Pyweave.
-        Secondly, check if there are any filters for pandoc conversion.
-        Then, find out if an aspell personal dictionary exists.
+        Firstly, search for the latex report. After that, compile pdf if it does
+        not exist. Thirdly, check if there are any filters for pandoc
+        conversion. Then, find out if an aspell personal dictionary exists.
         Finally, convert the report to plain text, to check the spelling.
 
         """
@@ -54,8 +55,20 @@ class ReportTests(unittest.TestCase):
             if not report_path.exists():
                 raise FileNotFoundError
         except FileNotFoundError:
+            sys.exit("Error: {} not found.".format(report_path))
+
+        try:
+            report_pdf_path = REPO_ROOT.joinpath(
+                "docs", "report", "proyecto.pdf"
+            ).resolve()
+
+            if not report_pdf_path.exists():
+                raise FileNotFoundError
+        except FileNotFoundError:
             with Sultan.load(cwd=str(REPO_ROOT)) as s:
-                s.pipenv("run", "inv", "docs.latex").run(quiet=True)
+                s.pipenv("run", "inv", "docs.pdf", "--no-bibtex").run(
+                    quiet=True
+                )
 
         try:
             filter_path = REPO_ROOT.joinpath(

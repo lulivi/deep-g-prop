@@ -105,3 +105,10 @@ venv.bak/
 
 # Cache
 cache/
+
+# Latex
+*.aux
+*.lo[tf]
+*.toc
+*.out
+*.pdf
