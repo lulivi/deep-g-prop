@@ -41,6 +41,7 @@ def clean(c, report_name=default_report_name):
         "docs/report/*.pyc",
         "docs/report/*.bbl",
         "docs/report/*.blg",
+        "docs/report/secciones/*.tex",
         "docs/report/{}.aux".format(report_name),
         "docs/report/{}.log".format(report_name),
         "docs/report/{}.out".format(report_name),
@@ -49,7 +50,6 @@ def clean(c, report_name=default_report_name):
         "docs/report/{}.toc".format(report_name),
         "docs/report/{}.fls".format(report_name),
         "docs/report/{}.fdb_latexmk".format(report_name),
-        "docs/report/{}.tex".format(report_name),
         "docs/report/{}.pdf".format(report_name),
         "docs/report/{}/".format(report_name),
     )
@@ -60,16 +60,31 @@ def clean(c, report_name=default_report_name):
 
 
 @task(clean)
-def latex(c, report_name=default_report_name):
+def latex(c):
     """Create tex file."""
     print("Building latex file and figures through pweave ...")
-    try:
-        report_name_path = Path("docs", "report", report_name)
-    except FileNotFoundError:
-        sys.exit("{} not found.".format(report_name_path))
+    report_dir_path = Path("docs", "report")
 
-    with Sultan.load(cwd="docs/report") as s:
-        s.pweave("-f", "texminted {}.texw".format(report_name)).run(quiet=True)
+    try:
+        report_dir_path = report_dir_path.resolve()
+
+        if not report_dir_path.exists():
+            raise FileNotFoundError
+    except FileNotFoundError:
+        sys.exit("{} not found.".format(str(report_dir_path)))
+
+    with Sultan.load() as s:
+        for pweave_file in report_dir_path.glob("**/*.texw"):
+            tex_file = str(pweave_file.with_suffix(".tex"))
+            s.pweave(
+                "--format=texminted",
+                "--documentation-mode",
+                "--figure-directory={}".format(
+                    str(report_dir_path.joinpath("figures"))
+                ),
+                "--output={}".format(tex_file),
+                "{}".format(str(pweave_file)),
+            ).run(quiet=True)
 
 
 @task(latex)

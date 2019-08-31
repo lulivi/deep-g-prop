@@ -11,6 +11,8 @@ pypdf = "*"
 invoke = "*"
 sultan = "*"
 pweave = "*"
+matplotlib = "*"
+scipy = "*"
 
 [requires]
 python_version = "3.7"
