@@ -1,11 +1,36 @@
 \chapter{Introducción}
 
+ % Introducción sobre el trabajo
+
 \section{Motivación}
+
+% Redes neuronales
+% Auge de las redes neuronales, qué son y cómo funcionan
+
+\textit{Machine learning} (\textit{aprendizaje automático}) es la capacidad que
+tiene un sistema de \textit{inteligencia artificial} para crear un conocimiento
+propio a partir de datos en bruto\cite[p.~2]{goodfellow_bengio_courville_2016}.
+Un subgrupo de \textit{machine learning}, \textit{deep learning}
+(\textit{aprendizaje profundo}), estudia problemas en los que algoritmos
+simples de \textit{machine learning} no tienen éxito, como reconocimiento de
+voz o reconocimiento de imágenes\cite[p.~15]{goodfellow_bengio_courville_2016}.
+En este subgrupo se encuentran las \textit{redes neuronales artificiales}
+(\textit{ANN} en inglés) y más en concreto el llamado perceptrón multicapa (MLP
+en inglés).
+
+Un \textit{MLP} tiene como objetivo aproximar una funcion $f$. Se compone de
+tres partes:
+
+\begin{itemize}
+    \item Capa de entrada
+    \item Capas ocultas
+    \item Capa de salida
+\end{itemize}
+
+% Algoritmos genéticos
+
+% Optimización de redes neuronales con algoritmos genéticos
 
 \section{Objetivos}
 
-\begin{itemize}
-    \item objetivo 1
-    \item objetivo 2
-    \item objetivo 3
-\end{itemize}
+% Objetivos del TFG
