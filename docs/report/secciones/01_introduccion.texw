@@ -11,26 +11,36 @@ En este subgrupo se encuentran las \textit{redes neuronales artificiales}
 (\textit{ANN} en inglés) y más en concreto el llamado \textit{perceptrón
 multicapa} (\textit{MLP} en inglés).
 
-% Intoducción de algoritmos evolutivos y en concreto, genéticos
+Otro de los subgrupos del \textit{machine learning} es el de los
+\textit{algoritmos evolutivos} (\textit{EA} en inglés), inspirados en los
+mecanísmos de la evolución biológica. Esta serie de algoritmos (como los
+\textit{algoritmos genéticos}) tienen etapas comunes, como la inicialización de
+la población, la evaluación y selección, y la reproducción y
+variación\cite{evolutionary_computation}.
 
 \section{Motivación}
 
-Dado que los perceptrones multicapa tienen cantidad de parámetros configurables
-(neuronas de la capa de entrada y salida, número de capas ocultas, neuronas por
-capa oculta, vectores de pesos), es complicado y tedioso encontrar una
-configuración óptima para cada problema. Este trabajo busca obtener una manera
-de conseguir una disposición de parámetros adaptada a cada tipo de problema
-mediante la ayuda de algoritmos genéticos.
+Dado que los \textit{perceptrones multicapa} tienen cantidad de parámetros
+configurables (neuronas de la capa de entrada y salida, número de capas
+ocultas, neuronas por capa oculta, vectores de pesos), es complicado y tedioso
+encontrar una configuración óptima para cada problema. Este trabajo busca
+obtener una manera de conseguir una disposición de parámetros adaptada a cada
+tipo de problema mediante la ayuda de algoritmos genéticos. Este trabajo está
+basado en el artículo G-Prop\cite{g_prop}, pero con múltiples capas de
+\textit{MLP}.
 
 \section{Objetivos}
 
 A parte de los objetivos básicos del proyecto como elegir frameworks tanto de
-\textit{MLP} como de AG.
+\textit{MLP} como de \textit{GA}. Se pretende conocer si es posible encontrar
+configuraciones óptimas de parámetros para \textit{MLP} con varias capas
+ocultas con varias capas ocultas.
 
 \begin{itemize}
 
-\item Comprobar si es posible conseguir parámetros que se ajusten a cada tipo
-      de problema automáticamente.
+\item Comprobar si se pueden conseguir configuraciones óptimas de \textit{MLP}
+
+\item Evitar sobreajuste en este tipo de configuraciones.
 
 \end{itemize}
 
