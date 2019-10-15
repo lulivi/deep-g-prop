@@ -31,16 +31,18 @@ basado en el artículo G-Prop\cite{g_prop}, pero con múltiples capas de
 
 \section{Objetivos}
 
-A parte de los objetivos básicos del proyecto como elegir frameworks tanto de
-\textit{MLP} como de \textit{GA}. Se pretende conocer si es posible encontrar
-configuraciones óptimas de parámetros para \textit{MLP} con varias capas
-ocultas con varias capas ocultas.
+A parte de los objetivos básicos del proyecto como elegir frameworks para
+programar tanto \textit{MLPs} como de \textit{GAs}, se pretende conocer si es
+posible encontrar configuraciones óptimas de parámetros para \textit{MLP} con
+varias capas ocultas.
 
 \begin{itemize}
 
 \item Comprobar si se pueden conseguir configuraciones óptimas de \textit{MLP}
 
-\item Evitar sobreajuste en este tipo de configuraciones.
+\item Evitar sobreajuste\footnote{Se refiere al entrenamiento excesivo con un
+conjunto de datos, dando lugar a muy buenos resultados para éste conjunto pero
+erroneos para distintos} en este tipo de configuraciones.
 
 \end{itemize}
 
