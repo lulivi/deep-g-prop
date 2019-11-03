@@ -12,6 +12,7 @@ addons:
     - texlive-fonts-recommended
     - texlive-fonts-extra
     - texlive-lang-spanish
+    - texlive-formats-extra
 before_install:
   - pip install pipenv
 install:
