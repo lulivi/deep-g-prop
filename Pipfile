@@ -6,14 +6,11 @@ verify_ssl = true
 [dev-packages]
 pytest = "*"
 PyPDF2 = "*"
-panflute = "*"
 
 [packages]
 invoke = "*"
 sultan = "*"
 pweave = "*"
-matplotlib = "*"
-scipy = "*"
 
 [requires]
 python_version = "3.7"

@@ -1,0 +1,9 @@
+dist: bionic
+python: "3.7"
+before_install:
+  - sudo apt -y install aspell pandoc texlive-latex-base texlive-bibtex-extra
+  - pip install pipenv
+install:
+  - pipenv install --dev
+script:
+  - inv tests.unittest

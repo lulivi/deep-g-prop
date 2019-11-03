@@ -1,17 +1,9 @@
-from invoke import task
-from pathlib import Path
-from sultan.api import Sultan
-
-REPO_ROOT = Path(__file__).parents[1]
+from invoke import task, run
+from . import docs
 
 
-@task
-def run(c):
+@task(pre=[docs.plain, docs.pdf])
+def unittest(c):
     """Run tests."""
-    print("Running tests...")
-    with Sultan.load(str(REPO_ROOT)) as s:
-        result = s.pytest("tests/", "-v").run(
-            quiet=True, halt_on_nonzero=False
-        )
-    for i in result.stdout:
-        print(i)
+    print("Running unittests...")
+    run("pytest tests/ -v", pty=True)
