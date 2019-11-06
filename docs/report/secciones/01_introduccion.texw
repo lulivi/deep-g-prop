@@ -1,11 +1,48 @@
 \chapter{Introducción}
 
+\textit{Machine learning} (\textit{aprendizaje automático}) es la capacidad que
+tiene un sistema de \textit{inteligencia artificial} para crear un conocimiento
+propio a partir de datos en bruto\cite[p.~2]{goodfellow_bengio_courville_2016}.
+Un subgrupo de \textit{machine learning}, \textit{deep learning}
+(\textit{aprendizaje profundo}), estudia problemas en los que algoritmos
+simples de \textit{machine learning} no tienen éxito, como reconocimiento de
+voz o reconocimiento de imágenes\cite[p.~15]{goodfellow_bengio_courville_2016}.
+En este subgrupo se encuentran las \textit{redes neuronales artificiales}
+(\textit{ANN} en inglés) y más en concreto el llamado \textit{perceptrón
+multicapa} (\textit{MLP} en inglés).
+
+Otro de los subgrupos del \textit{machine learning} es el de los
+\textit{algoritmos evolutivos} (\textit{EA} en inglés), inspirados en los
+mecanismos de la evolución biológica. Esta serie de algoritmos (como los
+\textit{algoritmos genéticos}) tienen etapas comunes, como la inicialización de
+la población, la evaluación y selección, y la reproducción y
+variación\cite{evolutionary_computation}.
+
 \section{Motivación}
+
+Dado que los \textit{perceptrones multicapa} tienen cantidad de parámetros
+configurables (neuronas de la capa de entrada y salida, número de capas
+ocultas, neuronas por capa oculta, vectores de pesos), es complicado y tedioso
+encontrar una configuración óptima para cada problema. Este trabajo busca
+obtener una manera de conseguir una disposición de parámetros adaptada a cada
+tipo de problema mediante la ayuda de algoritmos genéticos. Este trabajo está
+basado en el artículo G-Prop\cite{g_prop}, pero con múltiples capas de
+\textit{MLP}.
 
 \section{Objetivos}
 
+A parte de los objetivos básicos del proyecto como elegir frameworks para
+programar tanto \textit{MLPs} como de \textit{GAs}, se pretende conocer si es
+posible encontrar configuraciones óptimas de parámetros para \textit{MLP} con
+varias capas ocultas.
+
 \begin{itemize}
-    \item objetivo 1
-    \item objetivo 2
-    \item objetivo 3
+
+\item Comprobar si se pueden conseguir configuraciones óptimas de \textit{MLP}
+
+\item Evitar sobreajuste\footnote{Se refiere al entrenamiento excesivo con un
+conjunto de datos, dando lugar a muy buenos resultados para éste conjunto pero
+erróneos para distintos} en este tipo de configuraciones.
+
 \end{itemize}
+
