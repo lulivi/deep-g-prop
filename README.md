@@ -45,6 +45,10 @@ gestor de paquetes que se prefiera.
 
 ## Utilización
 
+Asegúrate de tener instalado lo necesario para compilar los documentos haciendo
+
+    pip install pweave invoke sultan
+    
 Para poder construir la documentacíón se puede ejecutar lo siguiente:
 
 ```python
