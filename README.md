@@ -19,9 +19,9 @@
 
 ## Instalación
 
-Primero se debe de tener python 3.7 y pip instalado en el sistema. Después
-instala el paquete `pipenv` para gestión de dependencias y entornos virtuales.
-Para ello se puede utilizar pip:
+Primero se debe de tener Python 3.7 y `pip` instalado en el sistema. Después
+deberá instalar el paquete `pipenv` para la gestión de dependencias y entornos
+virtuales. Para ello se puede utilizar `pip`:
 
 ```bash
 pip install pipenv
@@ -45,11 +45,16 @@ gestor de paquetes que se prefiera.
 
 ## Utilización
 
-Asegúrate de tener instalado lo necesario para compilar los documentos haciendo
+Primero deberá introducirse en el entorno de desarrollo:
 
-    pip install pweave invoke sultan
-    
-Para poder construir la documentacíón se puede ejecutar lo siguiente:
+```shell
+pipenv shell
+```
+
+Si no quiere, puede ejecutar cualquiera de los siguientes comandos precediendo
+siempre con `pipenv run`.
+
+Para poder construir la documentación se puede ejecutar lo siguiente:
 
 ```python
 inv docs.pdf
@@ -58,7 +63,7 @@ inv docs.pdf
 Para ejecutar los tests:
 
 ```python
-inv tests.run
+inv tests.unittest
 ```
 
 Para obtener otras opciones posibles con invoke:
