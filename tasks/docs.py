@@ -26,7 +26,7 @@ def clean(c):
         "docs/report/*.pyc",
         "docs/report/*.bbl",
         "docs/report/*.blg",
-        "docs/report/seccionges/*.tex",
+        "docs/report/secciones/*.tex",
         "docs/report/{}.aux".format(REPORT_NAME),
         "docs/report/{}.log".format(REPORT_NAME),
         "docs/report/{}.out".format(REPORT_NAME),
@@ -39,9 +39,9 @@ def clean(c):
         "docs/report/{}/".format(REPORT_NAME),
     )
 
-    with Sultan.load(cwd=str(REPORT_DIR_PATH)) as s:
+    with Sultan.load(cwd=str(ROOT)) as s:
         for pattern in patterns:
-            s.rm("-rf", pattern)
+            s.rm("-rf", pattern).run(quiet=True)
 
 
 @task(clean)
