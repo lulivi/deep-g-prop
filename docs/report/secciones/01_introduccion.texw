@@ -1,44 +1,46 @@
 \chapter{Introducción}
 
-\textit{Machine learning} (\textit{aprendizaje automático}) es la capacidad que
-tiene un sistema de \textit{inteligencia artificial} para crear un conocimiento
-propio a partir de datos en bruto\cite[p.~2]{goodfellow_bengio_courville_2016}.
-Un subgrupo de \textit{machine learning}, \textit{deep learning}
-(\textit{aprendizaje profundo}), estudia problemas en los que algoritmos
-simples de \textit{machine learning} no tienen éxito, como reconocimiento de
-voz o reconocimiento de imágenes\cite[p.~15]{goodfellow_bengio_courville_2016}.
-En este subgrupo se encuentran las \textit{redes neuronales artificiales}
-(\textit{ANN} en inglés) y más en concreto el llamado \textit{perceptrón
-multicapa} (\textit{MLP} en inglés).
+La \textit{clasificación supervisada} es una parte de la \textit{IA}
+(\textit{inteligencia artificial}) que busca clasificar ejemplos en diferentes
+grupos a partir de sus características. Los \textit{clasificadores automáticos}
+son \textit{metaheurísticas} que mediante \textit{aprendizaje automático} y, a
+partir de las características de un ejemplo, lo etiquetan con el subgrupo que
+le corresponde. La configuración de los \textit{clasificadores automáticos}
+(como las \textit{redes neuronales}) es una tarea complicada y manual, lo cual
+hace que se tenga que dedicar demasiado tiempo a la optimización de estos
+parámetros.
 
-Otro de los subgrupos del \textit{machine learning} es el de los
-\textit{algoritmos evolutivos} (\textit{EA} en inglés), inspirados en los
-mecanismos de la evolución biológica. Esta serie de algoritmos (como los
-\textit{algoritmos genéticos}) tienen etapas comunes, como la inicialización de
-la población, la evaluación y selección, y la reproducción y
-variación\cite{evolutionary_computation}.
+El \textit{aprendizaje automático} (\textit{ML} por sus siglas en inglés:
+\textit{machine learning}) es la capacidad que tiene un sistema de
+\textit{inteligencia artificial} para crear un conocimiento propio a partir de
+datos en bruto\cite[p.~2]{goodfellow_bengio_courville_2016}. Un subgrupo del
+\textit{aprendizaje automatico}, el \textit{aprendizaje profundo} (\textit{deep
+learning}), estudia problemas en los que algoritmos simples de \textit{ML} no
+tienen éxito, como reconocimiento de voz o reconocimiento de
+imágenes\cite[p.~15]{goodfellow_bengio_courville_2016}. En este subgrupo se
+encuentran las \textit{redes neuronales artificiales} (\textit{ANN} en inglés)
+y más en concreto el llamado \textit{perceptrón multicapa} (\textit{MLP} en
+inglés).
 
-\section{Motivación}
-
-Dado que los \textit{perceptrones multicapa} tienen cantidad de parámetros
-configurables (neuronas de la capa de entrada y salida, número de capas
-ocultas, neuronas por capa oculta, vectores de pesos), es complicado y tedioso
-encontrar una configuración óptima para cada problema. Este trabajo busca
-obtener una manera de conseguir una disposición de parámetros adaptada a cada
-tipo de problema mediante la ayuda de algoritmos genéticos. Este trabajo está
-basado en el artículo G-Prop\cite{g_prop}, pero con múltiples capas de
-\textit{MLP}.
+Otro de los subgrupos del \textit{aprendizaje automático} es el de los
+\textit{algoritmos evolutivos} (\textit{evolutionary algorithms} en inglés),
+inspirados en los mecanismos de la evolución biológica. Esta serie de
+algoritmos (como los \textit{algoritmos genéticos}) tienen etapas comunes, como
+la inicialización de la población, la evaluación y selección, y la reproducción
+y variación\cite{evolutionary_computation}.
 
 \section{Objetivos}
 
 A parte de los objetivos básicos del proyecto como elegir frameworks para
-programar tanto \textit{MLPs} como de \textit{GAs}, se pretende conocer si es
-posible encontrar configuraciones óptimas de parámetros para \textit{MLP} con
-varias capas ocultas.
+programar tanto \textit{perceptrones multicapa} (\textit{MLP} por sus siglas en
+inglés: \textit{multilayer perceptron}) como de \textit{algoritmos genéticos},
+se pretende conocer si es posible encontrar configuraciones óptimas de
+parámetros para los \textit{perceptrones multicapa}, como en el artículo en el
+que se basa el trabajo (G-Prop\cite{g_prop}) pero con varias capas ocultas.
 
 \begin{itemize}
 
-\item Comprobar si se pueden conseguir configuraciones óptimas de \textit{MLP}
+\item Comprobar si se pueden conseguir configuraciones óptimas de \textit{MLP}.
 
 \item Evitar sobreajuste\footnote{Se refiere al entrenamiento excesivo con un
 conjunto de datos, dando lugar a muy buenos resultados para éste conjunto pero
