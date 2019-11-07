@@ -112,3 +112,6 @@ cache/
 *.toc
 *.out
 *.pdf
+
+# VS code
+*.vscode/
