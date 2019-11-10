@@ -72,6 +72,17 @@ Para obtener otras opciones posibles con invoke:
 inv -l
 ```
 
+También puedes instalar todo lo necesario en tu instalación normal de
+Python 
+
+    pip install invoke consul
+    
+y ejecutar
+
+    inv docs.pdf 
+    
+directamente.
+
 ## Desarrollo
 
 En este proyecto se usa un metodología de desarrollo basada en tests.
