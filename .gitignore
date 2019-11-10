@@ -112,3 +112,7 @@ cache/
 *.toc
 *.out
 *.pdf
+_minted-*
+docs/report/secciones/*.tex
+*.blg
+*.bbl
