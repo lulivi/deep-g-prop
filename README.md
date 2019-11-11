@@ -19,56 +19,74 @@
 
 ## Instalación
 
-Primero se debe de tener Python 3.7 y `pip` instalado en el sistema. Después
-deberá instalar el paquete `pipenv` para la gestión de dependencias y entornos
-virtuales. Para ello se puede utilizar `pip`:
+Primero se debe de tener Python 3.7 y `pip` instalados en el sistema. Después
+se podrá elegir si utilizar el entorno virtual que viene con el repositorio, o
+instalar los paquetes manualmente.
 
-```bash
-pip install pipenv
-```
+1.  Si se elige la primera opción, se deberá instalar el paquete `pipenv` para
+    la gestión de dependencias y entornos virtuales. Para ello se puede
+    utilizar `pip`:
 
-Una vez instalado el paquete, ejecutando la siguiente línea se podrán utilizar
-las funciónes principales del código:
+    ```shell
+    pip install pipenv
+    ```
 
-```bash
-pipenv install
-```
+    Una vez instalado el paquete, ejecutando la siguiente línea se podrán utilizar
+    las funciónes principales del código:
 
-Si se quieren ejecutar los tests se pueden instalar los paquetes de desarrollo:
+    ```shell
+    pipenv install
+    ```
 
-```bash
-pipenv install --dev
-```
+2.  Por otro lado, si se quieren instalar los módulos de Python en el sistema
+    sin utilizar un entorno virtual se podrá utilizar `pip`:
 
-Además se deben instalar los paquetes `pandoc`, `aspell` y `aspell-es` con el
-gestor de paquetes que se prefiera.
+    ```shell
+    python3.7 -m pip install --user <paquete> [<paquete> ...]
+    ```
+
+    Siendo los paquetes los contenidos en el fichero [`Pipfile`](./Pipfile):
+
+    -   Para instalar los paquetes mínimos para ejecutar el proyecto, tendrá
+        que escogerlos de la etiqueta `[packages]`.
+
+    -   Si también quiere instalar los paquetes para tests, deberá añadirles
+        los que se encuentran bajo la etiqueta `[dev-packages]`.
+
+    Además se deben instalar los programas [pandoc][pandoc], [aspell][aspell] y
+    el [diccionario de español][aspell-es] para aspell (aspell-es en Linux).
 
 ## Utilización
 
-Primero deberá introducirse en el entorno de desarrollo:
-
-```shell
-pipenv shell
-```
-
-Si no quiere, puede ejecutar cualquiera de los siguientes comandos precediendo
-siempre con `pipenv run`.
+> **Nota:** Si se ha optado por utilizar el gestor de entornos virtuales
+> `pipenv`, primero deberá cargar el entorno ejecutando lo siguiente:
+>
+> ```shell
+> pipenv shell
+> ```
+>
+> Si no quiere, puede ejecutar cualquiera de los siguientes comandos
+> precediendo siempre con:
+>
+> ```shell
+> pipenv run <comando>
+> ```
 
 Para poder construir la documentación se puede ejecutar lo siguiente:
 
-```python
+```shell
 inv docs.pdf
 ```
 
 Para ejecutar los tests:
 
-```python
+```shell
 inv tests.unittest
 ```
 
-Para obtener otras opciones posibles con invoke:
+Para obtener otras opciones posibles con `invoke`:
 
-```python
+```shell
 inv -l
 ```
 
@@ -77,17 +95,17 @@ inv -l
 En este proyecto se usa un metodología de desarrollo basada en tests.
 
 Se utilizará también un fichero de log para ir destacando el trabajo que se
-realiza en el proyecto y otro para guardar todas las pruebas que se realizen con
+realiza en el proyecto y otro para guardar todas las pruebas que se realicen con
 código. Éstos tendrán una estructura parecida al ["ChangeLog" de
-GNU](https://www.gnu.org/software/emacs/manual/html_node/emacs/Format-of-ChangeLog.html).
+GNU][changelog].
 
 ## Frameworks
 
--   [Keras](https://keras.io/) - librería para la creación y ejecución de redes
+-   [Keras][keras] - librería para la creación y ejecución de redes
     neuronales. Se ha elegido ésta frente a otras librerías por su sensillez de
     uso, buena documentación y soporte (dada la gran comunidad que la utiliza).
 
--   [DEAP](https://deap.readthedocs.io/en/master/) - librería de construcción
+-   [DEAP][deap] - librería de construcción
     de algoritmos evolutivos. Se utilizará ésta para optimizar los parámetros
     de las redes neuronales.
 
@@ -98,34 +116,48 @@ bibliotecas similares y el por qué de la elección de éstas.
 
 -   General:
 
-    -   [Sultan](https://sultan.readthedocs.io/en/latest/) - librería en python
-        para ejecutar processos de manera cómoda.
+    - [Sultan][sultan] - librería en python para ejecutar processos de manera
+      cómoda.
 
 -   Automatización:
 
-    -   [Invoke](http://docs.pyinvoke.org/en/1.2/) - utilidad para ejecutar
-        procesos como la construcción de la documentación.
+    - [Invoke][invoke] - utilidad para ejecutar procesos como la construcción de
+      la documentación.
 
 -   Tests:
 
-    -   [pytest](https://docs.pytest.org/en/latest/) - librería de python para
-        la ejecución de tests que se usarán en la integración continua.
+    - [pytest][pytest] - librería de python para la ejecución de tests que se
+      usarán en la integración continua.
 
-    -   [pandoc](https://pandoc.org/MANUAL.html) y
-        [aspell](http://aspell.net/man-html/Introduction.html#Introduction) -
-        utilidades para convertir la documentación del trabajo a texto plano y
-        comprobar si hay errores ortográficos.
+    - [pandoc][pandoc] y [aspell][aspell] - utilidades para convertir la
+      documentación del trabajo a texto plano y comprobar si hay errores
+      ortográficos.
 
-    -   [PyPDF](http://mstamy2.github.io/PyPDF2/) - otra utilidad para comprobar
-        distintas características del PDF resultante de documentación.
+    - [PyPDF][PyPDF] - otra utilidad para comprobar distintas características
+      del PDF resultante de documentación.
 
 -   Documentación:
 
-    -   [Pweave](http://mpastell.com/pweave/) - módulo de python que permite
-        mostrar salida de código directamente en LaTeX.
+    - [Pweave][pweave] - módulo de python que permite mostrar salida de código
+      directamente en LaTeX.
 
-    -   [TexLive](https://tug.org/texlive/) - generador de archivos PDFs.
+    - [TexLive][texlive] - generador de archivos PDFs a partir de Latex.
 
 ## Licencia
 
 El código de este repositorio está liberado bajo la licencia [GPL](./LICENSE).
+
+[pandoc]: https://pandoc.org/
+[aspell]: http://aspell.net/
+[aspell-es]: https://ftp.gnu.org/gnu/aspell/dict/es/
+[changelog]:
+https://www.gnu.org/software/emacs/manual/html_node/emacs/Format-of-ChangeLog.html
+[keras]: https://keras.io/
+[deap]: https://deap.readthedocs.io/en/master/
+[sultan]: https://sultan.readthedocs.io/en/latest/
+[invoke]: http://docs.pyinvoke.org/en/1.2/
+[pytest]: https://docs.pytest.org/en/latest/
+[aspell]: http://aspell.net/man-html/Introduction.html#Introduction
+[PyPDF]: http://mstamy2.github.io/PyPDF2/
+[pweave]: http://mpastell.com/pweave/
+[texlive]: https://tug.org/texlive/
