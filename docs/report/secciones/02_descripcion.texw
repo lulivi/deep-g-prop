@@ -1,2 +1,115 @@
 \chapter{Descripción del problema}
 
+Como se introdujo en el capítulo anterior, las \textit{redes neuronales
+artificiales} y en concreto los \textit{perceptrones multicapa} son un modelo
+computacional inspirado en las \textit{neuronas} biológicas. Este modelo es muy
+complejo dado que tiene una cantidad de parámetros configurables inmensa, como
+el número de capas de la red, el número de \textit{neuronas} de cada capa, la
+función de activación de cada \textit{neurona}... Lo cual conlleva a invertir
+una cantidad ingente de tiempo para poder configurar manualmente la red acorde
+al problema que se plantee.
+
+En las siguientes secciones, se explicará de forma más detallada los
+\textit{perceptrones multicapa} y los \textit{algoritmos genéticos}.
+
+\section{Perceptrón multicapa}
+
+Los \textit{perceptrones multicapa} son un tipo de \textit{redes neuronales}
+simples. Éstos están compuestos de distintas capas: una de entrada, una de
+salida y una o varias capas ocultas. Cada una a su vez está formada por un
+numero fijo de \textit{neuronas} (ver \autoref{tikz:mlp}).
+
+\begin{figure}[h!]
+    \centering
+
+    \caption{Diagrama de un perceptrón multicapa con cuatro \textit{neuronas}
+    de entrada, dos de salida y dos capas ocultas con cinco \textit{neuronas}
+    cada una.}\label{tikz:mlp}
+
+    \vspace*{0.5cm}
+
+    \begin{tikzpicture}[shorten >=1pt,->,draw=black!50, node distance=2.5cm]
+        \tikzstyle{every pin edge}=[<-,shorten <=1pt]
+        \tikzstyle{neuron}=[circle,fill=black!25,minimum size=17pt,
+        inner sep=0pt]
+        \tikzstyle{input neuron}=[neuron, fill=green!50];
+        \tikzstyle{output neuron}=[neuron, fill=red!50];
+        \tikzstyle{hidden neuron}=[neuron, fill=gray!50];
+        \tikzstyle{annot} = [text width=4em, text centered]
+
+        % Draw the input layer nodes
+        \foreach \id in {1,...,4}
+        % This is the same as writing \foreach \name / \id in {1/1,2/2,3/3,4/4}
+            \node[input neuron, label=left:{Input \#\id}] (I-\id) at (0,-\id) {};
+
+        % Draw the hidden layers nodes
+        \foreach \id in {1,...,5}
+            \path[yshift=0.5cm]
+                node[hidden neuron] (H1-\id) at (2.5cm,-\id cm) {};
+
+        \foreach \id in {1,...,5}
+            \path[yshift=0.5cm]
+                node[hidden neuron] (H2-\id) at (4.5cm,-\id cm) {};
+
+        % Draw the output layer nodes
+        \foreach \id / \z in {1/2, 2/3}
+            \node[output neuron,label={right:Output \#\id}]
+                (O\id) at (7cm, -\z cm) {};
+
+        % Connect every node in the input layer with every node in the first
+        % hidden layer.
+        \foreach \source in {1,...,4}
+            \foreach \dest in {1,...,5}
+                \path (I-\source) edge (H1-\dest);
+
+        % Connect every node in the first hidden layer with every node in the
+        % second hidden layer.
+        \foreach \source in {1,...,5}
+            \foreach \dest in {1,...,5}
+                \path (H1-\source) edge (H2-\dest);
+
+        % Connect every node in the hidden layer with the output layer
+        \foreach \source in {1,...,5}
+            \foreach \dest in {1,...,2}
+                \path (H2-\source) edge (O\dest);
+
+        % Annotate the layers
+        \node[annot,above of=H1-1, node distance=1cm] (hl) {Hidden layer 1};
+        \node[annot,above of=H2-1, node distance=1cm] (h2) {Hidden layer 2};
+        \node[annot,left of=hl] {Input layer};
+        \node[annot,right of=h2] {Output layer};
+    \end{tikzpicture}% End of code
+\end{figure}
+
+Cada \textit{perceptrón} o \textit{neurona} tiene un valor de activación
+(normalmente incluido en el rango $[0, 1]$). En la primera capa, éste viene
+dado por los datos de entrada, como por ejemplo los píxeles de una imagen o las
+características de un ejemplo. Los valores de activación de las
+\textit{neuronas} de las capas siguientes vienen dados por la siguiente
+función:
+
+\[
+a^{(L+1)}_{i} = f(w_{L,0} a^{(L)}_{0} + w_{L,1} a^{(L)}_{1} + ... + w_{L,n} a^{(L)}_{n} + b)
+\]
+
+\noindent
+o, en resumen:
+
+\[
+a^{(L+1)} = f(W a^{L} + b)
+\]
+
+\noindent donde $a^{(L)}$ es el vector de valores de activación de cada
+\textit{neurona} en la capa $L$, $W$ es el vector de pesos de las uniones entre
+la capa $L$ y $L+1$, $b$ es el valor de sesgo que se le aplica al resultado y
+$f(x)$ es la función no lineal que define la activación de la \textit{neurona}.
+
+Una vez evaluadas todas las capas, las \textit{neuronas} de la capa de salida
+indican la certeza con la que la \textit{red} ha predicho cada una de las
+clases del problema.
+
+\section{Algoritmo genético}
+
+
+Por lo tanto, es necesario automatizar de manera eficiente la búsqueda de
+parámetros óptimos de entrada para los \textit{perceptrones multicapa}.
