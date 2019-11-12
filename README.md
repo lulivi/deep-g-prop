@@ -2,6 +2,8 @@
 
 > Optimización de Redes Neuronales con Algoritmos Genéticos
 
+[![Build Status](https://travis-ci.org/lulivi/deep-g-prop.svg?branch=master)](https://travis-ci.org/lulivi/deep-g-prop)
+
 **Autor(a): Luis Liñán Villafranca**
 
 **Tutor(a)(es): Juan Julián Merelo Guervós**
