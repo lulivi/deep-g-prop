@@ -52,9 +52,9 @@ numero fijo de \textit{neuronas} (ver \autoref{tikz:mlp}).
                 node[hidden neuron] (H2-\id) at (4.5cm,-\id cm) {};
 
         % Draw the output layer nodes
-        \foreach \id / \z in {1/2, 2/3}
-            \node[output neuron,label={right:Output \#\id}]
-                (O\id) at (7cm, -\z cm) {};
+        \foreach \id / \z in {1/2, 2/3, 3/4}
+            \node[output neuron,label={right:Output \#\id}, right of=H2-\z]
+                (O\id) {};
 
         % Connect every node in the input layer with every node in the first
         % hidden layer.
@@ -70,7 +70,7 @@ numero fijo de \textit{neuronas} (ver \autoref{tikz:mlp}).
 
         % Connect every node in the hidden layer with the output layer
         \foreach \source in {1,...,5}
-            \foreach \dest in {1,...,2}
+            \foreach \dest in {1,...,3}
                 \path (H2-\source) edge (O\dest);
 
         % Annotate the layers
@@ -79,6 +79,10 @@ numero fijo de \textit{neuronas} (ver \autoref{tikz:mlp}).
         \node[annot,left of=hl] {Input layer};
         \node[annot,right of=h2] {Output layer};
     \end{tikzpicture}% End of code
+
+    \vspace*{0.5cm}
+
+    \caption*{Versión modificada de un ejemplo de TEXample \cite{nn-diagram}.}
 \end{figure}
 
 Cada \textit{perceptrón} o \textit{neurona} tiene un valor de activación
@@ -92,8 +96,7 @@ función:
 a^{(L+1)}_{i} = f(w_{L,0} a^{(L)}_{0} + w_{L,1} a^{(L)}_{1} + ... + w_{L,n} a^{(L)}_{n} + b)
 \]
 
-\noindent
-o, en resumen:
+\noindent o, en resumen:
 
 \[
 a^{(L+1)} = f(W a^{L} + b)
@@ -106,10 +109,32 @@ $f(x)$ es la función no lineal que define la activación de la \textit{neurona}
 
 Una vez evaluadas todas las capas, las \textit{neuronas} de la capa de salida
 indican la certeza con la que la \textit{red} ha predicho cada una de las
-clases del problema.
+clases del problema. En la \textit{clasificación supervisada} obteniendo el
+cuadrado de la diferencia del vector de salidas (los valores de activación de
+las neuronas de la capa de salida) con lo etiquetado (valores que deberían de
+haberse obtenido) se obtiene el coste de cada ejemplo (véase
+\autoref{fig:mlp-cost}). Haciendo el promedio de todos estos valores de costo
+se obtiene el costo global del modelo.
+
+\begin{figure}[h!]
+    \centering
+    \caption{Obtención del coste de un ejemplo.}
+    \label{fig:mlp-cost}
+    \vspace*{0.5cm}
+    \includegraphics{figures/MLP-cost.pdf}
+\end{figure}
+
+
 
 \section{Algoritmo genético}
 
+\begin{figure}[!h]
+    \centering
+    \caption{Diagrama del proceso de evolución de los algoritmos genéticos.}
+    \label{fig:ga-steps}
+    \vspace*{0.5cm}
+    \includegraphics{figures/GA.pdf}
+\end{figure}[h!]
 
 Por lo tanto, es necesario automatizar de manera eficiente la búsqueda de
 parámetros óptimos de entrada para los \textit{perceptrones multicapa}.
