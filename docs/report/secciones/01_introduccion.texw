@@ -10,7 +10,7 @@ le corresponde. Una clase de modelo computacional que se utiliza para el
 artificiales}. Este modelo permite estudiar problemas en el que algoritmos
 simples de \textit{machine learning} no tienen éxito, como el reconocimiento de
 voz o de imágenes \cite[p.~15]{goodfellow}. El problema de estos modelos es su
-configurabilidad: es tan compleja que supone una inversión de tiempo y recursos
+configuración: es tan compleja que supone una inversión de tiempo y recursos
 inmensa.
 
 Dentro de las \textit{redes neuronales} existe un grupo denominado
