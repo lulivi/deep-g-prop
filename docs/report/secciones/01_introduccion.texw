@@ -1,39 +1,30 @@
 \chapter{Introducción}
 
 La \textit{clasificación supervisada} es una parte de la \textit{IA}
-(\textit{inteligencia artificial}) que busca clasificar ejemplos en diferentes
+(\textit{inteligencia artificial}) que busca clasificar datos en diferentes
 grupos a partir de sus características. Los \textit{clasificadores automáticos}
 son \textit{metaheurísticas} que mediante \textit{aprendizaje automático} y, a
 partir de las características de un ejemplo, lo etiquetan con el subgrupo que
-le corresponde. La configuración de los \textit{clasificadores automáticos}
-(como las \textit{redes neuronales}) es una tarea complicada y manual, lo cual
-hace que se tenga que dedicar demasiado tiempo a la optimización de estos
-parámetros.
+le corresponde. Una clase de modelo computacional que se utiliza para el
+\textit{aprendizaje supervisado} el el de las \textit{redes neuronales
+artificiales}. Este modelo permite estudiar problemas en el que algoritmos
+simples de \textit{machine learning} no tienen éxito, como el reconocimiento de
+voz o de imágenes \cite[p.~15]{goodfellow}. El problema de estos modelos es su
+configurabilidad: es tan compleja que supone una inversión de tiempo y recursos
+inmensa.
 
-El \textit{aprendizaje automático} (\textit{ML} por sus siglas en inglés:
-\textit{machine learning}) es la capacidad que tiene un sistema de
-\textit{inteligencia artificial} para crear un conocimiento propio a partir de
-datos en bruto\cite[p.~2]{goodfellow_bengio_courville_2016}. Un subgrupo del
-\textit{aprendizaje automático}, el \textit{aprendizaje profundo} (\textit{deep
-learning}), estudia problemas en los que algoritmos simples de \textit{ML} no
-tienen éxito, como reconocimiento de voz o reconocimiento de
-imágenes\cite[p.~15]{goodfellow_bengio_courville_2016}. En este subgrupo se
-encuentran las \textit{redes neuronales artificiales} (\textit{ANN} en inglés,
-\textit{artificial neural network}) y más en concreto el llamado
-\textit{perceptrón multicapa} (\textit{MLP} en inglés, \textit{multilayer
-perceptron}).
-
-Un \textit{perceptrón multicapa} está compuesto por neuronas agrupadas en capas
-y completamente conectadas entre dichas capas. Una \textit{neurona artificial}
-o \textit{perceptrón} se puede definir como una función que recibe valores de
-entrada y devuelve un número, que indica el nivel de activación
-\cite[Chapter~1]{nielsen}. Cada uno de estos valores viene dado por una
-\textit{neurona} de la capa anterior (menos si se trata de la capa de entrada),
-un peso correspondiente a cada conexión entre \textit{neuronas}, y un sesgo (a
-partir del cual se activarán éstas). En global el \textit{perceptrón multicapa}
-se compone de tres partes: capa de entrada, capas ocultas (puede haber una
-sola) y capa de salida. Más adelante se explicará con detalle cada una de estas
-capas y sus conexiones.
+Dentro de las \textit{redes neuronales} existe un grupo denominado
+\textit{perceptrón multicapa}. Un \textit{perceptrón multicapa} está compuesto
+por \textit{neuronas} agrupadas en capas y completamente conectadas entre
+dichas capas. Una \textit{neurona artificial} o \textit{perceptrón} se puede
+definir como una función que recibe valores de entrada y devuelve un número,
+que indica el nivel de activación \cite[Chapter~1]{nielsen}. Cada uno de estos
+valores viene dado por una \textit{neurona} de la capa anterior (menos si se
+trata de la capa de entrada), un peso correspondiente a cada conexión entre
+\textit{neuronas}, y un sesgo (a partir del cual se activarán éstas). En global
+el \textit{perceptrón multicapa} se compone de tres partes: capa de entrada,
+capas ocultas (puede haber una sola) y capa de salida. Más adelante se
+explicará con detalle cada una de estas capas y sus conexiones.
 
 Otro de los subgrupos del \textit{aprendizaje automático} es el de los
 \textit{algoritmos evolutivos} (\textit{evolutionary algorithms} en inglés),
@@ -44,19 +35,17 @@ y variación \cite{evolutionary_computation}.
 
 \section{Objetivos}
 
-A parte de los objetivos básicos del proyecto como elegir frameworks para
-programar tanto \textit{perceptrones multicapa} como de \textit{algoritmos
-genéticos}, se pretende conocer si es posible encontrar configuraciones óptimas
-de parámetros para los \textit{perceptrones multicapa}, como en el artículo en
-el que se basa el trabajo (G-Prop\cite{g-prop}) pero con varias capas ocultas.
+En este proyecto se pretende estudiar las distintas formas conseguidas de
+optimizar los parámetros de los \textit{perceptrones multicapa}, partiendo de
+la base del artículo G-Prop \cite{g-prop}.
 
 \begin{itemize}
 
-\item Comprobar si se pueden conseguir configuraciones óptimas de \textit{MLP}.
+\item Estudiar la materia relacionada con optimización de parámetros de
+\textit{perceptrones multicapa} con \textit{algoritmos genéticos}.
 
-\item Evitar sobreajuste\footnote{Se refiere al entrenamiento excesivo con un
-conjunto de datos, dando lugar a muy buenos resultados para éste conjunto pero
-erróneos para distintos} en este tipo de configuraciones.
+\item Encontrar la forma de obtener una mejora considerable de rendimiento
+partiendo de los \textit{perceptrones multicapa}.
 
 \end{itemize}
 
