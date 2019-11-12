@@ -3,7 +3,7 @@ from . import docs
 
 
 @task(pre=[docs.plain, docs.pdf])
-def unittest(c):
+def go(c):
     """Run tests."""
     print("Running unittests...")
     run("pytest tests/ -v", pty=True)

@@ -22,7 +22,7 @@ def clean(c):
     patterns = (
         "*.pyc",
         "docs/report/_*",
-        "docs/report/figures",
+        "docs/report/figures_pweave",
         "docs/report/*.pyc",
         "docs/report/*.bbl",
         "docs/report/*.blg",
@@ -48,7 +48,7 @@ def clean(c):
 def latex(c):
     """Create tex file."""
     print("Building latex files and figures through pweave ...")
-    fig_dir = str(REPORT_DIR_PATH.joinpath("figures"))
+    fig_dir = str(REPORT_DIR_PATH.joinpath("figures_pweave"))
     with Sultan.load(cwd=ROOT) as s:
         for pweave_file in REPORT_DIR_PATH.glob("**/*.texw"):
             tex_file = str(pweave_file.with_suffix(".tex"))
