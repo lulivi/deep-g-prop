@@ -116,6 +116,7 @@ _minted-*
 docs/report/secciones/*.tex
 *.blg
 *.bbl
+!docs/report/figures/*.pdf
 
 # VS code
 *.vscode/
