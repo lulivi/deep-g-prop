@@ -92,20 +92,26 @@ características de un ejemplo. Los valores de activación de las
 \textit{neuronas} de cada capa vienen dados por la siguiente función:
 
 \[
-a^{(L)}_{i} = f(w^{(L)}_{0} a^{(L-1)}_{0} + w^{(L)}_{1} a^{(L-1)}_{1} + \cdots + w^{(L)}_{i} a^{(L-1)}_{i} + \cdots + w^{(L)}_{n} a^{(L-1)}_{n} + b^{(L)})
+a^{(L)}_{i} \equiv f(w^{(L)}_{0} a^{(L-1)}_{0} + w^{(L)}_{1} a^{(L-1)}_{1} + \cdots + w^{(L)}_{i} a^{(L-1)}_{i} + \cdots + w^{(L)}_{n} a^{(L-1)}_{n} + b^{(L)}_{i})
+\]
+
+ó
+
+\[
+a^{(L)}_{i} \equiv f(\sum_{j=0}^{n-1}(w^{(L)}_{j} a^{(L-1)}_{j}) + b^{(L)}_{i})
 \]
 
 \noindent donde $L$ es el índice de la capa, $i$ es el índice de la neurona
 dentro de dicha capa, $w^{(L)}_{n}$ es el peso que hay en la conexión entre la
-neurona $(L-1,i)$ y $(L,j)$, $b^{(L)}$ es el valor de sesgo que se le aplica al
-resultado de la suma de la multiplicación de pesos por las activaciones
-correspondientes y $f()$ es la función que define la activación de cada
-neurona. Existen distintos tipos de funciones utilizadas en este punto, como la
-lineal, sigmoide, rectificadora (ReLU), etc. La expresión anterior se puede
-resumir así:
+neurona $(L-1,j)$ y $(L,i)$, $b^{(L)}_{i}$ es el valor de sesgo que se le
+aplica al resultado de la suma de la multiplicación de pesos por las
+activaciones correspondientes y $f()$ es la función que define la activación de
+cada neurona. Existen distintos tipos de funciones utilizadas en este punto,
+como la lineal, sigmoide, rectificadora (ReLU), etc. La expresión anterior se
+puede resumir así:
 
 \[
-a^{(L)} = f(W a^{(L-1)} + b)
+a^{(L)} \equiv f(W a^{(L-1)} + b)
 \]
 
 \noindent donde $a^{(L)}$ es el vector de valores de activación de cada
@@ -113,12 +119,13 @@ a^{(L)} = f(W a^{(L-1)} + b)
 la capa $L-1$ y $L$, $b$ es el vector de sesgos que se le aplica al resultado y
 $f(x)$ es la función antes descrita.
 
-Una vez evaluadas todas las capas, las \textit{neuronas} de la capa de salida
-indican la certeza con la que la \textit{red} ha predicho cada una de las
-clases del problema. En la \textit{clasificación supervisada} obteniendo el
-cuadrado de la diferencia del vector de salidas (los valores de activación de
-las neuronas de la capa de salida) con lo etiquetado (valores que deberían de
-haberse obtenido) se obtiene el coste de cada ejemplo (véase
+Una vez evaluadas todas las capas, las \textit{neuronas} de la capa de salida,
+éstas indican la certeza con la que el \textit{perceptrón multicapa} ha
+predicho cada una de las clases del problema (generalmente en el rango
+$[0.0, 1.0]$). En la \textit{clasificación supervisada} obteniendo el cuadrado
+de la diferencia entre del vector de salidas (los valores de activación de las
+\textit{neuronas} de la capa de salida) y lo etiquetado (valores que deberían
+de haberse obtenido) se obtiene el costo de cada ejemplo (véase
 \autoref{fig:mlp-cost}). Haciendo el promedio de todos estos valores de costo
 se obtiene el costo global del modelo.
 
@@ -130,17 +137,39 @@ se obtiene el costo global del modelo.
     \includegraphics{figures/MLP-cost.pdf}
 \end{figure}
 
+La forma óptima de mejorar el modelo es disminuyendo el costo ($C$), buscando
+obtener valores mínimos ($C \approx 0$). El costo variará dependiendo de los
+valores de los pesos correspondientes a cada union de \textit{neuronas} y los
+sesgos correspondientes a cada función de activación. Una aproximación estándar
+para llevar a cabo esta minimización se conoce como \textit{propagación hacia
+atrás} (\textit{backpropagation}) y suele utilizar el algoritmo de gradiente
+descendiente (o su variación estocástica), \textit{adam} (una variante del
+gradiente descendiente estocástico) o \textit{lbfgs} (BFGS de memoria limitada)
+entre otros. La fórmula con la que podemos describir el costo de todos los pesos
+y sesgos sería la siguiente:
 
+\[
+C(w,b) \equiv \frac{1}{2n} \sum_{x} \parallel y(x) - a \parallel^{2}
+\]
+
+$w$ denota el conjunto de pesos de la \textit{red}, $b$ el de sesgos, $n$ es el
+número total de ejemplos, $y(x)$ es el valor etiquetado del ejemplo y $a$ el
+obtenido. La sumatoria es sobre todos los ejemplos de entrenamiento. Esta
+función es conocida como \textit{error cuadrático medio} o \textit{MSE} (del
+inglés) y como se comentó en el párrafo anterior se busca minimizarla y hacer
+que $y(x)$ se aproxima a $a$ para todos los ejemplos de entrenamiento, ya que
+significaría que todos los ejemplos (o casi todos) se clasifican bien dando
+lugar a un modelo bien entrenado.
 
 \section{Algoritmo genético}
 
-\begin{figure}[!h]
+\begin{figure}[h!]
     \centering
     \caption{Diagrama del proceso de evolución de los algoritmos genéticos.}
     \label{fig:ga-steps}
     \vspace*{0.5cm}
     \includegraphics{figures/GA.pdf}
-\end{figure}[h!]
+\end{figure}
 
 Por lo tanto, es necesario automatizar de manera eficiente la búsqueda de
 parámetros óptimos de entrada para los \textit{perceptrones multicapa}.

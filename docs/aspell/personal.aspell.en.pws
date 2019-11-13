@@ -1,9 +1,13 @@
 personal_ws-1.1 en 12 utf-8
+adam
 backpropagation
+BFGS
 GAs
+lbfgs
 metaheurísticas
 MLP
 MLPs
+MSE
 multicapa
 multilayer
 perceptron
@@ -13,3 +17,4 @@ perceptrons
 ReLU
 sigmoide
 sobreajuste
+sumatoria
