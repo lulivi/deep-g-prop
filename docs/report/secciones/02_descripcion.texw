@@ -163,6 +163,33 @@ lugar a un modelo bien entrenado.
 
 \section{Algoritmo genético}
 
+Los \textit{algoritmos genéticos}\cite{ga-intro} son un unas metaheurísticas
+que se inspiran en la selección natural, y que forman parte del grupo de los
+\textit{algoritmos evolutivos}. Suelen utilizarse en problemas de optimización,
+como el que se trata aquí. Las características más destacables de estas
+metaheurísticas son sus funciones principales:
+
+\begin{itemize}
+
+\item Iniciación de la población. La población está compuesta por cromosomas, y
+estos a su vez por genes. En el caso de la optimización de parámetros para
+\textit{perceptrones multicapa} podríamos considerar como genes: número de
+capas ocultas, número de neuronas en cada capa, vectores de inicialización de
+los pesos y los sesgos, función de activación...
+
+\item Evaluación de la población.
+
+\item Selección.
+
+\item Cruce.
+
+\item Mutación.
+
+\end{itemize}
+
+También tienen otras características como la condición de parada, que decide
+cuando debe terminar la ejecución de la metaheurística.
+
 \begin{figure}[h!]
     \centering
     \caption{Diagrama del proceso de evolución de los algoritmos genéticos.}
