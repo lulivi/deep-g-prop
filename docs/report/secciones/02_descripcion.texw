@@ -167,7 +167,7 @@ Los \textit{algoritmos genéticos}\cite{ga-intro} son un unas metaheurísticas
 que se inspiran en la selección natural, y que forman parte del grupo de los
 \textit{algoritmos evolutivos}. Suelen utilizarse en problemas de optimización,
 como el que se trata aquí. Las características más destacables de estas
-metaheurísticas son sus funciones principales:
+metaheurísticas son sus funciones principales (ver \autoref{fig:ga-steps}):
 
 \begin{itemize}
 
@@ -187,14 +187,19 @@ siguiente población de individuos.
 varios métodos de selección, como la selección por torneo, por rango,
 aleatorio, etc.
 
-\item Cruce.
+\item Cruce. Se obtienen nuevos individuos de la población (descendencia)
+mezclando atributos de supervivientes tras la selección. Se puede mantener una
+población estable teniendo descendencia hasta llegar al mismo número de
+cromosomas del principio.
 
-\item Mutación.
+\item Mutación. En este último paso previo a la nueva evaluación se eligen
+aleatoriamente cromosomas dentro de la población y se realizan ciertas
+mutaciones en sus genes.
 
 \end{itemize}
 
-También tienen otras características como la condición de parada, que decide
-cuando debe terminar la ejecución de la metaheurística.
+Hay que definir también un punto de parada, como un número fijo de iteraciones
+o que se la mejora entre una población y otra sea menor de un umbral.
 
 \begin{figure}[h!]
     \centering
@@ -204,5 +209,7 @@ cuando debe terminar la ejecución de la metaheurística.
     \includegraphics{figures/GA.pdf}
 \end{figure}
 
-Por lo tanto, es necesario automatizar de manera eficiente la búsqueda de
-parámetros óptimos de entrada para los \textit{perceptrones multicapa}.
+Esta metaheurística se puede utilizar para solucionar nuestro problema
+principal: optimización de hiperparámetros para los \textit{perceptrones
+multicapa}. También existen otros métodos como \textit{grid search} o
+\textit{random search}.
