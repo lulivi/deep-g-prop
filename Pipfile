@@ -6,11 +6,18 @@ verify_ssl = true
 [dev-packages]
 pytest = "*"
 PyPDF2 = "*"
+panflute = "*"
+black = "*"
+mypy = "*"
 
 [packages]
 invoke = "*"
 sultan = "*"
 pweave = "*"
+pandas = "*"
+sklearn = "*"
+keras = "*"
+sklearn-deap = "*"
 
 [requires]
 python_version = "3.7"
