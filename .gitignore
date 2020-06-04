@@ -114,9 +114,12 @@ cache/
 *.pdf
 _minted-*
 docs/report/secciones/*.tex
+docs/report/figures
 *.blg
 *.bbl
-!docs/report/figures/*.pdf
 
 # VS code
 *.vscode/
+
+# Virtualenvs
+.venv*/

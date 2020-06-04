@@ -14,8 +14,6 @@ addons:
     - texlive-lang-spanish
     - texlive-formats-extra
 before_install:
-  - pip install pipenv
-install:
-  - pipenv install --dev
+  - pip install -U nox
 script:
-  - inv tests.go
+  - nox -s tests

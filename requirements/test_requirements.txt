@@ -1,0 +1,7 @@
+pytest==5.4.1
+pytest-cov==2.8.1
+PyPDF2==1.26.0
+panflute==1.12.5
+black==19.10b0
+mypy==0.770
+sultan==0.9.1
