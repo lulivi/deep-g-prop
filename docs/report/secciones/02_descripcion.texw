@@ -1,4 +1,4 @@
-\chapter{Descripción del problema}
+\chapter{Descripción del problema} \label{chap:problem-description}
 
 Como se introdujo en el capítulo anterior, las \textit{redes neuronales
 artificiales} y en concreto los \textit{perceptrones multicapa} son un modelo

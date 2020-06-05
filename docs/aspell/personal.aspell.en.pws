@@ -1,9 +1,12 @@
-personal_ws-1.1 en 12 utf-8
+personal_ws-1.1 en 28 utf-8
 adam
 backpropagation
+Bayesiana
 BFGS
 GAs
 hiperparámetros
+Keras
+Lasagne
 lbfgs
 metaheurística
 metaheurísticas
@@ -12,11 +15,20 @@ MLPs
 MSE
 multicapa
 multilayer
+mxnet
+nolearn
+Optimizator
 perceptron
 perceptrón
 perceptrones
 perceptrons
 ReLU
+Scikit
 sigmoide
+sklearn
+Skorch
 sobreajuste
+src
 sumatoria
+tensorflow
+theano

@@ -1,4 +1,4 @@
-\chapter{Introducción}
+\chapter{Introducción} \label{chap:introduction}
 
 La \textit{clasificación supervisada} es una parte de la \textit{IA}
 (\textit{inteligencia artificial}) que busca clasificar datos en diferentes

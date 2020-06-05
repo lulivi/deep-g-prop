@@ -1,2 +1,67 @@
-\chapter{Estado del arte}
+\chapter{Estado del arte} \label{chap:state-of-art}
+
+En esta sección explicaré la elección de los \textit{frameworks} con los que
+voy a trabajar, además de la comparativa con otros que no se adaptan las
+necesidades del proyecto.
+
+\section{Búsqueda de mejores parámetros} \label{chap:state-of-art}
+
+La búsqueda de valores óptimos para los parámetros de entrada de las
+\textit{redes neuronales artificiales} en cada problema puede llegar a requerir
+demasiado tiempo y convertirse en una tarea tediosa y complicada. Por ello,
+existen diferentes herramientas que facilitan esta búsqueda como son
+\textit{Grid Search}\cite{sklearn-grid} y \textit{Random
+Search}\cite{sklearn-random}.
+
+A parte de estas herramientas bien conocidas, también se pueden usar otros
+clasificadores ó algoritmos genéticos\cite{sklearn-deap} para la búsqueda de parámetros. En esta
+sección se compararán los métodos anteriores con la búsqueda utilizando
+algoritmos genéticos.
+
+Las tres utilidades explicadas a continuación utilizan como entrada, entre
+otros elementos, un conjunto de parámetros junto con los valores seleccionados
+de éstos. Así, para cada parámetro le damos varias posibilidades que serán
+utilizadas para entrenar la red neuronal y buscar la mejor puntuación.
+
+\begin{table}[h!]
+    \centering
+    \caption{Comparativa entre tres métodos de búsqueda de parámetros.}
+    \label{tab:hp-optimization}
+    \begin{tabular}{l|c|r}
+        \textbf{Optimizator}    & \textbf{Best Accuracy \%} & \textbf{Elapsed time (sec)} \\
+        \hline
+        Random Search  & 0.95103    &  119.76826    \\
+        Grid Search    & 0.96271    & 6746.02930   \\
+        Genetic Search & 0.93712    &  945.41645    \\
+    \end{tabular}
+\end{table}
+
+Las pruebas realizadas que respaldan los datos de la
+\autoref{tab:hp-optimization} se pueden encontrar en el directorio
+\texttt{src/hp\_optimization/}.
+
+\subsection{Grid Search}
+
+\textit{Grid search} es un método de búsqueda exhaustivo que, dada una función
+de la que maximizar el resultado, compara todas las posibles combinaciones de
+parámetros seleccionadas al inicio. Utilizando este método de búsqueda, tiene
+asegurada la mejor combinación de parámetros posible, por contra, va a
+necesitar demasiado tiempo (comparado con otras soluciones) para encontrarla.
+
+\subsection{Random Search}
+
+Similar a \textit{grid search}, éste algoritmo hace una búsqueda no tan
+exhaustiva en la cual se eligen distintos valores para cada parámetro
+utilizando un muestreo sobre éstos. En contraposición del método anterior, es
+posible que no llegue a obtener los mejores parámetros pero mejora el tiempo
+utilizado para la búsqueda.
+
+\subsection{Evolutionary Search}
+
+Ya se comentó sobre los algoritmos genéticos en el
+\autoref{chap:problem-description}. Éstos pueden ser utilizados de manera
+similar a las herramientas anteriores nombradas, acotando los cruces y
+mutaciones a la tabla de parámetros definida.
+
+\section{\textit{Frameworks} para redes neuronales}
 

@@ -1,12 +1,15 @@
 import sys
-import unittest
 import tempfile
+import unittest
 
-from PyPDF2 import PdfFileReader
 from pathlib import Path
+
 from sultan.api import Sultan
 
-ROOT = Path(__file__).parents[1].resolve()
+from PyPDF2 import PdfFileReader
+from settings import REPORT_NAME
+
+ROOT = Path(__file__).parents[2].resolve()
 try:
     ASPELL_DIR_PATH = ROOT.joinpath("docs", "aspell").resolve(strict=True)
     REPORT_DIR_PATH = ROOT.joinpath("docs", "report").resolve(strict=True)
@@ -29,9 +32,7 @@ class ReportTests(unittest.TestCase):
                 .run(quiet=True, halt_on_nonzero=False)
             )
 
-        self.assertEqual(
-            result.stdout, [], "List of wrong words is not empty."
-        )
+        self.assertFalse(result.stdout, "List of wrong words is not empty.")
 
     @unittest.skip("Not finished documentation")
     def test_pdf_pages_number(self):
@@ -46,17 +47,21 @@ class ReportTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """Create proper environment to check report spelling."""
-        cls.plain_report_path = Path(tempfile.gettempdir()).joinpath(
-            "plain_report.txt"
-        )
+        cls.plain_report_path = REPORT_DIR_PATH.joinpath(f"{REPORT_NAME}.txt")
 
         if not cls.plain_report_path.exists():
-            sys.exit("Latex report not found. Can not continue.")
+            sys.exit(
+                "Latex plain report not found. Ensure to run 'nox -e "
+                "build-plain' before running the tests."
+            )
 
         cls.pdf_report_path = REPORT_DIR_PATH.joinpath("proyecto.pdf")
 
         if not cls.pdf_report_path.exists():
-            sys.exit("PDF report not found. Can not continue.")
+            sys.exit(
+                "Latex PDF report not found. Ensure to run 'nox -e "
+                "build-docs' before running the tests."
+            )
 
         aspell_extra_dict = ASPELL_DIR_PATH.joinpath("personal.aspell.en.pws")
         cls.aspell_extra_args = []
