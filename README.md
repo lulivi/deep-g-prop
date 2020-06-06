@@ -142,8 +142,8 @@ bibliotecas similares y el por qué de la elección de éstas.
 
 - Automatización:
 
-  - [Invoke] - utilidad para ejecutar procesos como la construcción de la
-    documentación.
+  - [Nox] - herramienta de automatización para ejecutar procesos como la
+    construcción de la documentación o el lanzamiento de tests.
 
 - Tests:
 
@@ -189,7 +189,7 @@ El código de este repositorio está liberado bajo la licencia
 [Keras]: https://keras.io/
 [DEAP]: https://deap.readthedocs.io/en/master/
 [Sultan]: https://sultan.readthedocs.io/en/latest/
-[Invoke]: http://docs.pyinvoke.org/en/1.2/
+[Nox]: https://nox.thea.codes/en/stable/
 [pytest]: https://docs.pytest.org/en/latest/
 [aspell]: http://aspell.net/man-html/Introduction.html#Introduction
 [PyPDF]: http://mstamy2.github.io/PyPDF2/
