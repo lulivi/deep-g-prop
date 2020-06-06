@@ -64,8 +64,13 @@ vayan a utilizar. Para más información sobre [pip] y [venv] consultar el
     opcionales para el desarrollo pero necesarios para ejecutar los test.
 
     Además se deben instalar los programas [pandoc], [aspell] y el
-    [diccionario de español para `aspell`][aspell-es]. Para esto puede usar el
+    [diccionario de español para aspell][aspell-es]. Para esto puede usar el
     gestor de paquetes que desee.
+
+  - Si se desea hacer pruebas con los test de frameworks y de optimización de
+    parámetros usados para la sección de "Estado del arte" de la memoria,
+    deberá instalar los `requirements.txt` contenidos en cada uno de los
+    directorios.
 
   Para instalar cualquiera de los dos grupos de paquetes hay que ejecutar:
 
@@ -91,22 +96,23 @@ vayan a utilizar. Para más información sobre [pip] y [venv] consultar el
 > instalación](#table1.1) antes de ejecutar cualquiera de los
 > siguientes comandos.
 
-Usando [Invoke] podemos usar lo siguiente para construir la documentación:
+Usando [Nox] podemos ejecutar los siguientes comandos para construir la
+documentación:
 
 ```shell
-inv docs.pdf
+nox -e build-pdf
 ```
 
 Para ejecutar los test:
 
 ```shell
-inv tests.go
+nox -e tests-3.7
 ```
 
-Para obtener otras opciones posibles con `invoke`:
+Para obtener otras opciones posibles con Nox:
 
 ```shell
-inv -l
+nox -l
 ```
 
 ## Desarrollo

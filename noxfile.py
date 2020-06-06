@@ -258,7 +258,7 @@ def tests(session: Session) -> None:
 # -----------------------------------------------------------------------------
 @nox.session(name="format")
 def apply_format(session: Session) -> None:
-    """Some formatting."""
+    """Apply formating rules to the selected files."""
     session.install("black==19.10b0")
     session.install("isort==4.3.21")
     formating_files = ["noxfile.py", "src", "tests", "docs/filters/"]
@@ -271,7 +271,7 @@ def apply_format(session: Session) -> None:
 # -----------------------------------------------------------------------------
 @nox.session()
 def lint(session: Session) -> None:
-    """Some formatting."""
+    """Lint the selected files."""
     session.install(*lint_requirements)
     session.run("pylint", *style_target_files)
     session.run("mypy", *style_target_files)
