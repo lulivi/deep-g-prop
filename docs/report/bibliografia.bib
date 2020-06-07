@@ -1,10 +1,4 @@
-@misc{gplv3,
-    author       = {Free Software Foundation},
-    title        = {{GNU} {G}eneral {P}ublic {L}icense},
-    version      = {3},
-    howpublished = {\url{http://www.gnu.org/licenses/gpl.html}},
-    shorthand    = {GPL},
-}
+% 01_introduccion
 
 @book{goodfellow,
     place={Cambridge,MA},
@@ -13,6 +7,15 @@
     author={Goodfellow,Ian and Bengio,Yoshua and Courville,Aaron},
     year={2016}
 }
+
+@misc{nielsen,
+    author={Nielsen, Michael A.},
+    title={Neural Networks and Deep Learning},
+    howpublished={\url{http://neuralnetworksanddeeplearning.com/}},
+    publisher={Determination Press},
+    year={2015},
+}
+
 
 @ARTICLE{evolutionary_computation,
     author={J. {Zhang} and Z. {Zhan} and Y. {Lin} and N. {Chen} and Y. {Gong} and
@@ -40,12 +43,12 @@
     keywords = {Genetic algorithms, Neural networks, Optimization, Learning, Generalization},
 }
 
-@misc{nielsen,
-    author={Nielsen, Michael A.},
-    title={Neural Networks and Deep Learning},
-    howpublished={\url{http://neuralnetworksanddeeplearning.com/}},
-    publisher={Determination Press},
-    year={2015},
+% 02_descripcion
+
+@misc{ga-intro,
+    author = {Vijini Mallawaarachchi},
+    title = {Introduction to Genetic Algorithms},
+    howpublished = {\url{https://towardsdatascience.com/introduction-to-genetic-algorithms-including-example-code-e396e98d8bf3}}
 }
 
 @misc{nn-diagram,
@@ -54,55 +57,61 @@
     howpublished = {\url{http://www.texample.net/tikz/examples/neural-network/}}
 }
 
-@misc{3blue1brown-mlp-1,
-    author = {Grant Sanderson},
-    title = {Neural networks},
-    howpublished = {\url{https://www.youtube.com/watch?v=aircAruvnKk}},
+% 03_estado_del_arte
+
+@misk{sklearn-mlpclassifier,
+    author       = {scikit-learn developers},
+    title        = {Scikit-learn: MLPClassifier},
+    howpublished = {\url{https://scikit-learn.org/stable/modules/generated/sklearn.neural_network.MLPClassifier.html}},
+    year         = {2007-2019}
+}
+
+@article{sklearn,
+    title={Scikit-learn: Machine Learning in {P}ython},
+    author={Pedregosa, F. and Varoquaux, G. and Gramfort, A. and Michel, V.
+            and Thirion, B. and Grisel, O. and Blondel, M. and Prettenhofer, P.
+            and Weiss, R. and Dubourg, V. and Vanderplas, J. and Passos, A. and
+            Cournapeau, D. and Brucher, M. and Perrot, M. and Duchesnay, E.},
+    journal={Journal of Machine Learning Research},
+    volume={12},
+    pages={2825--2830},
+    year={2011}
 }
 
 @misc{sklearn-grid,
-  author       = {scikit-learn developers},
-  title        = {Scikit-learn: Grid search},
-  howpublished = {\url{https://scikit-learn.org/stable/modules/grid_search.html#exhaustive-grid-search}},
-  year         = {2007-2019}
+    author       = {scikit-learn developers},
+    title        = {Scikit-learn: Grid search},
+    howpublished = {\url{https://scikit-learn.org/stable/modules/grid_search.html#exhaustive-grid-search}},
+    year         = {2007-2019}
 }
 
 @misc{sklearn-random,
-  author       = {scikit-learn developers},
-  title        = {Scikit-learn: Random search},
-  howpublished = {\url{https://scikit-learn.org/stable/modules/grid_search.html#randomized-parameter-optimization}},
-  year         = {2007-2019}
+    author       = {scikit-learn developers},
+    title        = {Scikit-learn: Random search},
+    howpublished = {\url{https://scikit-learn.org/stable/modules/grid_search.html#randomized-parameter-optimization}},
+    year         = {2007-2019}
 }
 
 @misc{sklearn-deap,
-  author       = {rsteca en GitHub},
-  title        = {Use evolutionary algorithms instead of gridsearch in scikit-learn},
-  howpublished = {\url{https://github.com/rsteca/sklearn-deap}},
-  year         = {2015-2019}
+    author       = {rsteca en GitHub},
+    title        = {Use evolutionary algorithms instead of gridsearch in scikit-learn},
+    howpublished = {\url{https://github.com/rsteca/sklearn-deap}},
+    year         = {2015-2019}
 }
 
-@misc{ga-intro,
-    author = {Vijini Mallawaarachchi},
-    title = {Introduction to Genetic Algorithms},
-    howpublished = {\url{https://towardsdatascience.com/introduction-to-genetic-algorithms-including-example-code-e396e98d8bf3}}
+@misc{keras-nn,
+    title={Keras},
+    author={Chollet, Fran\c{c}ois and others},
+    year={2015},
+    howpublished={\url{https://keras.io}},
 }
 
-@misc{travis-ci,
-    author       = {Travis CI}, 
-    title        = {Test and Deploy with Confidence},
-    howpublished = {\url{https://travis-ci.org/}}
-}
-
-@misc{lasagne-nn,
-    author       = {Sander Dieleman and
-                    Jan Schlüter and
-                    Colin Raffel and
-                    others},
-    title        = {Lasagne: First release.},
-    month        = aug,
-    year         = 2015,
-    doi          = {10.5281/zenodo.27878},
-    url          = {http://dx.doi.org/10.5281/zenodo.27878}
+@misc{tensorflow-nn,
+    title={ {TensorFlow}: Large-Scale Machine Learning on Heterogeneous Systems},
+    url={https://www.tensorflow.org/},
+    note={Software available from tensorflow.org},
+    author={Mart\'{\i}n~Abadi and Ashish~Agarwal and Paul~Barham and Eugene~Brevdo and Zhifeng~Chen and Craig~Citro and Greg~S.~Corrado and Andy~Davis and Jeffrey~Dean and Matthieu~Devin and Sanjay~Ghemawat and Ian~Goodfellow and Andrew~Harp and Geoffrey~Irving and Michael~Isard and Yangqing Jia and Rafal~Jozefowicz and Lukasz~Kaiser and Manjunath~Kudlur and Josh~Levenberg and Dandelion~Man\'{e} and Rajat~Monga and Sherry~Moore and Derek~Murray and Chris~Olah and Mike~Schuster and Jonathon~Shlens and Benoit~Steiner and Ilya~Sutskever and Kunal~Talwar and Paul~Tucker and Vincent~Vanhoucke and Vijay~Vasudevan and Fernanda~Vi\'{e}gas and Oriol~Vinyals and Pete~Warden and Martin~Wattenberg and Martin~Wicke and Yuan~Yu and Xiaoqiang~Zheng},
+    year={2015},
 }
 
 @article{theano-nn,
@@ -117,23 +126,21 @@
     url = {http://arxiv.org/abs/1605.02688},
 }
 
-@misc{keras-nn,
-    title={Keras},
-    author={Chollet, Fran\c{c}ois and others},
-    year={2015},
-    howpublished={\url{https://keras.io}},
-}
-
-
 @incollection{pytorch-nn,
     title = {PyTorch: An Imperative Style, High-Performance Deep Learning Library},
-    author = {Paszke, Adam, Gross and others},
+    author = {Paszke, Adam and Gross, Sam and Massa, Francisco and Lerer, Adam and Bradbury, James and Chanan, Gregory and Killeen, Trevor and Lin, Zeming and Gimelshein, Natalia and Antiga, Luca and Desmaison, Alban and Kopf, Andreas and Yang, Edward and DeVito, Zachary and Raison, Martin and Tejani, Alykhan and Chilamkurthy, Sasank and Steiner, Benoit and Fang, Lu and Bai, Junjie and Chintala, Soumith},
     booktitle = {Advances in Neural Information Processing Systems 32},
     editor = {H. Wallach and H. Larochelle and A. Beygelzimer and F. d\textquotesingle Alch\'{e}-Buc and E. Fox and R. Garnett},
     pages = {8024--8035},
     year = {2019},
     publisher = {Curran Associates, Inc.},
     url = {http://papers.neurips.cc/paper/9015-pytorch-an-imperative-style-high-performance-deep-learning-library.pdf}
+}
+
+@MISC{torch-nn,
+    author = {Ronan Collobert and Samy Bengio and Johnny Marithoz},
+    title = {Torch: A Modular Machine Learning Software Library},
+    year = {2002}
 }
 
 @article{sklearn-nn,
@@ -146,4 +153,41 @@
     volume={12},
     pages={2825--2830},
     year={2011}
+}
+
+@article{f-measure,
+    author = {Hripcsak, George and Rothschild, Adam S.},
+    title = "{Agreement, the F-Measure, and Reliability in Information Retrieval}",
+    journal = {Journal of the American Medical Informatics Association},
+    volume = {12},
+    number = {3},
+    pages = {296-298},
+    year = {2005},
+    month = {05},
+    abstract = "{Information retrieval studies that involve searching the Internet or marking phrases usually lack a well-defined number of negative cases. This prevents the use of traditional interrater reliability metrics like the κ statistic to assess the quality of expert-generated gold standards. Such studies often quantify system performance as precision, recall, and F-measure, or as agreement. It can be shown that the average F-measure among pairs of experts is numerically identical to the average positive specific agreement among experts and that κ approaches these measures as the number of negative cases grows large. Positive specific agreement—or the equivalent F-measure—may be an appropriate way to quantify interrater reliability and therefore to assess the reliability of a gold standard in these studies.}",
+    issn = {1067-5027},
+    doi = {10.1197/jamia.M1733},
+    url = {https://doi.org/10.1197/jamia.M1733},
+    eprint = {https://academic.oup.com/jamia/article-pdf/12/3/296/2429751/12-3-296.pdf},
+}
+
+
+@misc{gplv3,
+    author       = {Free Software Foundation},
+    title        = {{GNU} {G}eneral {P}ublic {L}icense},
+    version      = {3},
+    howpublished = {\url{http://www.gnu.org/licenses/gpl.html}},
+    shorthand    = {GPL},
+}
+
+@misc{3blue1brown-mlp-1,
+    author = {Grant Sanderson},
+    title = {Neural networks},
+    howpublished = {\url{https://www.youtube.com/watch?v=aircAruvnKk}},
+}
+
+@misc{travis-ci,
+    author       = {Travis CI}, 
+    title        = {Test and Deploy with Confidence},
+    howpublished = {\url{https://travis-ci.org/}}
 }

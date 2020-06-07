@@ -4,7 +4,7 @@ En esta sección explicaré la elección de los \textit{frameworks} con los que
 voy a trabajar, además de la comparativa con otros que no se adaptan las
 necesidades del proyecto.
 
-\section{Búsqueda de mejores parámetros} \label{chap:state-of-art}
+\section{Búsqueda de mejores parámetros} \label{sec:param-search}
 
 La búsqueda de valores óptimos para los parámetros de entrada de las
 \textit{redes neuronales artificiales} en cada problema puede llegar a requerir
@@ -14,21 +14,22 @@ existen diferentes herramientas que facilitan esta búsqueda como son
 Search}\cite{sklearn-random}.
 
 A parte de estas herramientas bien conocidas, también se pueden usar otros
-clasificadores ó algoritmos genéticos\cite{sklearn-deap} para la búsqueda de parámetros. En esta
-sección se compararán los métodos anteriores con la búsqueda utilizando
-algoritmos genéticos.
+clasificadores ó algoritmos genéticos\cite{sklearn-deap} para la búsqueda de
+parámetros. En esta sección se compararán los métodos anteriores con la
+búsqueda utilizando algoritmos genéticos.
 
 Las tres utilidades explicadas a continuación utilizan como entrada, entre
 otros elementos, un conjunto de parámetros junto con los valores seleccionados
 de éstos. Así, para cada parámetro le damos varias posibilidades que serán
 utilizadas para entrenar la red neuronal y buscar la mejor puntuación.
 
-\begin{table}[h!]
+\begin{table}[h]
     \centering
     \caption{Comparativa entre tres métodos de búsqueda de parámetros.}
     \label{tab:hp-optimization}
     \begin{tabular}{l|c|r}
-        \textbf{Optimizator}    & \textbf{Best Accuracy \%} & \textbf{Elapsed time (sec)} \\
+        \textbf{Optimizator} & \textbf{Best Accuracy \%} &
+            \textbf{Elapsed time (sec)} \\
         \hline
         Random Search  & 0.95103    &  119.76826    \\
         Grid Search    & 0.96271    & 6746.02930   \\
@@ -38,7 +39,11 @@ utilizadas para entrenar la red neuronal y buscar la mejor puntuación.
 
 Las pruebas realizadas que respaldan los datos de la
 \autoref{tab:hp-optimization} se pueden encontrar en el directorio
-\texttt{src/hp\_optimization/}.
+\texttt{src/hp\_optimization/}. Para evaluar los optimizadores de parámetros se
+ha utilizado como estimador \textit{MLPClassifier}\cite{sklearn-mlpclassifier}
+de la librería \textit{scikit-learn}\cite{sklearn} y una validación cruzada de
+4 divisiones. Se ha usado el conjunto de datos de \textit{digits} obtenido
+también de \textit{scikit-learn}.
 
 \subsection{Grid Search}
 
@@ -63,5 +68,143 @@ Ya se comentó sobre los algoritmos genéticos en el
 similar a las herramientas anteriores nombradas, acotando los cruces y
 mutaciones a la tabla de parámetros definida.
 
-\section{\textit{Frameworks} para redes neuronales}
+%
+% Framework selection
+%
 
+\section{\textit{Frameworks} para redes neuronales} \label{sec:framework-comp}
+
+Dentro de este marco, partiendo de la inmensa cantidad de librerías que existen
+para trabajar con redes neuronales, nos centraremos en las que permiten
+ser usadas en Python. De éstas, destacaremos el subgrupo de las más
+conocidas. Entre ellas están:
+
+\begin{itemize}
+    \item Keras\cite{keras-nn} (TensorFlow\cite{tensorflow-nn} and
+        Theano\cite{theano-nn})
+    \item PyTorch \cite{pytorch-nn} (Torch\cite{torch-nn})
+    \item sklearn \cite{sklearn-nn}
+\end{itemize}
+
+Para la comparación entre los \textit{frameworks} nombrados, se ha utilizado
+validación cruzada de 5 particiones y los mismos datos que en la sección
+anterior: \autoref{sec:param-search}. Dado que los conjuntos de datos elegidos
+son de ``juguete'', en el entrenamiento se podrá ver sobreajuste en todas las
+medidas. Se han obtenido las siguientes puntuaciones para llevar la evaluación:
+
+\begin{table}[h]
+    \centering
+    \caption{Comparación de tiempos de fit de los distintos frameworks de redes
+        neuronales probados.}
+    \label{tab:mlp-comp-times}
+    \begin{tabular}{r|r}
+        \mr{2}{*}{\textbf{Estimator}} & \textbf{Mean fit time} \\
+                           & \textbf{(seconds)} \\
+        \hline
+        Scikit-learn       &   8.82 \\
+        Keras (theano)     &  38.02 \\
+        Keras (tensorflow) &  95.62 \\
+        Skorch (Torch)     & 120.28 \\
+    \end{tabular}
+\end{table}
+
+\begin{itemize}
+
+    \item \textit{Accuracy} (\autoref{tab:mlp-comp-accuracy}). Consiste en el
+    cálculo de los ejemplos bien clasificados. Un ejemplo bien clasificado
+    sería por ejemplo el cual estando etiquetado como número 2, se clasifica
+    como 2. La pega que tiene esta medida es que no considera los ejemplos mal
+    clasificados, y eso puede conllevar perdida de información en conjuntos de
+    datos desbalanceados.
+
+    \item \textit{Precision}\cite{f-measure}
+    (\autoref{tab:mlp-comp-precision}). Esta medida obtiene el porcentaje de
+    ejemplos que no se han clasificado mal. A parte de los ejemplos bien
+    clasificados como hace la métrica de \textit{accuracy}, ésta tiene en
+    cuenta también los ejemplos clasificados como positivos que realmente no lo
+    son.
+
+    \item \textit{Recall}\cite{f-measure} (\autoref{tab:mlp-comp-recall}).
+    Calcula la capacidad del clasificador de obtener todos los ejemplos
+    positivos de una clase, así, tiene también en cuenta los ejemplos mal
+    clasificados como de otra clase.
+
+    \item \textit{F1-score}\cite{f-measure} (\autoref{tab:mlp-comp-f1-score}).
+    En último lugar, aunque no menos importante, \textit{F1-score} o
+    \textit{F1-measure} hace un balance entre \textit{precision} y
+    \textit{recall} (media harmónica entre las dos medias).
+
+\end{itemize}
+
+A parte también se ha medido el tiempo total de ajuste del estimador. Esta va a
+ser una medida crítica a la hora de elegir el \textit{framework} idóneo para el
+trabajo, ya que la red neuronal se va re-ejecutar multiples veces con distintos
+cambios.
+
+\begin{table}[p]
+    \centering
+    \caption{Comparación de las puntuaciones de \textit{accuracy} de los
+        distintos frameworks.}
+    \label{tab:mlp-comp-accuracy}
+    \begin{tabular}{r|c|c|c|c}
+        \mr{2}{*}{\textbf{Estimator}} & \mc{2}{c|}{\textbf{Train accuracy}} & \mc{2}{c}{\textbf{Test accuracy}} \\
+        \cline{2-5}
+                           & \textbf{mean} & \textbf{std} & \textbf{mean} & \textbf{std} \\
+        \hline
+        Scikit-learn       & 1.000000 & 0.000000 & 0.979958 & 0.008890 \\
+        Keras (theano)     & 1.000000 & 0.000000 & 0.982185 & 0.007401 \\
+        Keras (tensorflow) & 1.000000 & 0.000000 & 0.983859 & 0.003702 \\
+        Skorch (Torch)     & 1.000000 & 0.000000 & 0.977736 & 0.007483 \\
+    \end{tabular}
+\end{table}
+
+\begin{table}[p]
+    \centering
+    \caption{Comparación de las puntuaciones de \textit{precision} de los distintos frameworks.}
+    \label{tab:mlp-comp-precision}
+    \begin{tabular}{r|c|c|c|c}
+        \mr{2}{*}{\textbf{Estimator}} & \mc{2}{c|}{\textbf{Train precision}} & \mc{2}{c}{\textbf{Test precision}}  \\
+        \cline{2-5}
+                           & \textbf{mean} & \textbf{std} & \textbf{mean} & \textbf{std} \\
+        \hline
+        Scikit-learn       & 1.000000 & 0.000000 & 0.981268 & 0.008253 \\
+        Keras (theano)     & 1.000000 & 0.000000 & 0.982662 & 0.006576 \\
+        Keras (tensorflow) & 1.000000 & 0.000000 & 0.984674 & 0.003597 \\
+        Skorch (Torch)     & 1.000000 & 0.000000 & 0.977820 & 0.007539 \\
+    \end{tabular}
+\end{table}
+
+\begin{table}[p]
+    \centering
+    \caption{Comparación de las puntuaciones de \textit{recall} de los
+        distintos frameworks.}
+    \label{tab:mlp-comp-recall}
+    \begin{tabular}{r|c|c|c|c}
+        \mr{2}{*}{\textbf{Estimator}} & \mc{2}{c|}{\textbf{Train recall}} & \mc{2}{c}{\textbf{Test recall}} \\
+        \cline{2-5}
+                           & \textbf{mean} & \textbf{std} & \textbf{mean} & \textbf{std} \\
+        \hline
+        Scikit-learn       & 1.000000 & 0.000000 & 0.979124 & 0.010237 \\
+        Keras (theano)     & 1.000000 & 0.000000 & 0.982052 & 0.007579 \\
+        Keras (tensorflow) & 1.000000 & 0.000000 & 0.984044 & 0.004134 \\
+        Skorch (Torch)     & 1.000000 & 0.000000 & 0.977400 & 0.008047 \\
+
+    \end{tabular}
+\end{table}
+
+\begin{table}[p]
+    \centering
+    \caption{Comparación de las puntuaciones de \textit{F1 score} de los
+        distintos frameworks.}
+    \label{tab:mlp-comp-f1-score}
+    \begin{tabular}{r|c|c|c|c}
+        \mr{2}{*}{\textbf{Estimator}} & \mc{2}{c|}{\textbf{Train F1 score}} & \mc{2}{c}{\textbf{Test F1 score}}  \\
+        \cline{2-5}
+                           & \textbf{mean} & \textbf{std} & \textbf{mean} & \textbf{std} \\
+        \hline
+        Scikit-learn       & 1.000000 & 0.000000 & 0.979859 & 0.009372 \\
+        Keras (theano)     & 1.000000 & 0.000000 & 0.982067 & 0.007249 \\
+        Keras (tensorflow) & 1.000000 & 0.000000 & 0.984094 & 0.003992 \\
+        Skorch (Torch)     & 1.000000 & 0.000000 & 0.977304 & 0.007888 \\
+    \end{tabular}
+\end{table}

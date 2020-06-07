@@ -13,6 +13,8 @@ El formato se basa en
 - Comparativa de distintos optimizadores de hyper-parámetros.
 - Tests para todo el código existente.
 - Explicación de desarrollo con venv.
+- Comparativa entre distintos frameworks para redes neuronales artificiales.
+- Tests para este nuevo código.
 
 ### Modificado
 
