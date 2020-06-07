@@ -1,20 +1,20 @@
+"""Tests related to the documentation."""
+import subprocess
 import sys
-import tempfile
 import unittest
 
 from pathlib import Path
 
-from sultan.api import Sultan
+from PyPDF2 import PdfFileReader  # type: ignore
 
-from PyPDF2 import PdfFileReader
 from settings import REPORT_NAME
 
 ROOT = Path(__file__).parents[2].resolve()
 try:
-    ASPELL_DIR_PATH = ROOT.joinpath("docs", "aspell").resolve(strict=True)
-    REPORT_DIR_PATH = ROOT.joinpath("docs", "report").resolve(strict=True)
-except FileNotFoundError as e:
-    sys.exit("{}: {}".format(e.strerror, e.filename))
+    ASPELL_DIR_PATH = (ROOT / "docs" / "aspell").resolve(strict=True)
+    REPORT_DIR_PATH = (ROOT / "docs" / "report").resolve(strict=True)
+except FileNotFoundError as error:
+    sys.exit("{}: {}".format(error.strerror, error.filename))
 
 
 class ReportTests(unittest.TestCase):
@@ -22,17 +22,26 @@ class ReportTests(unittest.TestCase):
 
     def test_report_spelling(self):
         """Run aspell and check if there is any misspelled word."""
-        with Sultan.load(cwd=ROOT, logging=False) as s:
-            result = (
-                s.cat(str(self.plain_report_path))
-                .pipe()
-                .aspell("--lang=es_ES", "list")
-                .pipe()
-                .aspell("--lang=en_US", "list", *self.aspell_extra_args)
-                .run(quiet=True, halt_on_nonzero=False)
-            )
-
-        self.assertFalse(result.stdout, "List of wrong words is not empty.")
+        process0 = subprocess.Popen(
+            ["cat", str(self.plain_report_path)],
+            cwd=ROOT,
+            stdout=subprocess.PIPE,
+        )
+        process1 = subprocess.Popen(
+            ["aspell", "--lang=es_ES", "list"],
+            cwd=ROOT,
+            stdin=process0.stdout,
+            stdout=subprocess.PIPE,
+        )
+        process2 = subprocess.Popen(
+            ["aspell", "--lang=en_US", "list", *self.aspell_extra_args],
+            cwd=ROOT,
+            stdin=process1.stdout,
+            stdout=subprocess.PIPE,
+            universal_newlines=True,
+        )
+        output = process2.communicate()[0].split()
+        self.assertListEqual(output, [], "List of wrong words is not empty.")
 
     @unittest.skip("Not finished documentation")
     def test_pdf_pages_number(self):
@@ -47,7 +56,7 @@ class ReportTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """Create proper environment to check report spelling."""
-        cls.plain_report_path = REPORT_DIR_PATH.joinpath(f"{REPORT_NAME}.txt")
+        cls.plain_report_path = REPORT_DIR_PATH / f"{REPORT_NAME}.txt"
 
         if not cls.plain_report_path.exists():
             sys.exit(
@@ -55,7 +64,7 @@ class ReportTests(unittest.TestCase):
                 "build-plain' before running the tests."
             )
 
-        cls.pdf_report_path = REPORT_DIR_PATH.joinpath("proyecto.pdf")
+        cls.pdf_report_path = REPORT_DIR_PATH / "proyecto.pdf"
 
         if not cls.pdf_report_path.exists():
             sys.exit(
@@ -63,7 +72,7 @@ class ReportTests(unittest.TestCase):
                 "build-docs' before running the tests."
             )
 
-        aspell_extra_dict = ASPELL_DIR_PATH.joinpath("personal.aspell.en.pws")
+        aspell_extra_dict = ASPELL_DIR_PATH / "personal.aspell.en.pws"
         cls.aspell_extra_args = []
 
         if aspell_extra_dict.exists():

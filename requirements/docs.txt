@@ -1,0 +1,2 @@
+Pweave==0.30.3
+panflute==1.12.5

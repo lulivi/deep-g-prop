@@ -1,8 +1,0 @@
-# numpy for array manipulation
-numpy==1.18.2
-# Easy-to-use MLP framework and utilities
-scikit-learn==0.22.2.post1
-# evolutionary algorithm hyper-parammeter search
-sklearn-deap==0.2.4
-# print tables
-tabulate==0.8.7

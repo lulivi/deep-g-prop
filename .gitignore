@@ -38,6 +38,7 @@ pip-delete-this-directory.txt
 # Unit test / coverage reports
 htmlcov/
 .tox/
+.nox/
 .coverage
 .coverage.*
 .cache
@@ -108,15 +109,16 @@ cache/
 
 # Latex
 *.aux
+*.bbl
+*.blg
 *.lo[tf]
-*.toc
 *.out
 *.pdf
+*.toc
 _minted-*
+docs/report/*.txt
 docs/report/secciones/*.tex
 docs/report/figures
-*.blg
-*.bbl
 
 # VS code
 *.vscode/

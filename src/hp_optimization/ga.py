@@ -1,11 +1,18 @@
-#!/usr/bin/env python3.7
+"""Hyper-parameter optimization with Genetic Algorithms."""
+try:
+    from src.hp_optimization import common
+except ImportError:  # pragma: no cover
+    from sys import path as syspath
+    from pathlib import Path
 
-from . import common
+    syspath.append(str(Path(__file__).resolve().parents[2]))
+
+    from src.hp_optimization import common
 
 
 def run_search() -> None:
     """Perform the search with an evolutionary search algorithm."""
-    cv = common.EvolutionaryAlgorithmSearchCV(
+    optimizer = common.EvolutionaryAlgorithmSearchCV(
         estimator=common.model,
         params=common.paramgrid,
         scoring="accuracy",
@@ -19,9 +26,14 @@ def run_search() -> None:
         n_jobs=4,
     )
 
-    result = common.cross_validate("Genetic Search", cv)
+    result = common.cross_validate("Genetic Search", optimizer)
     common.save_result(result)
 
 
-if __name__ == "__main__":
+def main():
+    """Call the search run."""
     run_search()
+
+
+if __name__ == "__main__":  # pragma: no cover
+    main()

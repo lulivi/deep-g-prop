@@ -1,3 +1,4 @@
+"""Common functions and variables used by the Hyper-parameter optimizators."""
 import csv
 import random
 import time
@@ -6,17 +7,17 @@ from pathlib import Path
 from typing import List, Union
 from warnings import simplefilter
 
-import numpy as np
-import sklearn.datasets
+import numpy as np  # type: ignore
+import sklearn.datasets  # type: ignore
 
-from evolutionary_search import EvolutionaryAlgorithmSearchCV
-from sklearn.exceptions import ConvergenceWarning
-from sklearn.model_selection import (
+from evolutionary_search import EvolutionaryAlgorithmSearchCV  # type: ignore
+from sklearn.exceptions import ConvergenceWarning  # type: ignore
+from sklearn.model_selection import (  # type: ignore
     GridSearchCV,
     RandomizedSearchCV,
     StratifiedKFold,
 )
-from sklearn.neural_network import MLPClassifier
+from sklearn.neural_network import MLPClassifier  # type: ignore
 
 # Set global path variables
 HP_OPTIMIZATION_DIR = Path(__file__).parent
@@ -52,22 +53,24 @@ simplefilter(action="ignore", category=ConvergenceWarning)
 
 def cross_validate(
     name: str,
-    cv: Union[EvolutionaryAlgorithmSearchCV, GridSearchCV, RandomizedSearchCV],
+    optimizer: Union[
+        EvolutionaryAlgorithmSearchCV, GridSearchCV, RandomizedSearchCV
+    ],
 ) -> List[str]:
     """Run the fit function to obtain the optimal parameters.
 
     :param name: name of the optimizer.
-    :param cv: optimizer cross validator.
-    :returns: the cv results.
+    :param optimizer: optimizer cross validator.
+    :returns: the search results.
 
     """
     time_start = time.perf_counter()
-    cv.fit(X, y)
+    optimizer.fit(X, y)
     time_stop = time.perf_counter()
 
     return [
         name,
-        f"{cv.best_score_:.5f}",
+        f"{optimizer.best_score_:.5f}",
         f"{time_stop - time_start:.5f}",
     ]
 
@@ -80,8 +83,8 @@ def save_result(result: List[str]) -> None:
     """
     HP_OPTIMIZATION_CSV.touch(exist_ok=True)
 
-    with open(HP_OPTIMIZATION_CSV, "r") as f:
-        csv_content = list(csv.reader(f))
+    with open(HP_OPTIMIZATION_CSV, "r") as file_descriptor:
+        csv_content = list(csv.reader(file_descriptor))
 
     result_headers = table_header
     contents = []
@@ -97,7 +100,7 @@ def save_result(result: List[str]) -> None:
 
     contents.append(result)
 
-    with open(HP_OPTIMIZATION_CSV, "w") as f:
-        writer = csv.writer(f)
+    with open(HP_OPTIMIZATION_CSV, "w") as file_descriptor:
+        writer = csv.writer(file_descriptor)
         writer.writerow(result_headers)
         writer.writerows(contents)

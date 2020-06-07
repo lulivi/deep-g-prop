@@ -11,8 +11,8 @@
 **Tutor(a)(es): Juan Julián Merelo Guervós**
 
 **Índice**
-- [Instalación](#instalaci%c3%b3n)
-- [Utilización](#utilizaci%c3%b3n)
+- [Instalación](#instalación)
+- [Utilización](#utilización)
 - [Desarrollo](#desarrollo)
 - [Frameworks](#frameworks)
 - [Utilidades](#utilidades)
@@ -54,25 +54,17 @@ vayan a utilizar. Para más información sobre [pip] y [venv] consultar el
   Tabla 1.1: *Activación de entorno virtual.*
 
 - Para instalar los paquetes una vez activado el entorno virtual, deberemos
-  usar [pip]. He dividido los paquetes en dos grupos:
+  usar [pip]. He dividido los paquetes en distintos grupos:
 
-  - Paquetes de desarrollo: localizados en el archivo [requirements.txt] son
-    los necesarios para crear la documentación y ejecutar el código que se
-    encuentra en el repositorio.
+  | Propósito                          | Ruta del archivo                     | Descripción                                                                                                             |
+  |------------------------------------|--------------------------------------|-------------------------------------------------------------------------------------------------------------------------|
+  | Producción                         | [`requirements/prod.txt`]            | Paquetes necesarios para ejecutar código asociado directamente a *DeepGProp*. El archivo [`requirements.txt`] de la raiz del repositorio símplemente instala los paquetes contenidos en este archivo. |
+  | Documentación                      | [`requirements/docs.txt`]            | Paquetes necesarios para construir la documentación. Si se usa [Nox], no será necesario instalar estos paquetes a mano. |
+  | Test                               | [`requirements/tests.txt`]           | Paquetes para ejecutar los tests. Si se usa [Nox], no será necesario instalar estos paquetes a mano. Además se deben instalar los programas [pandoc], [aspell] y el [diccionario de español para aspell][aspell-es] para poder ejecutar los tests de documentación. |
+  | Comparativa de Optimizadores       | [`requirements/hp_optimization.txt`] | Paquetes usados en la comparativa de optimizadores de hiper-parámetros.                                                 |
+  | Comparativa de Frameworks para MLP | [`requirements/mlp_frameworks.txt`]  | Paquetes usados en la comparativa de frameworks para redes neuronales.                                                  |
 
-  - Paquetes de testing: localizados en el archivo [test_requirements.txt] son
-    opcionales para el desarrollo pero necesarios para ejecutar los test.
-
-    Además se deben instalar los programas [pandoc], [aspell] y el
-    [diccionario de español para aspell][aspell-es]. Para esto puede usar el
-    gestor de paquetes que desee.
-
-  - Si se desea hacer pruebas con los test de frameworks y de optimización de
-    parámetros usados para la sección de "Estado del arte" de la memoria,
-    deberá instalar los `requirements.txt` contenidos en cada uno de los
-    directorios.
-
-  Para instalar cualquiera de los dos grupos de paquetes hay que ejecutar:
+  Para instalar cualquiera de los grupos de paquetes hay que ejecutar:
 
   ```shell
   pip install -r <nombre archivo>
@@ -96,7 +88,7 @@ vayan a utilizar. Para más información sobre [pip] y [venv] consultar el
 > instalación](#table1.1) antes de ejecutar cualquiera de los
 > siguientes comandos.
 
-Usando [Nox] podemos ejecutar los siguientes comandos para construir la
+Usando [Nox] podemos ejecutar el siguiente comando para construir la
 documentación:
 
 ```shell
@@ -106,7 +98,13 @@ nox -e build-pdf
 Para ejecutar los test:
 
 ```shell
-nox -e tests-3.7
+nox -k test
+```
+
+Para pasar los distintos linters al código:
+
+```shell
+nox -e lint
 ```
 
 Para obtener otras opciones posibles con Nox:
@@ -120,7 +118,7 @@ nox -l
 En este proyecto se usa un metodología de desarrollo basada en test.
 
 Se utilizará también un fichero de cambios basado en [Keep a Changelog]. Esta
-información se guardará en el archivo [CHANGELOG.md].
+información se guardará en el archivo [`CHANGELOG.md`].
 
 ## Frameworks
 
@@ -166,19 +164,23 @@ bibliotecas similares y el por qué de la elección de éstas.
 ## Licencia
 
 El código de este repositorio está liberado bajo la licencia
-[GPLv3]. Para más información vea el archivo [LICENSE].
+[GPLv3]. Para más información vea el archivo [`LICENSE`].
 
 <!-- Archivos -->
-[CHANGELOG.md]: ./CHANGELOG.md
-[LICENSE]: ./LICENSE
+[`requirements/prod.txt`]: ./requirements/prod.txt
+[`requirements.txt`]: ./requirements.txt
+[`requirements/docs.txt`]: ./requirements/docs.txt
+[`requirements/tests.txt`]: ./requirements/tests.txt
+[`requirements/hp_optimization.txt`]: ./requirements/hp_optimization.txt
+[`requirements/mlp_frameworks.txt`]: ./requirements/mlp_frameworks.txt
+[`CHANGELOG.md`]: ./CHANGELOG.md
+[`LICENSE`]: ./LICENSE
 
 <!-- Misceláneo -->
 [python-downloads-url]: https://www.python.org/downloads/
 [pip]: https://pypi.org/project/pip/
 [venv]: https://docs.python.org/3/library/venv.html
 [python-venv-pip-guide-url]: https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/
-[requirements.txt]: ./requirements.txt
-[test_requirements.txt]: ./test_requirements.txt
 [pandoc]: https://pandoc.org/
 [aspell]: http://aspell.net/
 [aspell-es]: https://ftp.gnu.org/gnu/aspell/dict/es/

@@ -1,45 +1,59 @@
+"""Automation module to run from documentation builds to tests."""
 import contextlib
 import sys
-import tempfile
 
 from functools import partial
 from pathlib import Path
 from shutil import rmtree
-from sys import exit as sysexit
-from typing import Callable, Iterator, List, Union
+from typing import Callable, Iterator, List
 
-import nox
+import nox  # type: ignore
 
-from nox.command import CommandFailed
-from nox.sessions import Session
+from nox.command import CommandFailed  # type: ignore
+from nox.sessions import Session  # type: ignore
 
 try:
-    from settings import FILTER_DIR_PATH, REPORT_DIR_PATH, REPORT_NAME, ROOT
+    from settings import (
+        FILTER_DIR_PATH,
+        REPORT_DIR_PATH,
+        REPORT_NAME,
+        ROOT,
+        REQUIR_DIR_PATH,
+    )
 except ModuleNotFoundError:
-    import sys
-
     sys.path.append(str(Path(__file__).resolve().parent))
-    from settings import FILTER_DIR_PATH, REPORT_DIR_PATH, REPORT_NAME, ROOT
+    from settings import (
+        FILTER_DIR_PATH,
+        REPORT_DIR_PATH,
+        REPORT_NAME,
+        REQUIR_DIR_PATH,
+        ROOT,
+    )
 
 
-format_requirements = ["black", "mypy"]
-lint_requirements = [
-    "pylint",
-    "flake8",
-    "pycodestyle",
-    "isort",
-    *format_requirements,
-]
-test_requirements = [
-    "-r",
-    "requirements/requirements.txt",
-    "-r",
-    "requirements/test_requirements.txt",
-]
-style_target_files = ["noxfile.py", "src", "tests"]
-nox.options.sessions = ["tests", "lint"]
+nox.options.sessions = ["test-docs", "test-sources", "lint"]
 nox.options.reuse_existing_virtualenvs = True
-latex_already_built = False
+nox.options.default_venv_backend = "venv"
+
+# Globals
+form_requirements = ["-r", str(REQUIR_DIR_PATH / "format.txt")]
+test_requirements = ["-r", str(REQUIR_DIR_PATH / "tests.txt")]
+docs_requirements = ["-r", str(REQUIR_DIR_PATH / "docs.txt")]
+prod_requirements = ["-r", str(REQUIR_DIR_PATH / "prod.txt")]
+mlp_frameworks_requirements = [
+    "-r",
+    str(REQUIR_DIR_PATH / "mlp_frameworks.txt"),
+]
+hp_optimization_requirements = [
+    "-r",
+    str(REQUIR_DIR_PATH / "hp_optimization.txt"),
+]
+python_files = [
+    "noxfile.py",
+    str(FILTER_DIR_PATH / "filters.py"),
+    "src",
+    "tests",
+]
 
 
 # -----------------------------------------------------------------------------
@@ -91,7 +105,7 @@ def remove_files(
 @nox.session(name="py-clean")
 def py_clean(session: Session) -> None:
     """Celean python cache files.
-    
+
     If ``verbose`` is provided in :attr:`Session.posargs`, each file removal
     will be logged. Nothing will print otherwise.
 
@@ -114,7 +128,7 @@ def py_clean(session: Session) -> None:
 @nox.session(name="doc-clean")
 def docs_clean(session: Session) -> None:
     """Clean doc construction.
-    
+
     If ``verbose`` is provided in :attr:`Session.posargs`, each file removal
     will be logged. Nothing will print otherwise.
 
@@ -162,14 +176,9 @@ def chdir(session: Session, dir_path: Path) -> Iterator[Path]:
 @nox.session(name="build-latex")
 def build_latex(session: Session) -> None:
     """Create tex files from Pweave sources."""
-    global latex_already_built
-    if latex_already_built:
-        session.log("Skipping latex build as it was already ran.")
-        return
-
     session.log("Building latex files and figures through pweave ...")
-    session.install("Pweave==0.30.3")
-    fig_dir = str(REPORT_DIR_PATH.joinpath("figures_pweave"))
+    session.install(*docs_requirements)
+    fig_dir = str(REPORT_DIR_PATH / "figures_pweave")
 
     with chdir(session, ROOT):
         for pweave_file in REPORT_DIR_PATH.glob("**/*.texw"):
@@ -182,19 +191,12 @@ def build_latex(session: Session) -> None:
                 str(pweave_file),
                 silent=True,
             )
-    latex_already_built = True
 
-
-@nox.session(name="build-plain")
-def build_plain(session: Session) -> None:
-    """Create plain documentation from latex."""
-    build_latex(session)
     session.log("Creating plain documentation from latex ...")
-    session.install("panflute==1.12.5")
-    plain_report_path = REPORT_DIR_PATH.joinpath(f"{REPORT_NAME}.txt")
-    filters_path = FILTER_DIR_PATH.joinpath("filters.py").resolve()
+    plain_report_path = str(REPORT_DIR_PATH / f"{REPORT_NAME}.txt")
+    filters_path = FILTER_DIR_PATH / "filters.py"
     pandoc_args = [
-        str(REPORT_DIR_PATH.joinpath(f"{REPORT_NAME}.tex")),
+        str(REPORT_DIR_PATH / f"{REPORT_NAME}.tex"),
         f"--output={plain_report_path}",
         "--from=latex",
         "--to=plain",
@@ -234,23 +236,39 @@ def build_pdf(session: Session) -> None:
 # -----------------------------------------------------------------------------
 # Tests
 # -----------------------------------------------------------------------------
-@nox.session(python=["3.6", "3.7", "3.8"])
-def tests(session: Session) -> None:
-    """Run tests."""
-    if session.posargs and session.posargs[0] == "skip-latex":
+@nox.session(name="test-docs")
+def test_docs(session: Session) -> None:
+    """Run the documentation related tests."""
+    if "skip-latex" in session.posargs:
         session.log("Skipping LaTeX and PDF building for this session.")
     else:
-        build_plain(session)
         build_pdf(session)
 
-    session.log("Running tests!")
-    session.install(*test_requirements)
-    session.install(
-        "-r",
-        str(ROOT.joinpath("requirements", "requirements.txt")),
-        env={"TMPDIR": "/var/tmp/"},
+    session.install(*test_requirements, *docs_requirements)
+    session.run("pytest", "-vvv", str(ROOT / "tests" / "docs"))
+
+
+@nox.session(name="test-sources", python=["3.6", "3.7", "3.8"])
+def test_sources(session: Session) -> None:
+    """Run the source code related tests."""
+    test_path = (
+        session.posargs[0] if session.posargs else str(ROOT / "tests" / "src")
     )
-    session.run("pytest", "tests/", "-vvv", silent=False)
+    session.log("Running tests!")
+    session.install(
+        *test_requirements,
+        *mlp_frameworks_requirements,
+        *hp_optimization_requirements,
+        env={"TMPDIR": "/var/tmp"},
+    )
+    session.run(
+        "pytest",
+        test_path,
+        f"--cov={str(ROOT / 'src')}",
+        "--cov-report=term-missing",
+        "-vvv",
+        silent=False,
+    )
 
 
 # -----------------------------------------------------------------------------
@@ -259,11 +277,11 @@ def tests(session: Session) -> None:
 @nox.session(name="format")
 def apply_format(session: Session) -> None:
     """Apply formating rules to the selected files."""
-    session.install("black==19.10b0")
-    session.install("isort==4.3.21")
-    formating_files = ["noxfile.py", "src", "tests", "docs/filters/"]
-    session.run("black", "-l", "79", *formating_files, silent=False)
-    session.run("isort", "-rc", *formating_files, silent=False)
+    session.install(*form_requirements)
+    session.run("black", "-l", "79", *python_files, silent=False)
+    session.run(
+        "isort", "-rc", "--check-only", "--diff", *python_files, silent=False,
+    )
 
 
 # -----------------------------------------------------------------------------
@@ -272,10 +290,19 @@ def apply_format(session: Session) -> None:
 @nox.session()
 def lint(session: Session) -> None:
     """Lint the selected files."""
-    session.install(*lint_requirements)
-    session.run("pylint", *style_target_files)
-    session.run("mypy", *style_target_files)
-    session.run("flake8", *style_target_files)
-    session.run("pycodestyle", *style_target_files)
-    session.run("black", "-l", "79", "--check", "--diff", *style_target_files)
-    session.run("isort", "-rc", "--check-only", "--diff", *style_target_files)
+    session.install(
+        *test_requirements,
+        *mlp_frameworks_requirements,
+        *hp_optimization_requirements,
+        *docs_requirements,
+        "nox==2020.5.24",
+        env={"TMPDIR": "/var/tmp"},
+    )
+    with chdir(session, ROOT):
+        session.run("pylint", *python_files)
+        session.run("mypy", *python_files)
+        session.run("flake8", *python_files)
+        session.run("pycodestyle", *python_files)
+        session.run("pydocstyle", *python_files)
+        session.run("black", "-l", "79", "--check", "--diff", *python_files)
+        session.run("isort", "-rc", "--check-only", "--diff", *python_files)

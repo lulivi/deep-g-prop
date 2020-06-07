@@ -1,11 +1,18 @@
-#!/usr/bin/env python3.7
+"""Hyper-parameter optimization with Grid search."""
+try:
+    from src.hp_optimization import common
+except ImportError:  # pragma: no cover
+    from sys import path as syspath
+    from pathlib import Path
 
-from . import common
+    syspath.append(str(Path(__file__).resolve().parents[2]))
+
+    from src.hp_optimization import common
 
 
 def run_search() -> None:
     """Perform the search with grid search algorithm."""
-    cv = common.GridSearchCV(
+    optimizer = common.GridSearchCV(
         estimator=common.model,
         param_grid=common.paramgrid,
         scoring="accuracy",
@@ -14,9 +21,14 @@ def run_search() -> None:
         n_jobs=4,
     )
 
-    result = common.cross_validate("Grid Search", cv)
+    result = common.cross_validate("Grid Search", optimizer)
     common.save_result(result)
 
 
-if __name__ == "__main__":
+def main():
+    """Call the search run."""
     run_search()
+
+
+if __name__ == "__main__":  # pragma: no cover
+    main()

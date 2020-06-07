@@ -1,18 +1,22 @@
-import panflute as pf
+"""Apply panflute filters to the project documentation."""
+from typing import Optional
+
+import panflute as pf  # type: ignore
 
 
-def remove_environments(elem, doc):
+def remove_environments(element, doc) -> Optional[list]:
     """Remove code and math blocks."""
-    if (
-        isinstance(elem, pf.CodeBlock)
-        or isinstance(elem, pf.Math)
-        or (isinstance(elem, pf.Str) and (elem.text == "image"))
+    # pylint: disable=unused-argument
+    if isinstance(element, (pf.CodeBlock, pf.Math)) or (
+        isinstance(element, pf.Str) and (element.text == "image")
     ):
         return []
+    return None
 
 
-def main(doc=None):
-    return pf.run_filter(remove_environments, doc=doc)
+def main():
+    """Run the panflute filter."""
+    return pf.run_filter(remove_environments, doc=None)
 
 
 if __name__ == "__main__":

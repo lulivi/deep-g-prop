@@ -8,9 +8,23 @@ El formato se basa en
 
 ## [Cambios inéditos]
 
+### Añadido
+
+- Comparativa de distintos optimizadores de hyper-parámetros.
+- Tests para todo el código existente.
+- Explicación de desarrollo con venv.
+
+### Modificado
+
+- Cambio de proveedor de entorno virtual a venv.
+
+### Eliminado
+
+- Entorno virtual basado en Pipenv.
+
 ## [0.0.1] - 2020-03-22
 
-### Added
+### Añadido
 
 - Añadido archivo de  licencia.
 

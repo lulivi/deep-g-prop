@@ -3,7 +3,7 @@ adam
 backpropagation
 Bayesiana
 BFGS
-GAs
+desbalanceados
 hiperparámetros
 Keras
 Lasagne
@@ -11,6 +11,7 @@ lbfgs
 metaheurística
 metaheurísticas
 MLP
+MLPClassifier
 MLPs
 MSE
 multicapa
@@ -23,6 +24,8 @@ perceptrón
 perceptrones
 perceptrons
 ReLU
+scikit
+scikit
 Scikit
 sigmoide
 sklearn
