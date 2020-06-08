@@ -3,8 +3,8 @@
 > Optimización de Redes Neuronales con Algoritmos Genéticos
 
 [![travis-badge]][travis-url]
-[![license-badge]][LICENSE]
-[![tag-badge]][CHANGELOG.md]
+[![license-badge]][`LICENSE`]
+[![tag-badge]][`CHANGELOG.md`]
 
 **Autor(a): Luis Liñán Villafranca**
 
