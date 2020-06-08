@@ -3,18 +3,7 @@ import subprocess
 import sys
 import unittest
 
-from pathlib import Path
-
-from PyPDF2 import PdfFileReader  # type: ignore
-
-from settings import REPORT_NAME
-
-ROOT = Path(__file__).parents[2].resolve()
-try:
-    ASPELL_DIR_PATH = (ROOT / "docs" / "aspell").resolve(strict=True)
-    REPORT_DIR_PATH = (ROOT / "docs" / "report").resolve(strict=True)
-except FileNotFoundError as error:
-    sys.exit("{}: {}".format(error.strerror, error.filename))
+from settings import ASPELL_DIR_PATH, REPORT_DIR_PATH, REPORT_NAME, ROOT
 
 
 class ReportTests(unittest.TestCase):
@@ -46,8 +35,18 @@ class ReportTests(unittest.TestCase):
     @unittest.skip("Not finished documentation")
     def test_pdf_pages_number(self):
         """Check if report has the minimun number of pages."""
-        pdf = PdfFileReader(str(self.pdf_report_path))
-        number_of_pages = pdf.getNumPages()
+        number_of_pages = int(
+            subprocess.run(
+                [
+                    "qpdf",
+                    "--show-npages",
+                    str(REPORT_DIR_PATH / "proyecto.pdf"),
+                ],
+                universal_newlines=True,
+                check=True,
+                stdout=subprocess.PIPE,
+            ).stdout.strip()
+        )
 
         self.assertGreaterEqual(
             number_of_pages, 50, "Minimun report pages not reached."

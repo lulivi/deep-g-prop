@@ -245,7 +245,7 @@ def test_docs(session: Session) -> None:
         build_pdf(session)
 
     session.install(*test_requirements, *docs_requirements)
-    session.run("pytest", "-vvv", str(ROOT / "tests" / "docs"))
+    session.run("pytest", "-vvv", "-rs", str(ROOT / "tests" / "docs"))
 
 
 @nox.session(name="test-sources", python=["3.6", "3.7", "3.8"])
