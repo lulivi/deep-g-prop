@@ -266,8 +266,8 @@ def test_docs(session: Session) -> None:
     session.run("pytest", "-vvv", "-rs", str(ROOT / "tests" / "docs"))
 
 
-@nox.session(name="test-sources", python=["3.6", "3.7", "3.8"])
-def test_sources(session: Session) -> None:
+@nox.session(name="test-src", python=["3.6", "3.7", "3.8"])
+def test_src(session: Session) -> None:
     """Run the source code related tests."""
     test_path = (
         session.posargs[0] if session.posargs else str(ROOT / "tests" / "src")

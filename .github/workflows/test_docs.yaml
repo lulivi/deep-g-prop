@@ -1,0 +1,36 @@
+# Run documentation tests
+defaults:
+  run:
+    shell: bash
+
+on:
+  push:
+    branches: master
+    paths:
+      - 'docs/**/*.tex'
+      - 'docs/**/*.texw'
+
+  pull_request:
+    branches: master
+    paths:
+      - 'docs/**/*.tex'
+      - 'docs/**/*.texw'
+
+jobs:
+  test-docs:
+    runs-on: ubuntu-18.04
+    name: Tests for the documentation
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.7
+      - name: Install necessary tools
+        run: pip install nox
+      - name: Install texlive packages
+        run:
+          - sudo apt install -y aspell pandoc qpdf texlive-base texlive-latex-recommended texlive-fonts-recommended texlive-fonts-extra texlive-lang-spanish texlive-formats-extra
+      - name: Run doc tests!
+        working-directory: ${{ github.workspace }}
+        run: nox -e test-docs

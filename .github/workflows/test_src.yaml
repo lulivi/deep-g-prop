@@ -1,0 +1,29 @@
+# Run source tests
+defaults:
+  run:
+    shell: bash
+
+on:
+  push:
+    branches: master
+    paths: "**/*.py"
+
+  pull_request:
+    branches: master
+    paths: "**/*.py"
+
+jobs:
+  test-src:
+    runs-on: ubuntu-18.04
+    name: Tests for the source code
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.x"
+      - name: Install necessary tools
+        run: pip install nox
+      - name: Run src tests!
+        working-directory: ${{ github.workspace }}
+        run: nox -e test-src
