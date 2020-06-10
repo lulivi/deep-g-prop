@@ -3,9 +3,9 @@
 > Optimización de Redes Neuronales con Algoritmos Genéticos
 
 [![travis-badge]][travis-url]
-![.github/workflows/test_lint.yaml](https://github.com/lulivi/deep-g-prop/workflows/.github/workflows/test_lint.yaml/badge.svg?branch=master)
-![.github/workflows/test_src.yaml](https://github.com/lulivi/deep-g-prop/workflows/.github/workflows/test_src.yaml/badge.svg?branch=master)
-![.github/workflows/test_docs.yaml](https://github.com/lulivi/deep-g-prop/workflows/.github/workflows/test_docs.yaml/badge.svg?branch=master)
+[![test_lint-badge]][test_lint-url]
+[![test_src-badge]][test_src-url]
+[![test_docs-badge]][test_docs-url]
 [![license-badge]][`LICENSE`]
 [![tag-badge]][`CHANGELOG.md`]
 
@@ -204,3 +204,9 @@ El código de este repositorio está liberado bajo la licencia
 [travis-url]: https://travis-ci.org/lulivi/deep-g-prop
 [license-badge]: https://img.shields.io/github/license/lulivi/deep-g-prop
 [tag-badge]: https://img.shields.io/github/v/tag/lulivi/deep-g-prop
+[test_lint-badge]: https://github.com/lulivi/deep-g-prop/workflows/Source%20code%20lint/badge.svg?branch=master
+[test_lint-url]: https://github.com/lulivi/deep-g-prop/actions?query=workflow%3A%22Source+code+lint%22
+[test_src-badge]: https://github.com/lulivi/deep-g-prop/workflows/Source%20code%20tests/badge.svg?branch=master
+[test_src-url]: https://github.com/lulivi/deep-g-prop/actions?query=workflow%3A%22Source+code+tests%22
+[test_docs-badge]: https://github.com/lulivi/deep-g-prop/workflows/Documentation%20tests/badge.svg?branch=master
+[test_docs-url]: https://github.com/lulivi/deep-g-prop/actions?query=workflow%3A%22Documentation+tests%22
