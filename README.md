@@ -87,7 +87,13 @@ vayan a utilizar. Para más información sobre [pip] y [venv] consultar el
 > usando uno de los comandos mostrados en la tabla de la sección de
 > instalación antes de ejecutar cualquiera de los siguientes comandos.
 
-Usando [Nox] podemos ejecutar el siguiente comando para construir la
+Primero instalamos la herramienta [Nox]:
+
+```shell
+pip install -U nox
+```
+
+Una vez instalado, podemos ejecutar el siguiente comando para construir la
 documentación:
 
 ```shell
