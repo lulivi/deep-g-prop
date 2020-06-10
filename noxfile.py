@@ -317,10 +317,25 @@ def lint(session: Session) -> None:
         env={"TMPDIR": "/var/tmp"},
     )
     with chdir(session, ROOT):
-        session.run("mypy", *python_files)
-        session.run("flake8", *python_files)
-        session.run("pycodestyle", *python_files)
-        session.run("pydocstyle", *python_files)
-        session.run("black", "-l", "79", "--check", "--diff", *python_files)
-        session.run("isort", "-rc", "--check-only", "--diff", *python_files)
-        session.run("pylint", *python_files)
+        session.run("mypy", *python_files, silent=False)
+        session.run("flake8", *python_files, silent=False)
+        session.run("pycodestyle", *python_files, silent=False)
+        session.run("pydocstyle", *python_files, silent=False)
+        session.run(
+            "black",
+            "-l",
+            "79",
+            "--check",
+            "--diff",
+            *python_files,
+            silent=False,
+        )
+        session.run(
+            "isort",
+            "-rc",
+            "--check-only",
+            "--diff",
+            *python_files,
+            silent=False,
+        )
+        session.run("pylint", *python_files, silent=False)

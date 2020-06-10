@@ -4,4 +4,5 @@ flake8==3.8.2
 pylint==2.5.2
 pycodestyle==2.6.0
 pydocstyle==5.0.2
+mypy==0.780
 -r format.txt
