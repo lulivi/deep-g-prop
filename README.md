@@ -122,9 +122,7 @@ información se guardará en el archivo [`CHANGELOG.md`].
 
 ## Frameworks
 
-- [Keras] - librería para la creación y ejecución de redes neuronales. Se ha
-  elegido ésta frente a otras librerías por su sencillez de uso, buena
-  documentación y soporte (dada la gran comunidad que la utiliza).
+- [Keras] - librería para la creación y ejecución de redes neuronales.
 
 - [DEAP] - librería de construcción de algoritmos evolutivos. Se utilizará ésta
   para optimizar los parámetros de las redes neuronales.
@@ -150,9 +148,6 @@ bibliotecas similares y el por qué de la elección de éstas.
 
   - [pandoc] y [aspell] - utilidades para convertir la documentación del
     trabajo a texto plano y comprobar si hay errores ortográficos.
-
-  - [PyPDF] - otra utilidad para comprobar distintas características del PDF
-    resultante de documentación.
 
 - Documentación:
 

@@ -80,10 +80,14 @@ ser usadas en Python. De éstas, destacaremos el subgrupo de las más
 conocidas. Entre ellas están:
 
 \begin{itemize}
+
+    \item scikit-learn \cite{sklearn-nn}
+
     \item Keras\cite{keras-nn} (TensorFlow\cite{tensorflow-nn} and
         Theano\cite{theano-nn})
+
     \item PyTorch \cite{pytorch-nn} (Torch\cite{torch-nn})
-    \item sklearn \cite{sklearn-nn}
+
 \end{itemize}
 
 Para la comparación entre los \textit{frameworks} nombrados, se ha utilizado
@@ -101,10 +105,10 @@ medidas. Se han obtenido las siguientes puntuaciones para llevar la evaluación:
         \mr{2}{*}{\textbf{Estimator}} & \textbf{Mean fit time} \\
                            & \textbf{(seconds)} \\
         \hline
-        Scikit-learn       &   8.82 \\
-        Keras (theano)     &  38.02 \\
-        Keras (tensorflow) &  95.62 \\
-        Skorch (Torch)     & 120.28 \\
+        scikit-learn       &   8.82 \\
+        Keras (Theano)     &  38.02 \\
+        Keras (TensorFlow) &  95.62 \\
+        skorch (Torch)     & 120.28 \\
     \end{tabular}
 \end{table}
 
@@ -141,7 +145,14 @@ ser una medida crítica a la hora de elegir el \textit{framework} idóneo para e
 trabajo, ya que la red neuronal se va re-ejecutar multiples veces con distintos
 cambios.
 
-\begin{table}[p]
+Cabe destacar, que todas las medidas mostradas en las tablas de comparaciones
+(\ref{tab:mlp-comp-times}, \ref{tab:mlp-comp-accuracy},
+\ref{tab:mlp-comp-precision}, \ref{tab:mlp-comp-recall}, y
+\ref{tab:mlp-comp-f1-score}) son la media de las 5 particiones utilizadas en la
+validación cruzada. También se muestra la desviación estándar asociada a esa
+lista de valores.
+
+\begin{table}[]
     \centering
     \caption{Comparación de las puntuaciones de \textit{accuracy} de los
         distintos frameworks.}
@@ -151,14 +162,14 @@ cambios.
         \cline{2-5}
                            & \textbf{mean} & \textbf{std} & \textbf{mean} & \textbf{std} \\
         \hline
-        Scikit-learn       & 1.000000 & 0.000000 & 0.979958 & 0.008890 \\
-        Keras (theano)     & 1.000000 & 0.000000 & 0.982185 & 0.007401 \\
-        Keras (tensorflow) & 1.000000 & 0.000000 & 0.983859 & 0.003702 \\
-        Skorch (Torch)     & 1.000000 & 0.000000 & 0.977736 & 0.007483 \\
+        scikit-learn       & 1.000000      & 0.000000     & 0.979958      & 0.008890 \\
+        Keras (Theano)     & 1.000000      & 0.000000     & 0.982185      & 0.007401 \\
+        Keras (TensorFlow) & 1.000000      & 0.000000     & 0.983859      & 0.003702 \\
+        skorch (Torch)     & 1.000000      & 0.000000     & 0.977736      & 0.007483 \\
     \end{tabular}
 \end{table}
 
-\begin{table}[p]
+\begin{table}[]
     \centering
     \caption{Comparación de las puntuaciones de \textit{precision} de los distintos frameworks.}
     \label{tab:mlp-comp-precision}
@@ -167,14 +178,14 @@ cambios.
         \cline{2-5}
                            & \textbf{mean} & \textbf{std} & \textbf{mean} & \textbf{std} \\
         \hline
-        Scikit-learn       & 1.000000 & 0.000000 & 0.981268 & 0.008253 \\
-        Keras (theano)     & 1.000000 & 0.000000 & 0.982662 & 0.006576 \\
-        Keras (tensorflow) & 1.000000 & 0.000000 & 0.984674 & 0.003597 \\
-        Skorch (Torch)     & 1.000000 & 0.000000 & 0.977820 & 0.007539 \\
+        scikit-learn       & 1.000000      & 0.000000     & 0.981268      & 0.008253 \\
+        Keras (Theano)     & 1.000000      & 0.000000     & 0.982662      & 0.006576 \\
+        Keras (TensorFlow) & 1.000000      & 0.000000     & 0.984674      & 0.003597 \\
+        skorch (Torch)     & 1.000000      & 0.000000     & 0.977820      & 0.007539 \\
     \end{tabular}
 \end{table}
 
-\begin{table}[p]
+\begin{table}[]
     \centering
     \caption{Comparación de las puntuaciones de \textit{recall} de los
         distintos frameworks.}
@@ -184,15 +195,15 @@ cambios.
         \cline{2-5}
                            & \textbf{mean} & \textbf{std} & \textbf{mean} & \textbf{std} \\
         \hline
-        Scikit-learn       & 1.000000 & 0.000000 & 0.979124 & 0.010237 \\
-        Keras (theano)     & 1.000000 & 0.000000 & 0.982052 & 0.007579 \\
-        Keras (tensorflow) & 1.000000 & 0.000000 & 0.984044 & 0.004134 \\
-        Skorch (Torch)     & 1.000000 & 0.000000 & 0.977400 & 0.008047 \\
+        scikit-learn       & 1.000000      & 0.000000     & 0.979124      & 0.010237 \\
+        Keras (Theano)     & 1.000000      & 0.000000     & 0.982052      & 0.007579 \\
+        Keras (TensorFlow) & 1.000000      & 0.000000     & 0.984044      & 0.004134 \\
+        skorch (Torch)     & 1.000000      & 0.000000     & 0.977400      & 0.008047 \\
 
     \end{tabular}
 \end{table}
 
-\begin{table}[p]
+\begin{table}[]
     \centering
     \caption{Comparación de las puntuaciones de \textit{F1 score} de los
         distintos frameworks.}
@@ -202,9 +213,61 @@ cambios.
         \cline{2-5}
                            & \textbf{mean} & \textbf{std} & \textbf{mean} & \textbf{std} \\
         \hline
-        Scikit-learn       & 1.000000 & 0.000000 & 0.979859 & 0.009372 \\
-        Keras (theano)     & 1.000000 & 0.000000 & 0.982067 & 0.007249 \\
-        Keras (tensorflow) & 1.000000 & 0.000000 & 0.984094 & 0.003992 \\
-        Skorch (Torch)     & 1.000000 & 0.000000 & 0.977304 & 0.007888 \\
+        scikit-learn       & 1.000000      & 0.000000     & 0.979859      & 0.009372 \\
+        Keras (Theano)     & 1.000000      & 0.000000     & 0.982067      & 0.007249 \\
+        Keras (TensorFlow) & 1.000000      & 0.000000     & 0.984094      & 0.003992 \\
+        skorch (Torch)     & 1.000000      & 0.000000     & 0.977304      & 0.007888 \\
     \end{tabular}
 \end{table}
+
+\subsection{scikit-learn}
+
+scikit-learn es una colección de herramientas sobre aprendizaje automático,
+proveyendo desde múltiples métodos de preprocesamiento, hasta estimadores de
+todo tipo. Nosotros nos centraremos en la clase \textit{MLPClassifier} que
+implementa una red neuronal simple o perceptrón multicapa. Como se observa en
+la \autoref{tab:mlp-comp-times}, evalúa con el tiempo más competitivo de los
+\textit{frameworks} utilizados. Éste estimador incluso obtiene de las mejores
+puntuaciones en todos los campos estudiados, pero no tiene tan buen soporte
+para trabajar con los pesos, activaciones y neuronas ocultas como Keras, por
+ejemplo.
+
+Es entendible que carezca de estas facilidades dado que no es un proyecto
+centrado en los perceptrones multicapa exclusivamente, sino en cantidad de
+diferentes estimadores y multitud de utilidades como se comentó al inicio.
+
+\subsection{skorch}
+
+A diferencia de la anterior, skorch si está centrada en el desarrollo de redes
+neuronales artificiales. Su finalidad es proporcionar la facilidad de
+scikit-learn con la flexibilidad de PyTorch. Consiste en una capa de
+abstracción sobre PyTorch que expone las funciones más comunes de scikit-learn
+mediante la clase \textit{NeuralNetClassifier}.
+
+Este \textit{framework} queda descartado dado el gran tiempo de ajuste que
+necesita el modelo para adaptarse a los datos de entrenamiento, siendo éste
+algo importante a tener en cuenta. Por otro lado, éste sí permite interacción
+sencilla con los pesos y las neuronas de la red.
+
+\subsection{Keras}
+
+Por ultimo y no menos importante se han hecho pruebas con la herramienta Keras.
+Permite, una vez definido un código, ejecutar los modelos con distintos
+\textit{backends} (como Theano, TensorFlow o MXNet\cite{mxnet-nn}) haciéndola
+así una herramienta muy flexible. Planteada como una librería para la
+experimentación rápida, goza de una comunidad gigante gracias a que está
+respaldada por Google. A parte de la buena documentación, podemos observar en
+las pruebas que los dos \textit{backends} utilizados consiguen las mejores
+puntuaciones de todos los \textit{frameworks} comentados previamente. Así,
+siendo Theano el \textit{backend} más rápido de los dos \textit{backends} será
+el que use para este proyecto.
+
+\subsection{DEAP}
+
+DEAP\cite{deap-ga}, de sus iniciales: \textit{Distributed Evolutionary
+Algorithms in Python}, es un \textit{framework} que permite desarrollar
+algoritmos genéticos (entre muchas utilidades más) en Python. Existen otras
+herramientas similares (como Platypus\cite{platypus-ga}) que no se ajustan al
+problema tan bien como DEAP (o que cuya funcionalidad ya viene contenida en
+DEAP). Por lo tanto, será el \textit{framework} que utilize para desarrollar el
+algoritmo genético que entrene las redes neuronales.

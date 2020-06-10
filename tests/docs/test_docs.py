@@ -27,10 +27,14 @@ class ReportTests(unittest.TestCase):
             cwd=ROOT,
             stdin=process1.stdout,
             stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
             universal_newlines=True,
         )
-        output = process2.communicate()[0].split()
-        self.assertListEqual(output, [], "List of wrong words is not empty.")
+        output, errors = process2.communicate()
+        self.assertFalse(
+            errors.strip(), "There where errors during the spell check."
+        )
+        self.assertFalse(output.split(), "List of wrong words is not empty.")
 
     @unittest.skip("Not finished documentation")
     def test_pdf_pages_number(self):
@@ -76,7 +80,7 @@ class ReportTests(unittest.TestCase):
 
         if aspell_extra_dict.exists():
             cls.aspell_extra_args.append(
-                "--add-extra-dicts={}".format(aspell_extra_dict)
+                "--extra-dicts={}".format(aspell_extra_dict)
             )
 
 

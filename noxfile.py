@@ -5,7 +5,7 @@ import sys
 from functools import partial
 from pathlib import Path
 from shutil import rmtree
-from typing import Callable, Iterator, List
+from typing import Callable, Dict, Iterator, List
 
 import nox  # type: ignore
 
@@ -59,14 +59,22 @@ python_files = [
 # -----------------------------------------------------------------------------
 # Cleaning
 # -----------------------------------------------------------------------------
-def get_logger(session: Session):
-    """Return the session logger function to call.
+def show_help(session: Session, help_dict: Dict[str, str]) -> None:
+    """Process the extra arguments for a session.
 
-    :param session: session from where to obtain the arguments.
-    :returns: the session logger, or an empty function.
+    :param session: current session.
+    :param help: arguments help for the curent session.
 
     """
-    return session.log if "verbose" in session.posargs else lambda *args: None
+    if "help" in session.posargs:
+        session.log("=" * 40)
+        session.log("Function posargs:")
+
+        for argument, description in help_dict.items():
+            session.log(f"\t- {argument}: {description}")
+
+        session.log("=" * 40)
+        session.skip()
 
 
 def remove_files(
@@ -110,6 +118,8 @@ def py_clean(session: Session) -> None:
     will be logged. Nothing will print otherwise.
 
     """
+    show_help(session, {"verbose": "Show each deleted file."})
+    lggr = session.log if "verbose" in session.posargs else lambda *args: None
     session.log("Cleaning global unwanted files...")
 
     remove_files(
@@ -121,7 +131,7 @@ def py_clean(session: Session) -> None:
             *list(ROOT.glob("**/_minted-*/")),
             *list(ROOT.glob("**/cache/")),
         ],
-        get_logger(session),
+        lggr,
     )
 
 
@@ -133,6 +143,8 @@ def docs_clean(session: Session) -> None:
     will be logged. Nothing will print otherwise.
 
     """
+    show_help(session, {"verbose": "Show each deleted file."})
+    lggr = session.log if "verbose" in session.posargs else lambda *args: None
     session.log("Cleaning latex and pweave files...")
 
     remove_files(
@@ -154,7 +166,7 @@ def docs_clean(session: Session) -> None:
             REPORT_DIR_PATH / f"{REPORT_NAME}.pdf",
             REPORT_DIR_PATH / f"{REPORT_NAME}/",
         ],
-        get_logger(session),
+        lggr,
     )
 
 
@@ -238,7 +250,13 @@ def build_pdf(session: Session) -> None:
 # -----------------------------------------------------------------------------
 @nox.session(name="test-docs")
 def test_docs(session: Session) -> None:
-    """Run the documentation related tests."""
+    """Run the documentation related tests.
+
+    If ``skip-latex`` is provided in :attr:`Session.posargs`, no Pweave/latex
+    building will be done before running the tests.
+
+    """
+    show_help(session, {"skip-latex": "Skip the latex step."})
     if "skip-latex" in session.posargs:
         session.log("Skipping LaTeX and PDF building for this session.")
     else:
@@ -299,10 +317,10 @@ def lint(session: Session) -> None:
         env={"TMPDIR": "/var/tmp"},
     )
     with chdir(session, ROOT):
-        session.run("pylint", *python_files)
         session.run("mypy", *python_files)
         session.run("flake8", *python_files)
         session.run("pycodestyle", *python_files)
         session.run("pydocstyle", *python_files)
         session.run("black", "-l", "79", "--check", "--diff", *python_files)
         session.run("isort", "-rc", "--check-only", "--diff", *python_files)
+        session.run("pylint", *python_files)
