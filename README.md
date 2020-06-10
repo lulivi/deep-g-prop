@@ -3,14 +3,16 @@
 > Optimización de Redes Neuronales con Algoritmos Genéticos
 
 [![travis-badge]][travis-url]
+![.github/workflows/test_docs.yaml](https://github.com/lulivi/deep-g-prop/workflows/.github/workflows/test_docs.yaml/badge.svg?branch=master)
+![.github/workflows/test_src.yaml](https://github.com/lulivi/deep-g-prop/workflows/.github/workflows/test_src.yaml/badge.svg?branch=master)
 [![license-badge]][`LICENSE`]
 [![tag-badge]][`CHANGELOG.md`]
 
-**Autor(a): Luis Liñán Villafranca**
+- **Autor(a): Luis Liñán Villafranca**
+- **Tutor(a)(es): Juan Julián Merelo Guervós**
 
-**Tutor(a)(es): Juan Julián Merelo Guervós**
+## Índice
 
-**Índice**
 - [Instalación](#instalación)
 - [Utilización](#utilización)
 - [Desarrollo](#desarrollo)
@@ -39,8 +41,6 @@ vayan a utilizar. Para más información sobre [pip] y [venv] consultar el
   instalado el entorno virtual, deberemos activarlo. Para ello hay que ejecutar
   uno de los siguientes comandos dependiendo del interprete de órdenes que se
   use (tabla obtenida de la documentación oficial de [venv]):
-
-  <a name="table1.1"></a>
 
   | Platform |      Shell      | Command to activate virtual environment |
   | :------: | --------------: | --------------------------------------- |
@@ -84,9 +84,8 @@ vayan a utilizar. Para más información sobre [pip] y [venv] consultar el
 ## Utilización
 
 > **Nota:** Si se ha optado por usar un entorno virtual, debe ser activado
-> usando uno de los comandos mostrados en la [tabla de la sección de
-> instalación](#table1.1) antes de ejecutar cualquiera de los
-> siguientes comandos.
+> usando uno de los comandos mostrados en la tabla de la sección de
+> instalación antes de ejecutar cualquiera de los siguientes comandos.
 
 Usando [Nox] podemos ejecutar el siguiente comando para construir la
 documentación:

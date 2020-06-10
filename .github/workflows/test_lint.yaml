@@ -1,0 +1,47 @@
+# Lint source code
+defaults:
+  run:
+    shell: bash
+
+on:
+  push:
+    branches: master
+    paths: "**/*.py"
+    paths: "**/*.md"
+
+  pull_request:
+    branches: master
+    paths: "**/*.py"
+    paths: "**/*.md"
+
+jobs:
+
+  lint-markdown:
+    runs-on: ubuntu-18.04
+    name: Markdown documents lint
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Node
+        uses: actions/setup-node@v2-beta
+        with:
+          node-version: '14'
+      - name: Install necessary tools
+        run: npm install markdownlint-cli@0.23.1
+      - name: Perform linting
+        working-directory: ${{ github.workspace }}
+        run: npx markdownlint --ignore node_modules .
+
+  lint-python:
+    runs-on: ubuntu-18.04
+    name: Python source lint
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.7
+      - name: Install necessary tools
+        run: pip install nox
+      - name: Perform linting
+        working-directory: ${{ github.workspace }}
+        run: nox -e lint

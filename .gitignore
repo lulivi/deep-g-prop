@@ -125,3 +125,7 @@ docs/report/figures
 
 # Virtualenvs
 .venv*/
+
+# Node
+node_modules/
+package-lock.json
