@@ -24,8 +24,6 @@ jobs:
           python-version: "3.x"
       - name: Install nox for executing tests
         run: pip install nox
-      - name: Install venv for python3.6
-        run: sudo apt install -y python3-venv
       - name: Run src tests!
         working-directory: ${{ github.workspace }}
         run: nox -e test-src
