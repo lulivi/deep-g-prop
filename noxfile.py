@@ -30,7 +30,7 @@ except ModuleNotFoundError:
         ROOT,
     )
 
-
+# Configure nox
 nox.options.sessions = ["test-docs", "test-sources", "lint"]
 nox.options.reuse_existing_virtualenvs = True
 nox.options.default_venv_backend = "venv"
