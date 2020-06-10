@@ -1,3 +1,4 @@
+"""Define global paths for easy file find."""
 from pathlib import Path
 from sys import exit as sysexit
 
