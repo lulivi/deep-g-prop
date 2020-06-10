@@ -1,4 +1,5 @@
 # Run source tests
+name: Source code tests
 defaults:
   run:
     shell: bash

@@ -1,4 +1,5 @@
 # Run documentation tests
+name: Documentation tests
 defaults:
   run:
     shell: bash

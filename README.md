@@ -3,8 +3,9 @@
 > Optimización de Redes Neuronales con Algoritmos Genéticos
 
 [![travis-badge]][travis-url]
-![.github/workflows/test_docs.yaml](https://github.com/lulivi/deep-g-prop/workflows/.github/workflows/test_docs.yaml/badge.svg?branch=master)
+![.github/workflows/test_lint.yaml](https://github.com/lulivi/deep-g-prop/workflows/.github/workflows/test_lint.yaml/badge.svg?branch=master)
 ![.github/workflows/test_src.yaml](https://github.com/lulivi/deep-g-prop/workflows/.github/workflows/test_src.yaml/badge.svg?branch=master)
+![.github/workflows/test_docs.yaml](https://github.com/lulivi/deep-g-prop/workflows/.github/workflows/test_docs.yaml/badge.svg?branch=master)
 [![license-badge]][`LICENSE`]
 [![tag-badge]][`CHANGELOG.md`]
 

@@ -1,4 +1,5 @@
 # Lint source code
+name: Source code lint
 defaults:
   run:
     shell: bash
