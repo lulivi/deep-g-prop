@@ -133,8 +133,8 @@ información se guardará en el archivo [`CHANGELOG.md`].
 - [DEAP] - librería de construcción de algoritmos evolutivos. Se utilizará ésta
   para optimizar los parámetros de las redes neuronales.
 
-En la documentación se podrá encontrar una comparativa detallada con otras
-bibliotecas similares y el por qué de la elección de éstas.
+En el capítulo 3 "El estado del arte" se podrá encontrar una comparativa
+detallada con otras bibliotecas similares y el por qué de la elección de éstas.
 
 ## Utilidades
 
