@@ -2,7 +2,6 @@
 
 > Optimización de Redes Neuronales con Algoritmos Genéticos
 
-[![travis-badge]][travis-url]
 [![test_lint-badge]][test_lint-url]
 [![test_src-badge]][test_src-url]
 [![test_docs-badge]][test_docs-url]
