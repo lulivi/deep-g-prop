@@ -1,8 +1,8 @@
 """Multilayer perceptron classification with Keras."""
-from keras import backend as K  # type: ignore
-from keras.layers import Dense  # type: ignore
-from keras.models import Sequential  # type: ignore
-from keras.wrappers.scikit_learn import KerasClassifier  # type: ignore
+from keras import backend as K
+from keras.layers import Dense
+from keras.models import Sequential
+from keras.wrappers.scikit_learn import KerasClassifier
 
 try:
     from src.mlp_frameworks import common

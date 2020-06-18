@@ -7,17 +7,19 @@ from pathlib import Path
 from typing import List, Union
 from warnings import simplefilter
 
-import numpy as np  # type: ignore
-import sklearn.datasets  # type: ignore
+import numpy as np
+import sklearn.datasets
 
-from evolutionary_search import EvolutionaryAlgorithmSearchCV  # type: ignore
-from sklearn.exceptions import ConvergenceWarning  # type: ignore
-from sklearn.model_selection import (  # type: ignore
+from evolutionary_search import EvolutionaryAlgorithmSearchCV
+from sklearn.exceptions import ConvergenceWarning
+from sklearn.model_selection import (
     GridSearchCV,
     RandomizedSearchCV,
     StratifiedKFold,
 )
-from sklearn.neural_network import MLPClassifier  # type: ignore
+from sklearn.neural_network import MLPClassifier
+
+from src.common import SEED
 
 # Set global path variables
 HP_OPTIMIZATION_DIR = Path(__file__).parent
@@ -25,8 +27,8 @@ LOGS_DIR = HP_OPTIMIZATION_DIR / "logs"
 LOGS_DIR.mkdir(exist_ok=True)
 HP_OPTIMIZATION_CSV = HP_OPTIMIZATION_DIR / "hp_optimization.csv"
 
-random.seed(12345)
-np.random.seed(12345)
+random.seed(SEED)
+np.random.seed(SEED)
 
 table_header = ["optimizator", "best_score", "time"]
 
@@ -41,7 +43,7 @@ paramgrid = {
     "batch_size": [3, 5],
     "learning_rate": ["constant", "invscaling", "adaptive"],
     "learning_rate_init": [0.001, 0.01],
-    "random_state": [12345],
+    "random_state": [SEED],
 }
 
 cross_validation = StratifiedKFold(n_splits=4)

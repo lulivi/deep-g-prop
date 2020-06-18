@@ -2,3 +2,4 @@ optimizator,best_score,time
 Random Search,0.95103,119.76826
 Grid Search,0.96271,6746.02930
 Genetic Search,0.93712,945.41645
+Random Search,0.95103,124.50527

@@ -5,27 +5,29 @@ import time
 from pathlib import Path
 from typing import List
 
-import numpy as np  # type: ignore
-import sklearn.datasets  # type: ignore
+import numpy as np
+import sklearn.datasets
 
-from sklearn.metrics import (  # type: ignore
+from sklearn.metrics import (
     accuracy_score,
     f1_score,
     precision_score,
     recall_score,
 )
-from sklearn.model_selection import KFold  # type: ignore
+from sklearn.model_selection import KFold
 from tabulate import tabulate
 
-from src.utils import configure_logger
+from src.common import SEED
+from src.dgp_logger import DGPLOGGER
 
 # Set global path variables
-FRAMEWORK_TESTING_DIR = Path(__file__).parent
-LOGS_DIR = FRAMEWORK_TESTING_DIR / "logs"
-LOGS_DIR.mkdir(exist_ok=True)
-FRAMEWORK_RESULTS_CSV = FRAMEWORK_TESTING_DIR / "framework_results.csv"
+CURRENT_FILE_PATH = Path(__file__).resolve()
+CURRENT_FILE_DIR = CURRENT_FILE_PATH.parent
+DGPLOGGER.configure_dgp_logger(
+    "DEBUG", CURRENT_FILE_DIR, CURRENT_FILE_PATH.stem
+)
+FRAMEWORK_RESULTS_CSV = CURRENT_FILE_DIR / "framework_results.csv"
 
-FR_LOGGER = configure_logger("framework-comparison", LOGS_DIR, "DEBUG")
 # Load the dataset
 dataset = sklearn.datasets.load_digits()
 X = dataset["data"].astype(np.float32)
@@ -33,15 +35,15 @@ y = dataset["target"].astype(np.int64)
 
 # Define some common estimator attributes
 FEATURE_NUMBER = X.shape[1]
-FR_LOGGER.info("Dataset shape: '%s'", X.shape)
+DGPLOGGER.info("Dataset shape: '%s'", X.shape)
+DGPLOGGER.info("Target data shape: '%s'", y.shape)
 CLASS_NUMBER = len(np.unique(y))
-FR_LOGGER.info("Number of classes: '%d'", CLASS_NUMBER)
-FR_LOGGER.info(
+DGPLOGGER.info("Number of classes: '%d'", CLASS_NUMBER)
+DGPLOGGER.info(
     "Class distribution: <%s>",
     np.asarray(np.unique(y, return_counts=True)).T.tolist(),
 )
-SEED = 12345
-FR_LOGGER.info("Seed: '%d'", SEED)
+DGPLOGGER.info("Seed: '%d'", SEED)
 np.random.seed(SEED)
 SGD_LR = 0.001
 EPOCHS = 200
@@ -92,8 +94,8 @@ def cross_validation(estimator, estimator_name, X, y, metrics,) -> List[str]:
 
     """
     # pylint: disable=too-many-locals,invalid-name,redefined-outer-name
-    FR_LOGGER.debug("Training %s...", estimator_name)
-    FR_LOGGER.debug("Estimator: %s", str(estimator))
+    DGPLOGGER.debug("Training %s...", estimator_name)
+    DGPLOGGER.debug("Estimator: %s", str(estimator))
     result = {"estimator": estimator_name}
     result["fit_times"] = np.zeros((N_SPLITS,))
     for metric_name in metrics.keys():
@@ -101,44 +103,44 @@ def cross_validation(estimator, estimator_name, X, y, metrics,) -> List[str]:
         result[f"test_{metric_name}"] = np.zeros((N_SPLITS,))
 
     for fold, (train_idx, test_idx) in enumerate(K_FOLD.split(X=X, y=y)):
-        FR_LOGGER.info("Fold %d/%d", fold + 1, N_SPLITS)
+        DGPLOGGER.info("Fold %d/%d", fold + 1, N_SPLITS)
 
         X_train, y_train = X[train_idx], y[train_idx]
         X_test, y_test = X[test_idx], y[test_idx]
 
-        FR_LOGGER.debug("Estimator fit...")
+        DGPLOGGER.debug("Estimator fit...")
         start_time = time.perf_counter()
         estimator.fit(X_train, y_train)
         fit_time = time.perf_counter() - start_time
-        FR_LOGGER.debug("Estimator fit... Done in %.5f seconds", fit_time)
+        DGPLOGGER.debug("Estimator fit... Done in %.5f seconds", fit_time)
 
         result["fit_times"][fold] = fit_time
-        FR_LOGGER.debug("Predicting train labels...")
+        DGPLOGGER.debug("Predicting train labels...")
         y_pred_train = estimator.predict(X_train)
-        FR_LOGGER.debug("Predicting test labels...")
+        DGPLOGGER.debug("Predicting test labels...")
         y_pred_test = estimator.predict(X_test)
 
         for metric_name, (func, kwargs) in metrics.items():
-            FR_LOGGER.debug("Obtaining train metric: %s...", metric_name)
+            DGPLOGGER.debug("Obtaining train metric: %s...", metric_name)
             result[f"train_{metric_name}"][fold] = func(
                 y_train, y_pred_train, **kwargs
             )
-            FR_LOGGER.debug(
+            DGPLOGGER.debug(
                 "Obtaining train metric: %s... Done: %s",
                 metric_name,
                 result[f"train_{metric_name}"][fold],
             )
-            FR_LOGGER.debug("Obtaining test metric: %s...", metric_name)
+            DGPLOGGER.debug("Obtaining test metric: %s...", metric_name)
             result[f"test_{metric_name}"][fold] = func(
                 y_test, y_pred_test, **kwargs
             )
-            FR_LOGGER.debug(
+            DGPLOGGER.debug(
                 "Obtaining test metric: %s... Done: %s",
                 metric_name,
                 result[f"test_{metric_name}"][fold],
             )
 
-    FR_LOGGER.debug("Training %s... Done", estimator_name)
+    DGPLOGGER.debug("Training %s... Done", estimator_name)
 
     output_list = [
         result.pop("estimator"),
@@ -193,7 +195,7 @@ def save_result(result: List[str]) -> None:
     :param result: list with the cross validation results of one estimator.
 
     """
-    FR_LOGGER.info("Saving results to %s...", str(FRAMEWORK_RESULTS_CSV))
+    DGPLOGGER.info("Saving results to %s...", str(FRAMEWORK_RESULTS_CSV))
     FRAMEWORK_RESULTS_CSV.touch(exist_ok=True)
 
     with open(FRAMEWORK_RESULTS_CSV, "r") as file_descriptor:
@@ -217,4 +219,4 @@ def save_result(result: List[str]) -> None:
         writer.writerow(result_header)
         writer.writerows(contents)
 
-    FR_LOGGER.info("Saving results to %s... Done", str(FRAMEWORK_RESULTS_CSV))
+    DGPLOGGER.info("Saving results to %s... Done", str(FRAMEWORK_RESULTS_CSV))

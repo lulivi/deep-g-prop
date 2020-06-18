@@ -1,10 +1,10 @@
 """Multilayer perceptron classification with skorch."""
-import torch  # type: ignore
-import torch.nn.functional as F  # type: ignore
+import torch
+import torch.nn.functional as F
 
-from skorch import NeuralNetClassifier  # type: ignore
-from torch import nn  # type: ignore
-from torch.optim import SGD  # type: ignore
+from skorch import NeuralNetClassifier
+from torch import nn
+from torch.optim import SGD
 
 try:
     from src.mlp_frameworks import common

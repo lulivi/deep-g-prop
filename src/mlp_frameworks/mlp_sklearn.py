@@ -1,5 +1,5 @@
 """Multilayer perceptron classification with scikit-learn."""
-from sklearn.neural_network import MLPClassifier  # type: ignore
+from sklearn.neural_network import MLPClassifier
 
 try:
     from src.mlp_frameworks import common
