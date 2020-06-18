@@ -1,7 +1,7 @@
 """Apply panflute filters to the project documentation."""
 from typing import Optional
 
-import panflute as pf  # type: ignore
+import panflute as pf
 
 
 def remove_environments(element, doc) -> Optional[list]:

@@ -7,10 +7,10 @@ from pathlib import Path
 from shutil import rmtree
 from typing import Callable, Dict, Iterator, List
 
-import nox  # type: ignore
+import nox
 
-from nox.command import CommandFailed  # type: ignore
-from nox.sessions import Session  # type: ignore
+from nox.command import CommandFailed
+from nox.sessions import Session
 
 try:
     from settings import (
@@ -298,7 +298,7 @@ def apply_format(session: Session) -> None:
     session.install(*form_requirements)
     session.run("black", "-l", "79", *python_files, silent=False)
     session.run(
-        "isort", "-rc", "--check-only", "--diff", *python_files, silent=False,
+        "isort", "-rc", *python_files, silent=False,
     )
 
 
