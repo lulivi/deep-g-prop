@@ -87,6 +87,23 @@ class Proben1Tests(unittest.TestCase):
             colalign=table_attributes["colalign"],
         )
 
+    def test_print_data_summary(self):
+        """Print the choosen data summary."""
+        data = np.array(
+            [
+                [0.1, 0.1, 0.1],
+                [0.2, 0.2, 0.2],
+                [0.3, 0.1, 0.2],
+                [0.4, 0.4, 0.4],
+            ]
+        )
+        labels = np.array([0, 0, 1, 0])
+        mock_print = mock.Mock()
+
+        utils.print_data_summary(data, labels, "test", mock_print)
+
+        self.assertEqual(mock_print.call_count, 6)
+
 
 if __name__ == "__main__":
     unittest.main()

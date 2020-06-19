@@ -18,7 +18,7 @@ try:
         REPORT_DIR_PATH,
         REPORT_NAME,
         ROOT,
-        REQUIR_DIR_PATH,
+        REQUIREMENTS_DIR_PATH,
     )
 except ModuleNotFoundError:
     sys.path.append(str(Path(__file__).resolve().parent))
@@ -26,7 +26,7 @@ except ModuleNotFoundError:
         FILTER_DIR_PATH,
         REPORT_DIR_PATH,
         REPORT_NAME,
-        REQUIR_DIR_PATH,
+        REQUIREMENTS_DIR_PATH,
         ROOT,
     )
 
@@ -36,17 +36,17 @@ nox.options.reuse_existing_virtualenvs = True
 nox.options.default_venv_backend = "venv"
 
 # Globals
-form_requirements = ["-r", str(REQUIR_DIR_PATH / "format.txt")]
-test_requirements = ["-r", str(REQUIR_DIR_PATH / "tests.txt")]
-docs_requirements = ["-r", str(REQUIR_DIR_PATH / "docs.txt")]
-prod_requirements = ["-r", str(REQUIR_DIR_PATH / "prod.txt")]
+form_requirements = ["-r", str(REQUIREMENTS_DIR_PATH / "format.txt")]
+test_requirements = ["-r", str(REQUIREMENTS_DIR_PATH / "tests.txt")]
+docs_requirements = ["-r", str(REQUIREMENTS_DIR_PATH / "docs.txt")]
+prod_requirements = ["-r", str(REQUIREMENTS_DIR_PATH / "prod.txt")]
 mlp_frameworks_requirements = [
     "-r",
-    str(REQUIR_DIR_PATH / "mlp_frameworks.txt"),
+    str(REQUIREMENTS_DIR_PATH / "mlp_frameworks.txt"),
 ]
 hp_optimization_requirements = [
     "-r",
-    str(REQUIR_DIR_PATH / "hp_optimization.txt"),
+    str(REQUIREMENTS_DIR_PATH / "hp_optimization.txt"),
 ]
 python_files = [
     "noxfile.py",

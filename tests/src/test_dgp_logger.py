@@ -1,4 +1,4 @@
-"""Test the :mod:`src.utils` module."""
+"""Test the :mod:`src.dgp_logger` module."""
 import unittest
 
 from unittest import mock

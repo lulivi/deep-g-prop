@@ -3,6 +3,7 @@
 from pathlib import Path
 from typing import List, Set
 
+import numpy as np
 import pandas as pd
 
 from tabulate import tabulate
@@ -48,23 +49,35 @@ def read_proben1_partition(
 
     trn_data = pd.read_csv(trn_file)
     trn_labels = trn_data.pop("class")
+    trn_labels_cat = pd.get_dummies(trn_labels)
 
     val_data = pd.read_csv(val_file)
     val_labels = val_data.pop("class")
+    val_labels_cat = pd.get_dummies(val_labels)
 
     tst_data = pd.read_csv(tst_file)
     tst_labels = tst_data.pop("class")
-
-    nin = len(trn_data.columns)
-    nout = pd.concat((trn_labels, val_labels, tst_labels)).nunique()
+    tst_labels_cat = pd.get_dummies(tst_labels)
 
     return Proben1Partition(
         dataset_name,
-        nin,
-        nout,
-        Proben1Split(trn_data.to_numpy(), trn_labels.to_numpy()),
-        Proben1Split(val_data.to_numpy(), val_labels.to_numpy()),
-        Proben1Split(tst_data.to_numpy(), tst_labels.to_numpy()),
+        len(trn_data.columns),
+        pd.concat((trn_labels, val_labels, tst_labels)).nunique(),
+        Proben1Split(
+            trn_data.to_numpy(),
+            trn_labels.to_numpy(),
+            trn_labels_cat.to_numpy(),
+        ),
+        Proben1Split(
+            val_data.to_numpy(),
+            val_labels.to_numpy(),
+            val_labels_cat.to_numpy(),
+        ),
+        Proben1Split(
+            tst_data.to_numpy(),
+            tst_labels.to_numpy(),
+            tst_labels_cat.to_numpy(),
+        ),
     )
 
 
@@ -131,3 +144,23 @@ def print_table(table: List[List[str]], print_fn=print, **kwargs) -> None:
             **kwargs,
         )
     )
+
+
+def print_data_summary(
+    data: np.ndarray, labels: np.ndarray, name: str = "", print_fn=print
+):
+    """Print a summary of the dataset provided.
+
+    :param data: dataset data.
+    :param labels: dataset labels.
+    :param name: name to display in the summary.
+
+    """
+    print_fn(f"Data summary: {name}")
+    print_fn(f"data.shape = {data.shape}")
+    print_fn(f"labels.shape = {labels.shape}")
+    total_elements = len(labels)
+    print_fn("Class distribution:")
+
+    for category, count in np.asarray(np.unique(labels, return_counts=True)).T:
+        print_fn(f"\t{category} - {count} ({count / total_elements})")

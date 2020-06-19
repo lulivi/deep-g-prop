@@ -10,8 +10,10 @@ try:
     REPORT_DIR_PATH = (ROOT / "docs" / "report").resolve(strict=True)
     FILTER_DIR_PATH = (ROOT / "docs" / "filters").resolve(strict=True)
     # Code
-    REQUIR_DIR_PATH = (ROOT / "requirements").resolve(strict=True)
+    REQUIREMENTS_DIR_PATH = (ROOT / "requirements").resolve(strict=True)
     SOURCE_DIR_PATH = (ROOT / "src").resolve(strict=True)
+    TESTS_DIR_PATH = (ROOT / "tests").resolve(strict=True)
+    MODELS_DIR_PATH = (SOURCE_DIR_PATH / "models").resolve(strict=True)
     LOGS_DIR_PATH = (SOURCE_DIR_PATH / "logs").resolve(strict=True)
     DATASETS_DIR_PATH = (SOURCE_DIR_PATH / "datasets").resolve(strict=True)
     PROBEN1_DIR_PATH = (DATASETS_DIR_PATH / "proben1").resolve(strict=True)

@@ -1,15 +1,7 @@
 """Multilayer perceptron classification with scikit-learn."""
 from sklearn.neural_network import MLPClassifier
 
-try:
-    from src.mlp_frameworks import common
-except ImportError:  # pragma: no cover
-    from sys import path as syspath
-    from pathlib import Path
-
-    syspath.append(str(Path(__file__).resolve().parents[2]))
-
-    from src.mlp_frameworks import common
+from src.mlp_frameworks import common
 
 
 def cross_validation() -> None:
@@ -43,5 +35,5 @@ def main():
     cross_validation()
 
 
-if __name__ == "__main__":  # pragma: no cover
+if __name__ == "__main__":
     main()

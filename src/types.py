@@ -10,11 +10,13 @@ class Proben1Split(NamedTuple):
 
     :ivar X: data of the split.
     :ivar y: labels of the split.
+    :ivar y: labels of the split categorized.
 
     """
 
     X: np.ndarray
     y: np.ndarray
+    y_cat: np.ndarray
 
 
 class Proben1Partition(NamedTuple):

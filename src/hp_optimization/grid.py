@@ -1,13 +1,5 @@
 """Hyper-parameter optimization with Grid search."""
-try:
-    from src.hp_optimization import common
-except ImportError:  # pragma: no cover
-    from sys import path as syspath
-    from pathlib import Path
-
-    syspath.append(str(Path(__file__).resolve().parents[2]))
-
-    from src.hp_optimization import common
+from src.hp_optimization import common
 
 
 def run_search() -> None:
@@ -30,5 +22,5 @@ def main():
     run_search()
 
 
-if __name__ == "__main__":  # pragma: no cover
+if __name__ == "__main__":
     main()
