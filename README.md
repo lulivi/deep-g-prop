@@ -109,7 +109,7 @@ nox -k test
 Para pasar los distintos linters al código:
 
 ```shell
-nox -e lint
+nox -k lint
 ```
 
 Para obtener otras opciones posibles con Nox:
@@ -136,10 +136,6 @@ En el capítulo 3 "El estado del arte" se podrá encontrar una comparativa
 detallada con otras bibliotecas similares y el por qué de la elección de éstas.
 
 ## Utilidades
-
-- General:
-
-  - [Sultan] - librería en Python para ejecutar procesos de manera cómoda.
 
 - Automatización:
 
