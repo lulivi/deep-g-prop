@@ -14,11 +14,14 @@ try:
     SOURCE_DIR_PATH = (ROOT / "src").resolve(strict=True)
     TESTS_DIR_PATH = (ROOT / "tests").resolve(strict=True)
     MODELS_DIR_PATH = (SOURCE_DIR_PATH / "models").resolve(strict=True)
-    LOGS_DIR_PATH = (SOURCE_DIR_PATH / "logs").resolve(strict=True)
     DATASETS_DIR_PATH = (SOURCE_DIR_PATH / "datasets").resolve(strict=True)
     PROBEN1_DIR_PATH = (DATASETS_DIR_PATH / "proben1").resolve(strict=True)
 except FileNotFoundError as error:
     sysexit(f"{error.strerror}: {error.filename}")
+
+# Possibly not existent folders
+LOGS_DIR_PATH = (SOURCE_DIR_PATH / "logs")
+LOGS_DIR_PATH.mkdir(exist_ok=True)
 
 # Find report name from the only TeX file in the report directory
 REPORT_NAME = list(REPORT_DIR_PATH.glob("*.tex"))[0].stem

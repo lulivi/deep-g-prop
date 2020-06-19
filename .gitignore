@@ -122,9 +122,7 @@ docs/report/figures
 
 # VS code
 *.vscode/
-
-# Virtualenvs
-.venv*/
+ignore/
 
 # Node
 node_modules/
