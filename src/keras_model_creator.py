@@ -49,13 +49,15 @@ def cli(
     hidden_layers_size: List[int],
     verbosity: str,
 ) -> None:
-    r"""Create a Keras model and save it compiled.
+    """Create a Keras model and save it compiled.
 
-    \b
     :param model_name: name of the model to save.
+
     :param dataset_name: name of the proben1 partition to use the dimensions
         from.
+
     :param hidden-layers-size: sequence of ints for the hidden layers.
+
     :param verbosity: terminal log verbosity.
 
     """
@@ -128,7 +130,7 @@ def cli(
         / f"{dataset.name[:-1]}_{hidden_layers_str}_{model_name}_model.h5"
     )
     model.save(model_path)
-    DGPLOGGER.info(f"Saved model to {model_path}.")
+    DGPLOGGER.info(f"Saved model to {model_path}")
 
 
 if __name__ == "__main__":

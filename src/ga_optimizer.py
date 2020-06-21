@@ -2,12 +2,13 @@
 import random
 import time
 
-from typing import Callable, List, Tuple
+from typing import Any, Callable, Dict, List, Tuple
 
 import numpy as np
 
 from deap import base, creator, tools
-from keras import Sequential
+from keras.layers import Dense
+from keras.models import Sequential
 from sklearn.metrics import balanced_accuracy_score, fbeta_score
 
 from src.common import SEED
@@ -19,57 +20,91 @@ ModelStructure = List[Tuple[tuple, np.dtype]]
 np.set_printoptions(precision=5, floatmode="fixed")
 
 
+class Layer:
+    """Keras information to create a :class:`Dense` layer.
+
+    :ivar config: layer configuration.
+    :ivar weights: layer weights array.
+    :ivar bias: layer bias array.
+
+    """
+
+    def __init__(
+        self, config: Dict[str, Any], weights: np.ndarray, bias: np.ndarray,
+    ) -> None:
+        """Create a new Layer object.
+
+        :param config: layer configuration.
+        :param weights: layer weights array.
+        :param bias: layer bias array.
+
+        """
+        self.config: Dict[str, Any] = config
+        self.weights: np.ndarray = weights
+        self.bias: np.ndarray = bias
+
+    def get_weights(self):
+        """Simulate the :class:`Dense` method.
+
+        :returns: weights and bias as a list.
+
+        """
+        return [self.weights, self.bias]
+
+    def set_weights(self, layer_weights: List[np.ndarray]):
+        """Simulate the :class:`Dense` method.
+
+        :param layer_weights: list with weights and bias.
+
+        """
+        self.weights = layer_weights[0]
+        self.bias = layer_weights[1]
+
+
 class MLPIndividual:
     """Basic structure of a simple MLP weights."""
 
-    def __init__(self) -> None:
-        """Create an empty weights list."""
-        self._weights: List[np.array] = []
-        self._bias: List[np.array] = []
+    def __init__(self, model: Sequential) -> None:
+        """Define the base model.
+
+        :param model: base mode from which to obtain the configuration and
+            weights
+
+        """
+        self._layers: List[Layer] = []
+
+        for layer in model.layers:
+            layer_weights = layer.get_weights()
+            self._layers.append(Layer(layer.get_config(), *layer_weights))
 
     def __len__(self) -> int:
-        """Calculate the number of layers the object has."""
-        return len(self._bias)
+        """Calculate the number of layers the model has.
 
-    def add_layer(self, weights: np.ndarray, bias: np.ndarray) -> None:
+        :returns: the number of layers.
+
+        """
+        return len(self._layers)
+
+    def append(
+        self, config: Dict[str, Any], weights: np.ndarray, bias: np.ndarray,
+    ) -> None:
         """Append a new layer.
 
+        :param config: layer configuration (name, units, initializers, ...).
         :param weights: layer weights.
         :param bias: layer bias.
 
         """
-        self._weights.append(weights)
-        self._bias.append(bias)
+        self._layers.append(Layer(config, weights, bias))
 
     @property
-    def weights(self) -> np.ndarray:
-        """Obtain the individual weights.
+    def layers(self) -> List[Layer]:
+        """Obtain the individual list of :class:`Layer`.
 
-        :returns: the weights :class:`np.ndarray`.
-
-        """
-        return self._weights
-
-    @property
-    def bias(self) -> np.ndarray:
-        """Obtain the individual bias.
-
-        :returns: the bias :class:`np.ndarray`.
+        :returns: the list of layers.
 
         """
-        return self._bias
-
-    def get_all(self) -> List[np.array]:
-        """Return the hole structure.
-
-        :returns: the layer list.
-
-        """
-        return [
-            layer
-            for layer_tuple in zip(self._weights, self._bias)
-            for layer in layer_tuple
-        ]
+        return self._layers
 
     def can_mate(self, other: "MLPIndividual") -> bool:
         """Check if the current individual can mate with ``other``.
@@ -81,8 +116,11 @@ class MLPIndividual:
         if len(self) != len(other):
             return False
 
-        for layer, other_layer in zip(self.get_all(), other.get_all()):
-            if layer.shape != other_layer.shape:
+        for layer, other_layer in zip(self.layers, other.layers):
+            if (
+                layer.weights.shape != other_layer.weights.shape
+                or layer.bias.shape != other_layer.bias.shape
+            ):
                 return False
 
         return True
@@ -91,13 +129,12 @@ class MLPIndividual:
         """Serialize as a string the object."""
         str_representation = f"{self.__class__.__name__}:"
 
-        for index, (weights, bias) in enumerate(
-            zip(self._weights, self._bias)
-        ):
+        for index, layer in enumerate(self.layers):
             str_representation += (
                 f"\nLayer {index}:"
-                f"\n-- Weights --\n{str(weights)}"
-                f"\n-- Bias --\n{str(bias)}"
+                f"\n-- Config --\n{str(layer.config)}"
+                f"\n-- Weights --\n{str(layer.weights)}"
+                f"\n-- Bias --\n{str(layer.bias)}"
             )
 
         return str_representation
@@ -115,38 +152,37 @@ class MLPIndividual:
 
 
 def individual_initializer(
-    individual_class, weight_structure, kernel_initializer=np.random.uniform,
+    individual_class: Callable, model: Sequential,
 ):
-    """Initialize an individual.
+    """Initialize an individual with uniform.
+
+    :func:`np.random.uniform` function is used to obtain the new individual
+    weights and bias.
 
     :param individual_class: individual class.
-    :param weight_structure: the internal array of weights the individual has.
-    :param kernel_initializer: weigths layers initializer.
+    :param model: :class:`Sequential` model from which obtain the
+    layer configuration and weights..
 
     """
-    individual = individual_class()
+    individual = individual_class(model)
 
-    for weights, bias in zip(weight_structure[::2], weight_structure[1::2]):
-        individual.add_layer(
-            kernel_initializer(low=-1.0, high=1.0, size=weights[0]),
-            np.zeros(shape=bias[0], dtype=bias[1]),
+    for layer in individual.layers:
+        layer.weights = np.random.uniform(
+            low=-1.0, high=1.0, size=layer.weights.shape
+        )
+        layer.bias = np.random.uniform(
+            low=-1.0, high=1.0, size=layer.bias.shape
         )
 
     return individual
 
 
 def individual_evaluator(
-    individual: MLPIndividual,
-    model: Sequential,
-    trn: Proben1Split,
-    tst: Proben1Split,
-    **kwargs,
+    individual: MLPIndividual, trn: Proben1Split, tst: Proben1Split, **kwargs,
 ):
     """Evaluate an individual.
 
     :param individual: current individual to evaluate.
-    :param model: :class:`keras.Sequential` model to evaluate the individual
-        with.
     :param trn: training data and labels.
     :param tst: validation data and labels.
     :param **kwargs: See below.
@@ -158,7 +194,15 @@ def individual_evaluator(
     :returns: a tuple with the scores.
 
     """
-    model.set_weights(individual.get_all())
+    start_time = time.perf_counter()
+    # Create the model with the individual configuration
+    model = Sequential()
+
+    for layer_index, layer in enumerate(individual.layers):
+        model.add(Dense.from_config(layer.config))
+        model.layers[layer_index].set_weights([layer.weights, layer.bias])
+
+    model.compile(optimizer="sgd", loss="binary_crossentropy")
 
     if kwargs.pop("fit_train", False):
         model.fit(
@@ -175,9 +219,11 @@ def individual_evaluator(
         ),
     )
     bal_accuracy_score = balanced_accuracy_score(tst.y, predicted_y)
+    end_time = time.perf_counter()
     DGPLOGGER.debug(
         f"    Obtained scores: f2-score={f2_score:.5f}, "
-        f"balanced acc score={bal_accuracy_score:.5f}"
+        f"balanced acc score={bal_accuracy_score:.5f}, in "
+        f"{end_time - start_time: .2f} sec"
     )
 
     return (f2_score, bal_accuracy_score)
@@ -193,26 +239,35 @@ def crossover_operator(ind1: MLPIndividual, ind2: MLPIndividual):
     :param ind2: the second individual.
 
     """
-    layer = random.randint(0, len(ind1) - 1)
-    neuron = random.randint(0, len(ind1.bias[layer]) - 1)
+    layer_index = random.randint(0, len(ind1) - 1)
+    neuron_index = random.randint(0, len(ind1.layers[layer_index].bias) - 1)
 
-    (ind1.weights[layer][:, neuron], ind2.weights[layer][:, neuron],) = (
-        ind2.weights[layer][:, neuron].copy(),
-        ind1.weights[layer][:, neuron].copy(),
+    (
+        ind1.layers[layer_index].weights[:, neuron_index],
+        ind2.layers[layer_index].weights[:, neuron_index],
+    ) = (
+        ind2.layers[layer_index].weights[:, neuron_index].copy(),
+        ind1.layers[layer_index].weights[:, neuron_index].copy(),
     )
-    (ind1.bias[layer][neuron], ind2.bias[layer][neuron]) = (
-        ind2.bias[layer][neuron],
-        ind1.bias[layer][neuron],
+    (
+        ind1.layers[layer_index].bias[neuron_index],
+        ind2.layers[layer_index].bias[neuron_index],
+    ) = (
+        ind2.layers[layer_index].bias[neuron_index],
+        ind1.layers[layer_index].bias[neuron_index],
     )
+
+
+# def neuron_mutator(individual: MLPIndividual, )
 
 
 def bias_mutator(individual: MLPIndividual, gen_prob: float) -> int:
     """Mutate some individual bias genes.
 
-    For each bias layer, obtain a random (between 0.0 and 1.0)
-    :class:`np.ndarray` with the same shape of the bias (in this case, a 1D
-    numpy array) and mutate the genes that satisfy the ``gen_prob`` probability
-    to mutate.
+    For each layer bias, obtain a random :class:`np.ndarray`(with values in the
+    range ``[0.0 and 1.0]``) with the same shape as the bias (in this case, a
+    1D numpy array) and mutate the genes that satisfy the ``gen_prob``
+    probability with a value in the range ``[-0.5, 0.5]``
 
     :param individual: individual to mutate.
     :param gen_prob: probability of a gen to mutate.
@@ -221,10 +276,13 @@ def bias_mutator(individual: MLPIndividual, gen_prob: float) -> int:
     """
     mutated_genes = 0
 
-    for layer_idx in range(len(individual)):
-        mask = np.random.rand(*individual.bias[layer_idx].shape) < gen_prob
+    for layer_index in range(len(individual)):
+        mask = (
+            np.random.rand(*individual.layers[layer_index].bias.shape)
+            < gen_prob
+        )
         mutated_genes += np.count_nonzero(mask)
-        individual.bias[layer_idx][mask] += random.uniform(-0.5, 0.5)
+        individual.layers[layer_index].bias[mask] += random.uniform(-0.5, 0.5)
 
     return mutated_genes
 
@@ -232,6 +290,11 @@ def bias_mutator(individual: MLPIndividual, gen_prob: float) -> int:
 def weights_mutator(individual: MLPIndividual, gen_prob: float) -> int:
     """Mutate some individual weights genes.
 
+    For each layer weights, obtain a random :class:`np.ndarray`(with values in
+    the range ``[0.0 and 1.0]``) with the same shape as the weights and mutate
+    the genes that satisfy the ``gen_prob`` probability with a value in the
+    range ``[-0.5, 0.5]``
+
     :param individual: individual to mutate.
     :param gen_prob: probability of a gen to mutate.
     :returns: number of genes mutated.
@@ -239,10 +302,15 @@ def weights_mutator(individual: MLPIndividual, gen_prob: float) -> int:
     """
     mutated_genes = 0
 
-    for layer_idx in range(len(individual)):
-        mask = np.random.rand(*individual.weights[layer_idx].shape) < gen_prob
+    for layer_index in range(len(individual)):
+        mask = (
+            np.random.rand(*individual.layers[layer_index].weights.shape)
+            < gen_prob
+        )
         mutated_genes += np.count_nonzero(mask)
-        individual.weights[layer_idx][mask] += random.uniform(-0.5, 0.5)
+        individual.layers[layer_index].weights[mask] += random.uniform(
+            -0.5, 0.5
+        )
 
     return mutated_genes
 
@@ -279,12 +347,7 @@ def configure_toolbox(
 
     DGPLOGGER.debug("Register the individual initializer...")
     toolbox.register(
-        "individual",
-        individual_initializer,
-        creator.Individual,
-        weight_structure=[
-            (layer.shape, layer.dtype) for layer in model.get_weights()
-        ],
+        "individual", individual_initializer, creator.Individual, model,
     )
 
     # define the population to be a list of individuals
@@ -298,7 +361,6 @@ def configure_toolbox(
     toolbox.register(
         "evaluate",
         individual_evaluator,
-        model=model,
         trn=dataset.trn,
         tst=dataset.val,
         average="micro" if dataset.nout > 2 else "binary",
@@ -473,9 +535,7 @@ def finished_algorithm_summary(
     print_table(final_pop_table, **table_common_attributes)
 
 
-def test_individual(
-    individual, model, dataset, fit_train,
-) -> Tuple[float, float]:
+def test_individual(individual, dataset, fit_train,) -> Tuple[float, float]:
     """Test an individual with the validation and test data.
 
     :param individual: current individual to evaluate.
@@ -489,10 +549,8 @@ def test_individual(
     DGPLOGGER.info(
         "Predicting the validation and test data with the best individual."
     )
-    individual.get_all()
     val_scores = individual_evaluator(
         individual,
-        model,
         dataset.trn,
         dataset.val,
         fit_train=fit_train,
@@ -500,7 +558,6 @@ def test_individual(
     )
     tst_scores = individual_evaluator(
         individual,
-        model,
         dataset.trn,
         dataset.tst,
         fit_train=fit_train,
@@ -570,7 +627,7 @@ def genetic_algorithm(
     evaluate_population(population, toolbox.evaluate)
 
     population.sort(key=lambda ind: ind.fitness.values, reverse=True)
-    test_individual(population[0], model, dataset, fit_train)
+    test_individual(population[0], dataset, fit_train)
 
     initial_population = population[:]
     DGPLOGGER.debug(f"    -- Evaluated {len(population)} individuals")
@@ -637,6 +694,6 @@ def genetic_algorithm(
     DGPLOGGER.debug(f"-- End of evolution in {elapsed_time} seconds.")
     population.sort(key=lambda ind: ind.fitness.values, reverse=True)
     finished_algorithm_summary(initial_population, population, tools.selBest)
-    test_individual(population[0], model, dataset, fit_train)
+    test_individual(population[0], dataset, fit_train)
 
     return initial_population[0], population[0]

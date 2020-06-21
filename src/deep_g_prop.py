@@ -42,8 +42,11 @@ def cli(
     """Load <model-path> Keras model and optimize it with genetic algorithms.
 
     :param model_path: path to the ``h5`` model.
+
     :param dataset_name: name of the proben1 partition.
+
     :param fit_train: whether to fit the model before predicting labels.
+
     :param verbosity: terminal log verbosity.
 
     """
