@@ -198,7 +198,7 @@ class TestGeneticAlgorithm(unittest.TestCase):
     def test_genetic_algorithm_train(self):
         """Run the genetic algorithm a few times and check if it works."""
         first_weights, best_weights = ga_optimizer.genetic_algorithm(
-            self.model, self.dataset, 5, 3, fit_train=True
+            self.model, self.dataset, 3, 8, fit_train=True
         )
         first_score = ga_optimizer.test_individual(
             first_weights, self.dataset, fit_train=True

@@ -263,6 +263,103 @@ def crossover_operator(ind1: MLPIndividual, ind2: MLPIndividual):
     )
 
 
+def layer_mutator(individual: MLPIndividual) -> int:
+    """Add/remove one layer to the model.
+
+    :param individual: individual to mutate.
+    :return: wether the layer was added or removed.
+
+    """
+    # Choose a random number of neurons
+    neurons_number = random.randint(2, 5)
+
+    # Choose randomly to add or delete a layer
+    choice = random.choice((-1, 1))
+
+    if choice > 0:
+        # Create a new layer config and weights
+        previous_layer_output = individual.layers[-2].config["units"]
+        new_layer_config = {
+            "name": f"HiddenLayer{len(individual)+1}",
+            "trainable": True,
+            "dtype": "float32",
+            "units": neurons_number,
+            "activation": "relu",
+            "use_bias": True,
+            "kernel_initializer": {"class_name": "Zeros", "config": {}},
+            "bias_initializer": {"class_name": "Zeros", "config": {}},
+            "kernel_regularizer": None,
+            "bias_regularizer": None,
+            "activity_regularizer": None,
+            "kernel_constraint": None,
+            "bias_constraint": None,
+        }
+        new_layer_weights = np.random.uniform(
+            -1, 1, size=(previous_layer_output, neurons_number)
+        )
+        new_layer_bias = np.random.uniform(-1, 1, size=(neurons_number,))
+
+        # Insert the recently created configuration and weights into our
+        # individual
+        individual.layers.insert(
+            len(individual.layers) - 1,
+            Layer(new_layer_config, new_layer_weights, new_layer_bias,),
+        )
+
+        # Obtain the differences between the new layer neurons and the output
+        # layer input neurons and apply necessary changes to this last one
+        next_layer_input_len = individual.layers[-1].weights.shape[0]
+        difference = neurons_number - next_layer_input_len
+
+        # Add input neuron entries
+        if difference > 0:
+            next_layer_neurons = len(individual.layers[-1].bias)
+            individual.layers[-1].weights = np.append(
+                individual.layers[-1].weights,
+                np.random.uniform(-1.0, 1.0, (difference, next_layer_neurons)),
+                axis=0,
+            )
+        # Remove input neuron entries
+        elif difference < 0:
+            individual.layers[-1].weights = np.delete(
+                individual.layers[-1].weights,
+                slice(next_layer_input_len + difference, next_layer_input_len),
+                axis=0,
+            )
+    # Ensure there are 2 or more layers in the model before deleting one
+    elif len(individual) > 2:
+        # Obtain the predecessor output units and delte the choosen layer
+        removed_predecessor_units = individual.layers[-3].config["units"]
+        del individual.layers[-2]
+
+        # Calculate the difference between the predecesor layer and the output
+        # layer
+        output_layer_input_len = individual.layers[-1].weights.shape[0]
+        difference = removed_predecessor_units - output_layer_input_len
+
+        # Append the neccesary input neuron entries
+        if difference > 0:
+            next_layer_neurons = len(individual.layers[-1].bias)
+            individual.layers[-1].weights = np.append(
+                individual.layers[-1].weights,
+                np.random.uniform(-0.5, 0.5, (difference, next_layer_neurons)),
+                axis=0,
+            )
+        # Remove the leftovers
+        elif difference < 0:
+            individual.layers[-1].weights = np.delete(
+                individual.layers[-1].weights,
+                slice(
+                    output_layer_input_len + difference, output_layer_input_len
+                ),
+                axis=0,
+            )
+    else:
+        choice = 0
+
+    return choice
+
+
 def neuron_mutator(individual: MLPIndividual) -> int:
     """Add/remove one neuron from a random hidden layer.
 
@@ -275,13 +372,8 @@ def neuron_mutator(individual: MLPIndividual) -> int:
     # We want to ignore output layer so it only adds/pops from a hidden layer
     layer_index = random.randint(0, len(individual) - 2)
 
-    # Ensure there are more than 2 neurons per hidden layer
-    if individual.layers[layer_index].bias.shape[0] <= 3:
-        choice = 1
-    else:
-        choice = random.choice((-1, 1))
-
-    individual.layers[layer_index].config["units"] += choice
+    # Choose randomly to add or delete a neuron
+    choice = random.choice((-1, 1))
 
     if choice > 0:
         # Get previous layer neurons as a reference for creating a new neuron
@@ -307,7 +399,8 @@ def neuron_mutator(individual: MLPIndividual) -> int:
             np.random.uniform(-0.5, 0.5, (1, next_layer_neurons)),
             axis=0,
         )
-    else:
+    # Ensure there are 2 or more neurons in the hidden layer
+    elif len(individual.layers[layer_index].bias) > 2:
         # Remove last neuron weights and bias from the choosen layer
         individual.layers[layer_index].weights = np.delete(
             individual.layers[layer_index].weights, -1, axis=1
@@ -319,6 +412,11 @@ def neuron_mutator(individual: MLPIndividual) -> int:
         individual.layers[layer_index + 1].weights = np.delete(
             individual.layers[layer_index + 1].weights, -1, axis=0
         )
+    else:
+        choice = 0
+
+    # Update the units in the layer config
+    individual.layers[layer_index].config["units"] += choice
 
     return choice
 
@@ -444,6 +542,9 @@ def configure_toolbox(
     DGPLOGGER.debug("register the neuron mutator operator")
     toolbox.register("mutate_neuron", neuron_mutator)
 
+    DGPLOGGER.debug("register the layer mutator operator")
+    toolbox.register("mutate_layer", layer_mutator)
+
     DGPLOGGER.debug("Register the selector function...")
     toolbox.register("select", tools.selTournament, tournsize=3)
 
@@ -501,38 +602,43 @@ def apply_crossover(
 
 
 def apply_mutation(
-    population: list, toolbox: base.Toolbox, mut_neuron_prob: float,
+    population: list,
+    toolbox: base.Toolbox,
+    mut_neuron_prob: float,
+    mut_layer_prob: float,
 ) -> int:
     """Mutate the population with probabilities.
 
     :param population: list of individuals.
-    :param mut_bias_prob: probability to mutate the individual bias genes.
-    :param mut_weights_prob: probability to mutate the individual weights
-        genes.
-    :param mut_bias_fn: function to mute the bias genes.
-    :param mut_weights_fn: function to mute the weights genes.
+    :param toolbox: object where the mutation operators are defined.
+    :param mut_neuron_prob: probability to mute a neuron (append/pop).
+    :param mut_layer_prob: probability to mute a layer (append/pop).
     :returns: the number of individuals mutated.
 
     """
     mutated_individuals = 0
 
     for index, mutant in enumerate(population):
-        mutated_bias_genes = mutated_weights_genes = neuron_diff = 0
+        mut_bias_genes = mut_weights_genes = neuron_diff = layer_diff = 0
 
-        mutated_bias_genes = toolbox.mutate_bias(mutant)
-        mutated_weights_genes = toolbox.mutate_weights(mutant)
+        mut_bias_genes = toolbox.mutate_bias(mutant)
+        mut_weights_genes = toolbox.mutate_weights(mutant)
         del mutant.fitness.values
 
         if random.random() < mut_neuron_prob:
             neuron_diff = toolbox.mutate_neuron(mutant)
 
-        if mutated_bias_genes or mutated_weights_genes:
+        if random.random() < mut_layer_prob:
+            layer_diff = toolbox.mutate_layer(mutant)
+
+        if mut_bias_genes or mut_weights_genes:
             mutated_individuals += 1
             DGPLOGGER.debug(
                 f"    For individual {index}:\n"
-                f"        mutated {mutated_bias_genes} bias genes\n"
-                f"        mutated {mutated_weights_genes} weights genes\n"
-                f"        changed neuron number {neuron_diff}"
+                f"        mutated {mut_bias_genes} bias genes\n"
+                f"        mutated {mut_weights_genes} weights genes\n"
+                f"        changed neuron number {neuron_diff}\n"
+                f"        changed layer number {layer_diff}\n"
             )
 
     return mutated_individuals
@@ -663,10 +769,11 @@ def genetic_algorithm(
     dataset: Proben1Partition,
     init_population_size: int = 50,
     max_generations: int = 1000,
-    mut_bias_prob: float = 0.2,
+    cx_prob: float = 0.5,
+    mut_bias_prob: float = 0.3,
     mut_weights_prob: float = 0.4,
     mut_neuron_prob: float = 0.3,
-    cx_prob: float = 0.5,
+    mut_layer_prob: float = 0.3,
     fit_train: bool = False,
 ) -> Tuple[MLPIndividual, MLPIndividual]:
     """Perform optimization with a genetic algorithm.
@@ -675,10 +782,12 @@ def genetic_algorithm(
     :param dataset: data to work with.
     :param init_population_size: initial population size.
     :param max_generations: maximun number of generations to run.
+    :param cx_prob: probability to mate two individuals.
     :param mut_bias_prob: probability to mutate the individual bias genes.
     :param mut_weights_prob: probability to mutate the individual weights
         genes.
-    :param cx_prob: probability to mate two individuals.
+    :param mut_neuron_prob: probability to add/remove a neuron from the model.
+    :param mut_layer_prob: probability to add/remove a layer from the model.
     :param fit_train: whether to fit the training data in each evaluation.
     :returns: the toolbox with the registered functions.
 
@@ -721,6 +830,7 @@ def genetic_algorithm(
     try:
         # Begin the evolution
         while max(fits) < 1 and current_generation < max_generations:
+
             # A new generation
             current_generation = current_generation + 1
             DGPLOGGER.info(f"-- Generation {current_generation} --")
@@ -743,7 +853,7 @@ def genetic_algorithm(
             )
             DGPLOGGER.debug("    -- Mutating some individuals.")
             mutated_individuals = apply_mutation(
-                offspring, toolbox, mut_neuron_prob
+                offspring, toolbox, mut_neuron_prob, mut_layer_prob
             )
             DGPLOGGER.info(
                 f"    -- Mutated {mutated_individuals} individuals."
