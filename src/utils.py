@@ -163,4 +163,4 @@ def print_data_summary(
     print_fn("Class distribution:")
 
     for category, count in np.asarray(np.unique(labels, return_counts=True)).T:
-        print_fn(f"\t{category} - {count} ({count / total_elements})")
+        print_fn(f"\t{category} - {count} ({count / total_elements:.2f})")

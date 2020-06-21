@@ -1,4 +1,4 @@
-"""Multilayer peceptron optimization via genetic algorithms."""
+"""Multilayer perceptron optimization via genetic algorithms."""
 import random
 import time
 
@@ -186,7 +186,6 @@ def individual_evaluator(
     :param trn: training data and labels.
     :param tst: validation data and labels.
     :param **kwargs: See below.
-
     :Keyword Arguments:
         - fit_train: whether to fit the train data with some forward pases
             before predicting.
@@ -195,6 +194,10 @@ def individual_evaluator(
 
     """
     start_time = time.perf_counter()
+    units_size_list = [layer.config["units"] for layer in individual.layers]
+    DGPLOGGER.debug(
+        f"Evaluating individual with neuron number: {units_size_list}"
+    )
     # Create the model with the individual configuration
     model = Sequential()
 
@@ -204,11 +207,13 @@ def individual_evaluator(
 
     model.compile(optimizer="sgd", loss="binary_crossentropy")
 
+    # Train if choosen
     if kwargs.pop("fit_train", False):
         model.fit(
             trn.X, trn.y_cat, epochs=20, batch_size=8, verbose=0,
         )
 
+    # Predict the scores
     predicted_y = model.predict_classes(tst.X)
     f2_score = fbeta_score(
         tst.y,
@@ -258,7 +263,64 @@ def crossover_operator(ind1: MLPIndividual, ind2: MLPIndividual):
     )
 
 
-# def neuron_mutator(individual: MLPIndividual, )
+def neuron_mutator(individual: MLPIndividual) -> int:
+    """Add/remove one neuron from a random hidden layer.
+
+    Randomly choose whether to add or remove a neuron.
+
+    :param individual: individual to mutate.
+    :returns: whether the neuron was added or removed.
+
+    """
+    # We want to ignore output layer so it only adds/pops from a hidden layer
+    layer_index = random.randint(0, len(individual) - 2)
+
+    # Ensure there are more than 2 neurons per hidden layer
+    if individual.layers[layer_index].bias.shape[0] <= 3:
+        choice = 1
+    else:
+        choice = random.choice((-1, 1))
+
+    individual.layers[layer_index].config["units"] += choice
+
+    if choice > 0:
+        # Get previous layer neurons as a reference for creating a new neuron
+        # for this layer
+        previous_layer_neurons = individual.layers[layer_index].weights.shape[
+            0
+        ]
+        # Append a new neuron to the weights and bias of the choosen layer
+        individual.layers[layer_index].weights = np.append(
+            individual.layers[layer_index].weights,
+            np.random.uniform(-0.5, 0.5, (previous_layer_neurons, 1)),
+            axis=1,
+        )
+        individual.layers[layer_index].bias = np.append(
+            individual.layers[layer_index].bias,
+            [random.uniform(-0.5, 0.5)],
+            axis=0,
+        )
+        # Append a new input entry for the choosen layer in the following layer
+        next_layer_neurons = len(individual.layers[layer_index + 1].bias)
+        individual.layers[layer_index + 1].weights = np.append(
+            individual.layers[layer_index + 1].weights,
+            np.random.uniform(-0.5, 0.5, (1, next_layer_neurons)),
+            axis=0,
+        )
+    else:
+        # Remove last neuron weights and bias from the choosen layer
+        individual.layers[layer_index].weights = np.delete(
+            individual.layers[layer_index].weights, -1, axis=1
+        )
+        individual.layers[layer_index].bias = np.delete(
+            individual.layers[layer_index].bias, -1, axis=0
+        )
+        # Remove the input neuron from the next layer
+        individual.layers[layer_index + 1].weights = np.delete(
+            individual.layers[layer_index + 1].weights, -1, axis=0
+        )
+
+    return choice
 
 
 def bias_mutator(individual: MLPIndividual, gen_prob: float) -> int:
@@ -319,8 +381,7 @@ def weights_mutator(individual: MLPIndividual, gen_prob: float) -> int:
 def configure_toolbox(
     model: Sequential,
     dataset: Proben1Partition,
-    mut_bias_prob: float,
-    mut_weights_prob: float,
+    probabilities: Dict[str, float],
     fit_train: bool,
 ):
     """Register all neccesary objects and functions.
@@ -372,11 +433,16 @@ def configure_toolbox(
 
     DGPLOGGER.debug("Register the weights mutate operator...")
     toolbox.register(
-        "mutate_weights", weights_mutator, gen_prob=mut_weights_prob
+        "mutate_weights", weights_mutator, gen_prob=probabilities["weights"]
     )
 
     DGPLOGGER.debug("Register the bias mutate operator...")
-    toolbox.register("mutate_bias", bias_mutator, gen_prob=mut_bias_prob)
+    toolbox.register(
+        "mutate_bias", bias_mutator, gen_prob=probabilities["bias"]
+    )
+
+    DGPLOGGER.debug("register the neuron mutator operator")
+    toolbox.register("mutate_neuron", neuron_mutator)
 
     DGPLOGGER.debug("Register the selector function...")
     toolbox.register("select", tools.selTournament, tournsize=3)
@@ -401,6 +467,7 @@ def evaluate_population(population: list, evaluate_fn: Callable) -> None:
     fitnesses = map(evaluate_fn, population)
 
     for ind, fit in zip(population, fitnesses):
+
         ind.fitness.values = fit
 
 
@@ -417,9 +484,15 @@ def apply_crossover(
     """
     crossed_individuals = 0
 
-    for child1, child2 in zip(population[::2], population[1::2]):
+    for crossover_index, (child1, child2) in enumerate(
+        zip(population[::2], population[1::2])
+    ):
         if random.random() < cx_prob and child1.can_mate(child2):
             crossed_individuals += 1
+            DGPLOGGER.debug(
+                f"Applying crossover for the {crossover_index} couple "
+                f"({crossover_index * 2}, {crossover_index * 2+1}))."
+            )
             crossover_fn(child1, child2)
             del child1.fitness.values
             del child2.fitness.values
@@ -428,11 +501,7 @@ def apply_crossover(
 
 
 def apply_mutation(
-    population: list,
-    mut_bias_prob: float,
-    mut_weights_prob: float,
-    mut_bias_fn: Callable,
-    mut_weights_fn: Callable,
+    population: list, toolbox: base.Toolbox, mut_neuron_prob: float,
 ) -> int:
     """Mutate the population with probabilities.
 
@@ -448,22 +517,22 @@ def apply_mutation(
     mutated_individuals = 0
 
     for index, mutant in enumerate(population):
-        mutated_bias_genes = mutated_weights_genes = 0
+        mutated_bias_genes = mutated_weights_genes = neuron_diff = 0
 
-        if random.random() < mut_bias_prob:
-            mutated_bias_genes = mut_bias_fn(mutant)
-            del mutant.fitness.values
+        mutated_bias_genes = toolbox.mutate_bias(mutant)
+        mutated_weights_genes = toolbox.mutate_weights(mutant)
+        del mutant.fitness.values
 
-        if random.random() < mut_weights_prob:
-            mutated_weights_genes = mut_weights_fn(mutant)
-            del mutant.fitness.values
+        if random.random() < mut_neuron_prob:
+            neuron_diff = toolbox.mutate_neuron(mutant)
 
         if mutated_bias_genes or mutated_weights_genes:
             mutated_individuals += 1
             DGPLOGGER.debug(
-                f"    For individual {index}: mutated "
-                f"{mutated_bias_genes} bias genes and "
-                f"{mutated_weights_genes} weights genes."
+                f"    For individual {index}:\n"
+                f"        mutated {mutated_bias_genes} bias genes\n"
+                f"        mutated {mutated_weights_genes} weights genes\n"
+                f"        changed neuron number {neuron_diff}"
             )
 
     return mutated_individuals
@@ -535,7 +604,12 @@ def finished_algorithm_summary(
     print_table(final_pop_table, **table_common_attributes)
 
 
-def test_individual(individual, dataset, fit_train,) -> Tuple[float, float]:
+def test_individual(
+    individual: MLPIndividual,
+    dataset: Proben1Partition,
+    text: str = "Individual",
+    fit_train: bool = False,
+) -> Tuple[float, float]:
     """Test an individual with the validation and test data.
 
     :param individual: current individual to evaluate.
@@ -544,7 +618,7 @@ def test_individual(individual, dataset, fit_train,) -> Tuple[float, float]:
     :param fit_train: whether to fit the training data in each evaluation.
 
     """
-    DGPLOGGER.info("Best individual weights")
+    DGPLOGGER.info(f"{text} weights")
     DGPLOGGER.info(str(individual))
     DGPLOGGER.info(
         "Predicting the validation and test data with the best individual."
@@ -587,10 +661,11 @@ def test_individual(individual, dataset, fit_train,) -> Tuple[float, float]:
 def genetic_algorithm(
     model: Sequential,
     dataset: Proben1Partition,
-    init_population_size: int = 100,
+    init_population_size: int = 50,
     max_generations: int = 1000,
     mut_bias_prob: float = 0.2,
     mut_weights_prob: float = 0.4,
+    mut_neuron_prob: float = 0.3,
     cx_prob: float = 0.5,
     fit_train: bool = False,
 ) -> Tuple[MLPIndividual, MLPIndividual]:
@@ -613,7 +688,10 @@ def genetic_algorithm(
 
     # Configure dataset related variables
     toolbox = configure_toolbox(
-        model, dataset, mut_bias_prob, mut_weights_prob, fit_train,
+        model,
+        dataset,
+        {"bias": mut_bias_prob, "weights": mut_weights_prob},
+        fit_train,
     )
 
     # --------------------------------
@@ -627,7 +705,9 @@ def genetic_algorithm(
     evaluate_population(population, toolbox.evaluate)
 
     population.sort(key=lambda ind: ind.fitness.values, reverse=True)
-    test_individual(population[0], dataset, fit_train)
+    test_individual(
+        population[0], dataset, "Best initial individual", fit_train
+    )
 
     initial_population = population[:]
     DGPLOGGER.debug(f"    -- Evaluated {len(population)} individuals")
@@ -663,11 +743,7 @@ def genetic_algorithm(
             )
             DGPLOGGER.debug("    -- Mutating some individuals.")
             mutated_individuals = apply_mutation(
-                offspring,
-                mut_bias_prob,
-                mut_weights_prob,
-                toolbox.mutate_bias,
-                toolbox.mutate_weights,
+                offspring, toolbox, mut_neuron_prob
             )
             DGPLOGGER.info(
                 f"    -- Mutated {mutated_individuals} individuals."
@@ -694,6 +770,6 @@ def genetic_algorithm(
     DGPLOGGER.debug(f"-- End of evolution in {elapsed_time} seconds.")
     population.sort(key=lambda ind: ind.fitness.values, reverse=True)
     finished_algorithm_summary(initial_population, population, tools.selBest)
-    test_individual(population[0], dataset, fit_train)
+    test_individual(population[0], dataset, "Best final individual", fit_train)
 
     return initial_population[0], population[0]
