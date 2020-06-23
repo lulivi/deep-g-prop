@@ -44,18 +44,22 @@ class TestKerasModelCreatorCli(unittest.TestCase):
             )
 
         self.assertEqual(result.exit_code, 2, result.stdout)
-
-    def test_cli_ok(self):
+    @mock.patch("src.keras_model_creator.DGPLOGGER")
+    @mock.patch("src.keras_model_creator.keras")
+    def test_cli_ok(self, mock_keras, mock_dgplogger):
         """Model path could not be found."""
         model_name = "example1"
         dataset_name = "cancer1"
         hidden_layers = "5 6 7"
         runner = CliRunner()
-        with mock.patch("src.deep_g_prop.keras"):
-            result = runner.invoke(
-                cli, [model_name, dataset_name, hidden_layers]
-            )
+        result = runner.invoke(
+            cli, [model_name, dataset_name, hidden_layers]
+        )
 
+        mock_keras.models.Sequential.return_value.save.assert_called_once()
+        mock_dgplogger.title.assert_called()
+        mock_dgplogger.debug.assert_called()
+        mock_dgplogger.info.assert_called()
         self.assertEqual(result.exit_code, 0, result.stdout)
 
 

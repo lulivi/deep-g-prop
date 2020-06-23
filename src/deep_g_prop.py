@@ -50,11 +50,6 @@ def cli(
     :param verbosity: terminal log verbosity.
 
     """
-    # Configure log file handler
-    DGPLOGGER.configure_dgp_logger(
-        log_stream_level=verbosity, log_file_stem_sufix=Path(__file__).stem
-    )
-
     # Load the dataset
     try:
         dataset: Proben1Partition = read_proben1_partition(dataset_name)
@@ -69,17 +64,11 @@ def cli(
             param_hint="--dataset-name",
         ) from error
 
-    # Load the keras model
     if (
-        model_path.exists()
-        and dataset.name[:-1] in model_path.stem
-        and model_path.suffix == ".h5"
+        not model_path.exists()
+        or dataset.name[:-1] not in model_path.stem
+        or model_path.suffix != ".h5"
     ):
-        DGPLOGGER.title(msg=f"Loading Keras model from {str(model_path)}")
-        model = keras.models.load_model(str(model_path))
-        model.summary(print_fn=DGPLOGGER.debug)
-        DGPLOGGER.debug(pformat(model.get_weights()))
-    else:
         DGPLOGGER.critical(
             "There was an error when lading the provided model from "
             f"'{str(model_path)}'"
@@ -89,6 +78,17 @@ def cli(
             "provided, or it is not a '.h5' file.",
             param_hint="MODEL_PATH",
         )
+
+    # Configure log file handler
+    DGPLOGGER.configure_dgp_logger(
+        log_stream_level=verbosity, log_file_stem_sufix=Path(__file__).stem
+    )
+
+    # Load the keras model
+    DGPLOGGER.title(msg=f"Loading Keras model from {str(model_path)}")
+    model = keras.models.load_model(str(model_path))
+    model.summary(print_fn=DGPLOGGER.debug)
+    DGPLOGGER.debug(pformat(model.get_weights()))
 
     # Data summary
     DGPLOGGER.title(level=DEBUG, msg="Printing dataset sumary:")

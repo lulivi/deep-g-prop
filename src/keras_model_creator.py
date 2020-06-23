@@ -61,11 +61,6 @@ def cli(
     :param verbosity: terminal log verbosity.
 
     """
-    # Configure log file handler
-    DGPLOGGER.configure_dgp_logger(
-        log_stream_level=verbosity, log_file_stem_sufix=Path(__file__).stem
-    )
-
     # Load the dataset
     try:
         dataset: Proben1Partition = read_proben1_partition(dataset_name)
@@ -79,6 +74,11 @@ def cli(
             f"'{dataset_name}'.",
             param_hint="--dataset-name",
         ) from error
+
+    # Configure log file handler
+    DGPLOGGER.configure_dgp_logger(
+        log_stream_level=verbosity, log_file_stem_sufix=Path(__file__).stem
+    )
 
     DGPLOGGER.title(msg="Creating Keras model...")
     model = keras.models.Sequential()

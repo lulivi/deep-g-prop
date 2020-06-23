@@ -53,7 +53,8 @@ class TestDeepGPropCli(unittest.TestCase):
 
         self.assertEqual(result.exit_code, 2, result.stdout)
 
-    def test_cli_model_found(self):
+    @mock.patch("src.deep_g_prop.DGPLOGGER")
+    def test_cli_ok(self, mock_dgplogger):
         """Model is found."""
         model_path = str(
             TESTS_DIR_PATH / "test_files" / "cancer_test_model.h5"
@@ -66,6 +67,9 @@ class TestDeepGPropCli(unittest.TestCase):
         ):
             result = runner.invoke(cli, [model_path])
 
+        mock_dgplogger.title.assert_called()
+        mock_dgplogger.debug.assert_called()
+        mock_dgplogger.info.assert_called()
         self.assertEqual(result.exit_code, 0, result.stdout)
 
 
