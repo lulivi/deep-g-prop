@@ -15,8 +15,6 @@ Se distribuyen de la siguiente manera:
 - [`types.py`]: distintos tipos de datos utilizados en varios módulos.
 - [`utils.py`]: funciones útiles para diversos casos.
 - [`common.py`]: variables comunes utilizadas por distintos módulos.
-
-
 - [`models`]: carpeta donde se pueden encontrar los modelos creados con
   `keras_model_creator.py`.
 - [`datasets`]: carpeta en la que se incluyen los conjuntos de datos utilizados
