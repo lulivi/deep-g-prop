@@ -1,13 +1,11 @@
 """Multilayer perceptron testing with Keras."""
 from logging import DEBUG
-from pathlib import Path
-from pprint import pformat
+from typing import List
 
 import click
-import keras
 
 from src.dgp_logger import DGPLOGGER
-from src.ga_optimizer import genetic_algorithm
+from src.ga_optimizer import HiddenLayerInfo, genetic_algorithm
 from src.types import Proben1Partition
 from src.utils import (
     DatasetNotFoundError,
@@ -16,13 +14,90 @@ from src.utils import (
 )
 
 
+class HiddenLayerInfoList(click.ParamType):
+    """Custom click type to match a hidden layer sequence."""
+
+    name = "hidden layer info sequence"
+
+    @staticmethod
+    def _get_layer_info(layer_info_str):
+        """Return a hidden layer info object from a string."""
+        neurons_str, trainable_str = layer_info_str.split()
+        return HiddenLayerInfo(
+            int(neurons_str), click.BOOL(trainable_str.strip()),
+        )
+
+    def convert(self, value, param, ctx):
+        """Conver from string to a :class:`List[HiddenLayerInfo]`."""
+        try:
+            return list(map(self._get_layer_info, value.split(",")))
+        except ValueError:
+            self.fail(
+                f"{value!r} is not a valid hidden layer sequence", param, ctx
+            )
+
+
 @click.command()
-@click.argument("model-path", type=Path, required=True)
 @click.option(
     "--dataset-name",
     type=click.STRING,
     default="cancer1",
     help="name of the proben1 partition located in src/datasets/",
+)
+@click.option(
+    "--hidden-sequence",
+    type=HiddenLayerInfoList(),
+    default="3 True",
+    help=(
+        'sequence of hidden layer configuration in the form of "4 True, 2'
+        ' False" to have two hidden layers: the first one trainable with 4 '
+        "neurons and the second one non-trainable with 2."
+    ),
+)
+@click.option(
+    "--init-pop",
+    type=click.INT,
+    default=50,
+    help="number of individuals for the first population.",
+)
+@click.option(
+    "--max-gen",
+    type=click.INT,
+    default=300,
+    help="maximun number of generations.",
+)
+@click.option(
+    "--cx-prob",
+    type=click.FLOAT,
+    default=0.5,
+    help="probability for two individuals to mate.",
+)
+@click.option(
+    "--mut-bias-prob",
+    type=click.FLOAT,
+    default=0.2,
+    help="probability to mutate each individual bias gene.",
+)
+@click.option(
+    "--mut-weights-prob",
+    type=click.FLOAT,
+    default=0.75,
+    help="probability to mutate each individual weight gene.",
+)
+@click.option(
+    "--mut-neuron-prob",
+    type=click.FLOAT,
+    default=0.3,
+    help=(
+        "probability to add/remove the last neuron of a random layer for an "
+        "individual."
+    ),
+)
+@click.option(
+    "--mut-layer-prob",
+    type=click.FLOAT,
+    default=0.3,
+    help="probability to add/remove the last layer from an individual.",
 )
 @click.option(
     "--fit-train",
@@ -36,16 +111,41 @@ from src.utils import (
     default="INFO",
     help="stream handler verbosity level.",
 )
+# pylint: disable=too-many-arguments
 def cli(
-    model_path: Path, dataset_name: str, fit_train: bool, verbosity: str
+    dataset_name: str,
+    hidden_sequence: List[HiddenLayerInfo],
+    init_pop: int,
+    max_gen: int,
+    cx_prob: float,
+    mut_bias_prob: float,
+    mut_weights_prob: float,
+    mut_neuron_prob: float,
+    mut_layer_prob: float,
+    fit_train: bool,
+    verbosity: str,
 ) -> None:
-    """Load <model-path> Keras model and optimize it with genetic algorithms.
+    """Run a genetic algorithm with the choosen settings.
 
-    :param model_path: path to the ``h5`` model.
+    :param hidden_layers_info: list of hidden layers basic configuration.
 
-    :param dataset_name: name of the proben1 partition.
+    :param dataset: data to work with.
 
-    :param fit_train: whether to fit the model before predicting labels.
+    :param init_pop: initial population size.
+
+    :param max_gen: maximun number of generations to run.
+
+    :param cx_prob: probability to mate two individuals.
+
+    :param mut_bias_prob: probability to mutate the individual bias genes.
+
+    :param mut_weights_prob: probability to mutate the individual weights
+        genes.
+    :param mut_neuron_prob: probability to add/remove a neuron from the model.
+
+    :param mut_layer_prob: probability to add/remove a layer from the model.
+
+    :param fit_train: whether to fit the training data in each evaluation.
 
     :param verbosity: terminal log verbosity.
 
@@ -64,31 +164,18 @@ def cli(
             param_hint="--dataset-name",
         ) from error
 
-    if (
-        not model_path.exists()
-        or dataset.name[:-1] not in model_path.stem
-        or model_path.suffix != ".h5"
-    ):
-        DGPLOGGER.critical(
-            "There was an error when lading the provided model from "
-            f"'{str(model_path)}'"
-        )
-        raise click.BadParameter(
-            "Model path does not exist, it is not compatible with the dataset "
-            "provided, or it is not a '.h5' file.",
-            param_hint="MODEL_PATH",
-        )
+    hidden_str = "_".join(
+        [
+            f"{hidden.neurons}{'t' if hidden.trainable else 'n'}"
+            for hidden in hidden_sequence
+        ]
+    )
+    file_name = f"{hidden_str}_{'train' if fit_train else 'noTrain'}"
 
     # Configure log file handler
     DGPLOGGER.configure_dgp_logger(
-        log_stream_level=verbosity, log_file_stem_sufix=Path(__file__).stem
+        log_stream_level=verbosity, log_file_stem_sufix=file_name
     )
-
-    # Load the keras model
-    DGPLOGGER.title(msg=f"Loading Keras model from {str(model_path)}")
-    model = keras.models.load_model(str(model_path))
-    model.summary(print_fn=DGPLOGGER.debug)
-    DGPLOGGER.debug(pformat(model.get_weights()))
 
     # Data summary
     DGPLOGGER.title(level=DEBUG, msg="Printing dataset sumary:")
@@ -103,7 +190,18 @@ def cli(
     )
 
     # Call the genetic algorithm
-    genetic_algorithm(model, dataset, fit_train=fit_train)
+    genetic_algorithm(
+        hidden_layers_info=hidden_sequence,
+        dataset=dataset,
+        init_population_size=init_pop,
+        max_generations=max_gen,
+        cx_prob=cx_prob,
+        mut_bias_prob=mut_bias_prob,
+        mut_weights_prob=mut_weights_prob,
+        mut_neuron_prob=mut_neuron_prob,
+        mut_layer_prob=mut_layer_prob,
+        fit_train=fit_train,
+    )
 
 
 if __name__ == "__main__":
