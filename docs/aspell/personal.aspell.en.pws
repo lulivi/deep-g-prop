@@ -6,7 +6,9 @@ backpropagation
 bayesiana
 BFGS
 DEAP
+DeepGProp
 desbalanceados
+GProp
 hiperparámetros
 keras
 lasagne
@@ -29,6 +31,7 @@ perceptrón
 perceptrones
 perceptrons
 preprocesamiento
+Proben
 ReLU
 scikit
 sigmoide

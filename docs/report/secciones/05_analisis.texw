@@ -1,2 +1,224 @@
 \chapter{Análisis del problema}
- 
+
+En este capítulo se comentarán las pruebas realizadas junto al análisis de los
+resultados obtenidos.
+
+Las métricas utilizadas para llevar el control del algoritmo y que además
+sirven para comparar unas ejecuciones con otras son: F2 score y Accuracy error.
+
+La métrica F2 score es una definida como la media armónica ponderada entre
+precisión (\textit{precision})\footnote{Fracción de instancias que son de la
+clase relevante. Esto es: el número de ejemplos que pertenecen a la clase
+relevante dividido por el número total de ejemplos que se han predicho.} y
+sensibilidad (\textit{recall})\footnote{Fracción de instancias de la clase
+relevante que se han clasificado bien.}. Por un lado, si los datos están
+desbalanceados la precisión puede salir alta pero la sensibilidad saldrá baja.
+Usando cómo parámetro de ponderación el número dos, le damos más importancia a
+la sensibilidad, para evitar lo antes comentado.
+
+Siempre que se refiera a un número de capas concreto se estará hablando de las
+capas ocultas, dado que la tanto la capa de entrada como la de salida son
+obligatorias y de estructura fija.
+
+Para las pruebas se han utilizado distintos conjuntos de datos de
+Proben1\cite{Proben1}\footnote{Base de datos dedicada a comparar redes
+neuronales.} para poder comparar los resultados obtenidos con GProp ya
+mencionado en la introducción.
+
+\section{Evolución de población sin modificación de estructura}
+
+Primero se han llevado a cabo pruebas en las que no se ha modificado la
+estructura del perceptrón multicapa, se elegía manualmente al inicio de la
+iteración. Solo se modifican los los \textit{pesos} y \textit{sesgos} de cada
+capa (\textit{weights} y \textit{bias}).
+
+En las Tablas \ref{tab:dgp-3n-init} y
+\ref{tab:dgp-3n-end} tenemos los resultados de la
+primera ejecución: una capa interna de tres neuronas la cuál sólo sufrirá la
+modificación que ocasione la operación de cruce en cada generación. Se han
+evitado las mutaciones de los genes de los \textit{pesos} y \textit{sesgos} de
+las capas internas para comparar los datos obtenidos con otras ejecuciones
+distintas.
+
+\begin{table}
+    \centering
+    \caption{
+        Resultados del mejor individuo \textbf{inicial} obtenidos con una capa
+        oculta de tres neuronas sin modificaciones y sin ajuste previo a la
+        predicción.
+    }
+    \label{tab:dgp-3n-init}
+    \begin{tabular}{r|c|c}
+        \textbf{Partition} & \textbf{F2 score}& \textbf{Accuracy error} \% \\
+        \hline
+        \textbf{Validation (no train)} &  0.97015  &    5.75 \\
+          \textbf{Validation (train)}  &  0.92476  &    3.45 \\
+              \textbf{Test (no train)} &  0.93750  &    8.57 \\
+              \textbf{Test (train)}    &  0.88561  &    5.71 \\
+    \end{tabular}
+\end{table}
+
+Se puede observar un claro incremento del valor F2 y el decremento proporcional
+del error de acierto. Dado que se realizan mutaciones en la capa de salida y se
+intercambian neuronas entre individuos, por la naturaleza de los algoritmos
+genéticos se puede predecir este aumento de puntuación.
+
+\begin{table}
+    \centering
+    \caption{
+        Resultados del mejor individuo \textbf{final} obtenidos con una capa
+        oculta de tres neuronas sin modificaciones y sin ajuste previo a la
+        predicción.
+    }
+    \label{tab:dgp-3n-end}
+    \begin{tabular}{r|c|c}
+        \textbf{Partition} & \textbf{F2 score} &  \textbf{Accuracy error \%} \\
+        \hline
+        \textbf{Validation (no train)} & 0.99693 & 0.57 \\
+          \textbf{Validation (train)}  & 0.93750 & 2.87 \\
+              \textbf{Test (no train)} & 0.97122 & 2.86 \\
+              \textbf{Test (train)}    & 0.90074 & 5.14 \\
+    \end{tabular}
+\end{table}
+
+Si a esta configuración le incorporamos la probabilidad que se realice
+propagación hacia atrás en algunos individuos, se puede advertir en la
+\autoref{tab:dgp-3n-fit-end} un incremento considerable a
+la hora de comparar los resultados de ``Test'' con la
+\autoref{tab:dgp-3n-end}, tanto con entrenamiento como
+sin él. Esto puede ser debido al ajuste que ocasiona la propagación hacia
+atrás.
+
+\begin{table}[ht]
+    \centering
+    \caption{
+        Resultados del mejor individuo \textbf{inicial} obtenidos con una capa
+        oculta de tres neuronas sin modificaciones y con una probabilidad de
+        ajuste previo a la predicción de 30\%.
+    }
+    \label{tab:dgp-3n-fit-init}
+    \begin{tabular}{r|c|c}
+        \textbf{Partition} & \textbf{F2 score} &  \textbf{Accuracy error \%} \\
+        \hline
+        \textbf{Validation (no train)} & 0.60714 & 70.69 \\
+          \textbf{Validation (train)}  & 0.93750 &  2.87 \\
+              \textbf{Test (no train)} & 0.64103 & 71.43 \\
+              \textbf{Test (train)}    & 0.93066 &  4.00 \\
+    \end{tabular}
+\end{table}
+
+Cabe destacar al visualizar los resultados de inicio de esta última ejecución
+(\autoref{tab:dgp-3n-fit-init}) nos encontramos una mejor
+puntuación en la validación con ajuste previo debido a un claro sobreajuste
+producido por la propagación hacia atrás en la primera evaluación de la
+población. También se nota en la puntuación tan baja cuando se le ejecuta la
+validación y el test sin ajuste previo.
+
+\begin{table}[ht]
+    \centering
+    \caption{
+        Resultados del mejor individuo \textbf{final} obtenidos con una capa
+        oculta de tres neuronas sin modificaciones y con una probabilidad de
+        ajuste previo a la predicción de 30\%.
+    }
+    \label{tab:dgp-3n-fit-end}
+    \begin{tabular}{r|c|c}
+        \textbf{Partition} & \textbf{F2 score} &  \textbf{Accuracy error \%} \\
+        \hline
+        \textbf{Validation (no train)} & 0.99693 & 0.57 \\
+          \textbf{Validation (train)}  & 0.92476 & 3.45 \\
+              \textbf{Test (no train)} & 0.98566 & 2.29 \\
+              \textbf{Test (train)}    & 0.97826 & 1.71 \\
+    \end{tabular}
+\end{table}
+
+También se han realizado pruebas con otras estructuras (igualmente introducidas
+a mano) como por ejemplo teniendo dos capas ocultas con diez neuronas cada una
+en diferentes casos. Se advierte en la \autoref{tab:dgp-10n-10n} unos
+resultados muy buenos, incluso mejores que los anteriores observados en
+\autoref{tab:dgp-3n-fit-end}. Parece que esta estructura se adapta mejor al
+problema que la anterior expuesta. El resto de configuraciones (entrenando las
+capas ocultas y sin/con ajuste a los datos de entrenamiento antes de predecir
+resultados) también obtienen mejores resultados que sus similares en la previa
+configuración.
+
+\begin{table}[h]
+    \centering
+    \caption{
+        Resultados iniciales obtenidos con 2 capas ocultas de 10 neuronas cada
+        una sin modificaciones y sin ajuste previo a la predicción.
+    }
+    \label{tab:dgp-10n-10n}
+    \begin{tabular}{r|c|c}
+        \textbf{Partition} & \textbf{F2 score} &  \textbf{Accuracy error \%} \\
+        \hline
+        \textbf{Validation (no train)} & 0.99693 & 0.57 \\
+        \textbf{Validation (train)}    & 0.92476 & 3.45 \\
+        \textbf{Test (no train)}       & 0.98921 & 1.71 \\
+        \textbf{Test (train)}          & 0.97826 & 1.71 \\
+    \end{tabular}
+\end{table}
+
+\begin{table}[h]
+    \centering
+    \caption{
+        Resultados iniciales obtenidos con 2 capas ocultas de 10 neuronas cada
+        una con modificaciones y sin ajuste previo a la predicción.
+    }
+    \label{tab:dgp-10t-10t}
+    \begin{tabular}{r|c|c}
+        \textbf{Partition} & \textbf{F2 score} &  \textbf{Accuracy error \%} \\
+        \hline
+        \textbf{Validation (no train)} & 0.98765 & 0.57 \\
+        \textbf{Validation (train)}    & 0.95016 & 2.30 \\
+        \textbf{Test (no train)}       & 0.95668 & 3.43 \\
+        \textbf{Test (train)}          & 0.94545 & 3.43 \\
+    \end{tabular}
+\end{table}
+
+\begin{table}[h]
+    \centering
+    \caption{
+        Resultados iniciales obtenidos con 2 capas ocultas de 10 neuronas cada
+        una sin modificaciones y con ajuste previo a la predicción.
+    }
+    \label{tab:dgp-10n-10n-fit}
+    \begin{tabular}{r|c|c}
+        \textbf{Partition} & \textbf{F2 score} &  \textbf{Accuracy error \%} \\
+        \hline
+        \textbf{Validation (no train)} & 0.99085 & 1.72 \\
+        \textbf{Validation (train)}    & 0.93458 & 3.45 \\
+        \textbf{Test (no train)}       & 0.95406 & 5.71 \\
+        \textbf{Test (train)}          & 0.95238 & 2.29 \\
+    \end{tabular}
+\end{table}
+
+\begin{table}[h]
+    \centering
+    \caption{
+        Resultados iniciales obtenidos con 2 capas ocultas de 10 neuronas cada
+        una con modificaciones y con ajuste previo a la predicción.
+    }
+    \label{tab:dgp-10t-10t-fit}
+    \begin{tabular}{r|c|c}
+        \textbf{Partition} & \textbf{F2 score} &  \textbf{Accuracy error \%} \\
+        \hline
+        \textbf{Validation (no train)} & 0.33451 & 29.31 \\
+        \textbf{Validation (train)}    & 0.97859 &  2.30 \\
+        \textbf{Test (no train)}       & 0.35714 & 22.29 \\
+        \textbf{Test (train)}          & 0.94891 &  2.86 \\
+    \end{tabular}
+\end{table}
+
+Se puede sacar en claro que generalmente al realizar pequeñas modificaciones en
+los modelos de perceptrones multicapa se obtienen mejores resultados que si
+solo entrenamos el modelo con propagación hacia atrás, dado que cabe la
+posibilidad de que ocurra el inconveniente del sobreajuste. En las siguientes
+secciones se explorarán nuevas mutaciones más complejas ya modificando la
+estructura del perceptrón multicapa de generación en generación.
+
+\section{Evolución de población con modificación de número de neuronas}
+
+\section{Evolución de población con modificación de número de neuronas y capas}
+
+
