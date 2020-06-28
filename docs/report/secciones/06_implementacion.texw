@@ -1,1 +1,26 @@
 \chapter{Implementación}
+
+En este capítulo se explicará detalladamente la implementación en Python
+seguida para llegar a las conclusiones obtenidas.
+
+\section{Elección de \textit{framework} y comparación con otros algoritmos}
+\subsection{Comparación de buscadores de parámetros}
+
+En el \autoref{chap:state-of-art} se trataron una serie de utilidades que
+sirven para encontrar parámetros iniciales de un perceptrón multicapa estándar.
+
+\subsection{Comparación de \textit{frameworks} para redes neuronales}
+
+\section{DeepGProp}
+
+El código del trabajo está localizado en el directorio \texttt{src} situado en
+la carpeta raíz del repositorio. El \textit{script} llamado
+\texttt{deep\_g\_prop} es el punto de entrada del programa. Por línea de
+comandos se le indica la configuración que se quiere utilizar en el algoritmo
+genético.
+
+\subsection{Herramienta de línea de comandos}
+
+\subsection{Utilidades}
+
+\subsection{Optimización con algoritmos genéticos}
