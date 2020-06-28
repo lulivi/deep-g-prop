@@ -33,7 +33,11 @@ class HiddenLayerInfoList(click.ParamType):
             return list(map(self._get_layer_info, value.split(",")))
         except ValueError:
             self.fail(
-                f"{value!r} is not a valid hidden layer sequence", param, ctx
+                f"{value!r} is not a valid hidden layer sequence. It sould be "
+                "'<num_neurons> <traineable>[, <neurons> <traineable> [...]]'"
+                ". For example: '4 True, 2 False, 6 True'",
+                param,
+                ctx,
             )
 
 
@@ -45,7 +49,7 @@ class HiddenLayerInfoList(click.ParamType):
     help="name of the proben1 partition located in src/datasets/",
 )
 @click.option(
-    "--hidden-sequence",
+    "--hidden-layers-info",
     type=HiddenLayerInfoList(),
     default="3 True",
     help=(
@@ -55,13 +59,13 @@ class HiddenLayerInfoList(click.ParamType):
     ),
 )
 @click.option(
-    "--init-pop",
+    "--init-population-size",
     type=click.INT,
     default=50,
     help="number of individuals for the first population.",
 )
 @click.option(
-    "--max-gen",
+    "--max-generations",
     type=click.INT,
     default=300,
     help="maximun number of generations.",
@@ -100,10 +104,13 @@ class HiddenLayerInfoList(click.ParamType):
     help="probability to add/remove the last layer from an individual.",
 )
 @click.option(
-    "--fit-train",
-    type=click.BOOL,
-    default=False,
-    help="whether to train the model when evaluating each individual.",
+    "--fit-train-prob",
+    type=click.FLOAT,
+    default=0.3,
+    help=(
+        "probability to fit the training data for each individual in each "
+        "evaluation."
+    ),
 )
 @click.option(
     "--verbosity",
@@ -114,15 +121,15 @@ class HiddenLayerInfoList(click.ParamType):
 # pylint: disable=too-many-arguments
 def cli(
     dataset_name: str,
-    hidden_sequence: List[HiddenLayerInfo],
-    init_pop: int,
-    max_gen: int,
+    hidden_layers_info: List[HiddenLayerInfo],
+    init_population_size: int,
+    max_generations: int,
     cx_prob: float,
     mut_bias_prob: float,
     mut_weights_prob: float,
     mut_neuron_prob: float,
     mut_layer_prob: float,
-    fit_train: bool,
+    fit_train_prob: float,
     verbosity: str,
 ) -> None:
     """Run a genetic algorithm with the choosen settings.
@@ -131,9 +138,9 @@ def cli(
 
     :param dataset: data to work with.
 
-    :param init_pop: initial population size.
+    :param init_population_size: initial population size.
 
-    :param max_gen: maximun number of generations to run.
+    :param max_generations: maximun number of generations to run.
 
     :param cx_prob: probability to mate two individuals.
 
@@ -145,7 +152,8 @@ def cli(
 
     :param mut_layer_prob: probability to add/remove a layer from the model.
 
-    :param fit_train: whether to fit the training data in each evaluation.
+    :param fit_train_prob: probability to fit the training data for each
+        individual in each evaluation.
 
     :param verbosity: terminal log verbosity.
 
@@ -164,13 +172,22 @@ def cli(
             param_hint="--dataset-name",
         ) from error
 
-    hidden_str = "_".join(
+    hidden_layers_str = "_".join(
         [
             f"{hidden.neurons}{'t' if hidden.trainable else 'n'}"
-            for hidden in hidden_sequence
+            for hidden in hidden_layers_info
         ]
     )
-    file_name = f"{hidden_str}_{'train' if fit_train else 'noTrain'}"
+    file_name = f"{dataset_name}_{hidden_layers_str}"
+
+    if mut_neuron_prob > 0.0:
+        file_name += "_neur"
+
+    if mut_layer_prob > 0.0:
+        file_name += "_lay"
+
+    if fit_train_prob > 0.0:
+        file_name += "_fit"
 
     # Configure log file handler
     DGPLOGGER.configure_dgp_logger(
@@ -189,18 +206,34 @@ def cli(
         dataset.tst.X, dataset.tst.y, "Test", print_fn=DGPLOGGER.info
     )
 
+    DGPLOGGER.title(msg="Selected configuration values")
+    DGPLOGGER.info(
+        f"-- Hidden layer sequence configuration: {hidden_layers_info}"
+    )
+    DGPLOGGER.info(f"-- Dataset name: {dataset.name}")
+    DGPLOGGER.info(f"-- Initial population size: {init_population_size}")
+    DGPLOGGER.info(f"-- Maximun number of generations: {max_generations}")
+    DGPLOGGER.info(f"-- Cossover probability: {cx_prob}")
+    DGPLOGGER.info(f"-- Bias gene mutation probability: {mut_bias_prob}")
+    DGPLOGGER.info(f"-- Weights gene mutation probability: {mut_weights_prob}")
+    DGPLOGGER.info(f"-- Neuron mutation probability: {mut_neuron_prob}")
+    DGPLOGGER.info(f"-- Layer mutation probability: {mut_layer_prob}")
+    DGPLOGGER.info(
+        f"-- Fit train before predicting probability: {fit_train_prob}"
+    )
+
     # Call the genetic algorithm
     genetic_algorithm(
-        hidden_layers_info=hidden_sequence,
+        hidden_layers_info=hidden_layers_info,
         dataset=dataset,
-        init_population_size=init_pop,
-        max_generations=max_gen,
+        init_population_size=init_population_size,
+        max_generations=max_generations,
         cx_prob=cx_prob,
         mut_bias_prob=mut_bias_prob,
         mut_weights_prob=mut_weights_prob,
         mut_neuron_prob=mut_neuron_prob,
         mut_layer_prob=mut_layer_prob,
-        fit_train=fit_train,
+        fit_train_prob=fit_train_prob,
     )
 
 

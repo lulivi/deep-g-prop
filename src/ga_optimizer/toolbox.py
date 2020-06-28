@@ -12,7 +12,7 @@ import numpy as np
 
 from deap import base, creator, tools
 from keras.layers import Dense
-from keras.losses import CategoricalCrossentropy
+from keras.losses import BinaryCrossentropy, CategoricalCrossentropy
 from keras.models import Sequential
 from keras.optimizers import SGD
 from sklearn.metrics import accuracy_score, fbeta_score
@@ -30,11 +30,10 @@ def individual_initializer(
 ):
     """Initialize an individual with uniform.
 
-    :func:`np.random.uniform` function is used to obtain the new individual
-    weights and bias.
-
     :param individual_class: individual class.
-    :param model: :class:`Sequential` model from which obtain the
+    :param model_input: number of neurons in the input layer.
+    :param hidden_layer_sequence: :class:`HiddenLayerInfo` list of layers.
+    :param model_output: number of classes to predict.
     layer configuration and weights..
 
     """
@@ -51,12 +50,13 @@ def individual_evaluator(
     :param tst: validation data and labels.
     :param **kwargs: See below.
     :Keyword Arguments:
-        - fit_train: whether to fit the train data with some forward pases
-            before predicting.
-        - average: average approach for :func:`fbeta_score` scorer.
-    :returns: a tuple with the scores.
+        - fit_train_prob: probability to fit the train data with some forward
+            pases before predicting.
+        - multi_class: ``True`` if the dataset is for multiclass
+            classification.
 
     """
+    multi_class = kwargs.get("multi_class", False)
     start_time = time.perf_counter()
     units_size_list = [
         layer.config["units"] for layer in individual.layers[:-1]
@@ -72,11 +72,14 @@ def individual_evaluator(
         model.layers[layer_index].set_weights([layer.weights, layer.bias])
 
     model.compile(
-        optimizer=SGD(), loss=CategoricalCrossentropy(),
+        optimizer=SGD(),
+        loss=CategoricalCrossentropy()
+        if multi_class
+        else BinaryCrossentropy(),
     )
 
     # Train if choosen
-    if kwargs.pop("fit_train", False):
+    if random.random() < kwargs.pop("fit_train_prob"):
         model.fit(
             trn.X, trn.y_cat, epochs=100, batch_size=16, verbose=0,
         )
@@ -87,9 +90,7 @@ def individual_evaluator(
         tst.y,
         predicted_y,
         beta=2,
-        average=kwargs.pop(
-            "average", "micro" if trn.y_cat.shape[1] > 2 else "binary"
-        ),
+        average="micro" if multi_class else "binary",
     )
     accuracy = accuracy_score(tst.y, predicted_y, normalize=True)
     error_perc = (1.0 - accuracy) * 100
@@ -298,6 +299,7 @@ def bias_mutator(individual: MLPIndividual, gen_prob: float) -> int:
     for layer in individual.layers:
         if not layer.config["trainable"]:
             continue
+
         mask = np.random.rand(*layer.bias.shape) < gen_prob
         mutated_genes += np.count_nonzero(mask)
         mutations = np.random.uniform(-0.5, 0.5, layer.bias.shape)
@@ -325,6 +327,7 @@ def weights_mutator(individual: MLPIndividual, gen_prob: float) -> int:
     for layer in individual.layers:
         if not layer.config["trainable"]:
             continue
+
         mask = np.random.rand(*layer.weights.shape) < gen_prob
         mutated_genes += np.count_nonzero(mask)
         mutations = np.random.uniform(-0.5, 0.5, layer.weights.shape)
@@ -339,14 +342,13 @@ def configure_toolbox(
     hidden_layers_info: List[HiddenLayerInfo],
     dataset: Proben1Partition,
     probabilities: Dict[str, float],
-    fit_train: bool,
 ):
     """Register all neccesary objects and functions.
 
     :param hidden_layers_info: list of hidden layers basic configuration.
     :param dataset: data to work with.
-    :param probabilities: list of mutation probabilities for weights and genes.
-    :param fit_train: whether to fit the training data in each evaluation.
+    :param probabilities: list of mutation probabilities for weights and genes
+        and application probability fortrain fitting.
     :returns: the toolbox with the registered functions.
 
     """
@@ -384,8 +386,8 @@ def configure_toolbox(
         individual_evaluator,
         trn=dataset.trn,
         tst=dataset.val,
-        average="micro" if dataset.nout > 2 else "binary",
-        fit_train=fit_train,
+        multi_class=dataset.nout > 2,
+        fit_train_prob=probabilities["fit"],
     )
 
     DGPLOGGER.debug("Register the crossover operator...")

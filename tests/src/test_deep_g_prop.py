@@ -39,9 +39,9 @@ class TestDeepGPropCli(unittest.TestCase):
     def test_cli_ok(self, mock_dgplogger):
         """Model is found."""
         argv = [
-            "--init-pop",
+            "--init-population-size",
             "1",
-            "--max-gen",
+            "--max-generations",
             "1",
             "--cx-prob",
             "1.1",
@@ -53,8 +53,8 @@ class TestDeepGPropCli(unittest.TestCase):
             "1.1",
             "--mut-layer-prob",
             "1.1",
-            "--fit-train",
-            "True",
+            "--fit-train-prob",
+            "0.5",
             "--verbosity",
             "DEBUG",
         ]

@@ -36,7 +36,7 @@ def genetic_algorithm(
     mut_weights_prob: float,
     mut_neuron_prob: float,
     mut_layer_prob: float,
-    fit_train: bool,
+    fit_train_prob: float,
 ) -> Tuple[MLPIndividual, MLPIndividual]:
     """Perform optimization with a genetic algorithm.
 
@@ -63,8 +63,11 @@ def genetic_algorithm(
     toolbox = configure_toolbox(
         hidden_layers_info,
         dataset,
-        {"bias": mut_bias_prob, "weights": mut_weights_prob},
-        fit_train,
+        {
+            "bias": mut_bias_prob,
+            "weights": mut_weights_prob,
+            "fit": fit_train_prob,
+        },
     )
 
     # --------------------------------
@@ -105,7 +108,7 @@ def genetic_algorithm(
 
             # A new generation
             current_generation = current_generation + 1
-            DGPLOGGER.info(f"-- Generation {current_generation} --")
+            DGPLOGGER.title(msg=f"-- Generation {current_generation} --")
 
             # Select the next generation individuals
             offspring = toolbox.select(population, len(population))

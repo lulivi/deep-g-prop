@@ -228,42 +228,19 @@ class TestMLPIndividual(unittest.TestCase):
 class TestGeneticAlgorithm(unittest.TestCase):
     """Test the genetic_algorithm."""
 
-    def test_genetic_algorithm_no_train(self):
+    def test_genetic_algorithm(self):
         """Run the genetic algorithm a few times and check if it works."""
         first_weights, best_weights = ga_optimizer.genetic_algorithm(
-            [ga_optimizer.types.HiddenLayerInfo(4, True)],
+            [ga_optimizer.types.HiddenLayerInfo(3, True)],
             self.dataset,
-            10,
             30,
-            0.5,
-            0.2,
-            0.75,
-            0.3,
-            0.3,
-            False,
-        )
-        first_score = ga_optimizer.utils.test_individual(
-            first_weights, self.dataset
-        )
-        best_score = ga_optimizer.utils.test_individual(
-            best_weights, self.dataset
-        )
-        self.assertGreater(best_score[0], first_score[0])
-        self.assertLess(best_score[1], first_score[1])
-
-    def test_genetic_algorithm_train(self):
-        """Run the genetic algorithm a few times and check if it works."""
-        first_weights, best_weights = ga_optimizer.genetic_algorithm(
-            [ga_optimizer.types.HiddenLayerInfo(4, True)],
-            self.dataset,
             10,
-            8,
             0.5,
             0.2,
             0.75,
             0.3,
             0.3,
-            True,
+            0.4,
         )
         first_score = ga_optimizer.utils.test_individual(
             first_weights, self.dataset

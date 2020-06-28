@@ -202,9 +202,8 @@ def test_individual(
     """Test an individual with the validation and test data.
 
     :param individual: current individual to evaluate.
-    :param model: base model, from whom obtain the initial individual shape.
     :param dataset: data to work with.
-    :param fit_train: whether to fit the training data in each evaluation.
+    :param text: text to print before the table.
 
     """
     DGPLOGGER.info(f"{text} weights")
@@ -216,29 +215,29 @@ def test_individual(
         individual,
         dataset.trn,
         dataset.val,
-        fit_train=False,
-        average="micro" if dataset.nout > 2 else "binary",
+        multi_class=dataset.nout > 2,
+        fit_train_prob=0.0,
     )
     val_scores_train = individual_evaluator(
         individual,
         dataset.trn,
         dataset.val,
-        fit_train=True,
-        average="micro" if dataset.nout > 2 else "binary",
+        multi_class=dataset.nout > 2,
+        fit_train_prob=1.0,
     )
     tst_scores_no_train = individual_evaluator(
         individual,
         dataset.trn,
         dataset.tst,
-        fit_train=False,
-        average="micro" if dataset.nout > 2 else "binary",
+        multi_class=dataset.nout > 2,
+        fit_train_prob=0.0,
     )
     tst_scores_train = individual_evaluator(
         individual,
         dataset.trn,
         dataset.tst,
-        fit_train=True,
-        average="micro" if dataset.nout > 2 else "binary",
+        multi_class=dataset.nout > 2,
+        fit_train_prob=1.0,
     )
     individual_table = [
         ["Validation (no train)", *val_scores_no_train],
