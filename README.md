@@ -81,6 +81,12 @@ vayan a utilizar. Para más información sobre [pip] y [venv] consultar el
   Es el mismo comando pero precedido por `python3.7 -m` para evitar problemas
   si tenemos otras versiones de Python instaladas en el sistema.
 
+Es necesario añadir la ruta al repositorio a la variable de entorno
+`PYTHONPATH`. También, si no se quiere preceder cada ejecución de
+`src/deep-g-prop.py` con `KERAS_BACKEND=theano`, se puede exportar esa
+variable. Si desea ejecutar la comparación de frameworks de perceptrones
+multicapa, tendrá que usar el primer método.
+
 ## Utilización
 
 > **Nota:** Si se ha optado por usar un entorno virtual, debe ser activado

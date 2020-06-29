@@ -185,6 +185,7 @@ def finished_algorithm_summary(
     )
     final_pop_neurons_table.append(["Max", *final_pop_layer_list.max(0)])
     final_pop_neurons_table.append(["Mean", *final_pop_layer_list.mean(0)])
+    final_pop_neurons_table.append(["Min", *final_pop_layer_list.min(0)])
     final_pop_neurons_table.append(["Std", *final_pop_layer_list.std(0)])
     DGPLOGGER.debug("Final population layer neurons statistics:")
     print_table(

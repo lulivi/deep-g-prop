@@ -224,7 +224,9 @@ def build_latex(session: Session) -> None:
 @nox.session(name="build-pdf")
 def build_pdf(session: Session) -> None:
     """Create pdf file."""
-    build_latex(session)
+    show_help(session, {"skip-latex": "Skip Pweave to LaTeX generation."})
+    if "skip-latex" not in session.posargs:
+        build_latex(session)
     session.log("Building pdf through pdflatex ...")
     pdflatex_cmd = [
         "pdflatex",

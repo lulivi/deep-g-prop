@@ -148,6 +148,7 @@ def cli(
 
     :param mut_weights_prob: probability to mutate the individual weights
         genes.
+
     :param mut_neuron_prob: probability to add/remove a neuron from the model.
 
     :param mut_layer_prob: probability to add/remove a layer from the model.
