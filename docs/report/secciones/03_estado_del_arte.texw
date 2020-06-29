@@ -266,8 +266,11 @@ el que use para este proyecto.
 
 DEAP\cite{deap-ga}, de sus iniciales: \textit{Distributed Evolutionary
 Algorithms in Python}, es un \textit{framework} que permite desarrollar
-algoritmos genéticos (entre muchas utilidades más) en Python. Existen otras
-herramientas similares (como Platypus\cite{platypus-ga}) que no se ajustan al
-problema tan bien como DEAP (o que cuya funcionalidad ya viene contenida en
-DEAP). Por lo tanto, será el \textit{framework} que utilize para desarrollar el
-algoritmo genético que entrene las redes neuronales.
+algoritmos genéticos (entre muchas utilidades más) en Python. DEAP es una
+librería muy completa y versátil permitiendo la creación de individuos
+personalizados y la definición de multiples operaciones a parte de las
+clásicas. Existen otras herramientas similares (como
+Platypus\cite{platypus-ga}) que no se ajustan al problema tan bien como DEAP (o
+que cuya funcionalidad ya viene contenida en DEAP). Por lo tanto, será el
+\textit{framework} que se utilize para desarrollar el algoritmo genético que
+entrene las redes neuronales.
