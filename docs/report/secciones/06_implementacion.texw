@@ -3,24 +3,172 @@
 En este capítulo se explicará detalladamente la implementación en Python
 seguida para llegar a las conclusiones obtenidas.
 
-\section{Elección de \textit{framework} y comparación con otros algoritmos}
-\subsection{Comparación de buscadores de parámetros}
-
-En el \autoref{chap:state-of-art} se trataron una serie de utilidades que
-sirven para encontrar parámetros iniciales de un perceptrón multicapa estándar.
-
-\subsection{Comparación de \textit{frameworks} para redes neuronales}
-
-\section{DeepGProp}
-
 El código del trabajo está localizado en el directorio \texttt{src} situado en
 la carpeta raíz del repositorio. El \textit{script} llamado
-\texttt{deep\_g\_prop} es el punto de entrada del programa. Por línea de
-comandos se le indica la configuración que se quiere utilizar en el algoritmo
-genético.
+\texttt{deep\_g\_prop} es el punto de entrada del programa.
 
-\subsection{Herramienta de línea de comandos}
+\section{Herramienta de línea de comandos}
 
-\subsection{Utilidades}
+Por línea de comandos se le indica la configuración que se quiere utilizar en
+el algoritmo genético. Para información sobre las opciones del programa, se
+puede ejecutar lo siguiente:
 
-\subsection{Optimización con algoritmos genéticos}
+\begin{verbatim}
+python src/deep-g-prop.py --help
+\end{verbatim}
+
+Lo cual mostraría por pantalla algo similar a:
+
+{\footnotesize
+\begin{verbatim}
+Usage: deep_g_prop.py [OPTIONS]
+
+Options:
+  --dataset-name TEXT             name of the proben1 partition located in
+                                  src/datasets/
+
+  --hidden-layers-info HIDDEN LAYER INFO SEQUENCE
+                                  sequence of hidden layer configuration in
+                                  the form of "4 True, 2 False" to have two
+                                  hidden layers: the first one trainable with
+                                  4 neurons and the second one non-trainable
+                                  with 2.
+
+  --init-population-size INTEGER  number of individuals for the first
+                                  population.
+
+  --max-generations INTEGER       maximun number of generations.
+  --cx-prob FLOAT                 probability for two individuals to mate.
+  --mut-bias-prob FLOAT           probability to mutate each individual bias
+                                  gene.
+
+  --mut-weights-prob FLOAT        probability to mutate each individual weight
+                                  gene.
+
+  --mut-neuron-prob FLOAT         probability to add/remove the last neuron of
+                                  a random layer for an individual.
+
+  --mut-layer-prob FLOAT          probability to add/remove the last layer
+                                  from an individual.
+
+  --fit-train-prob FLOAT          probability to fit the training data for
+                                  each individual in each evaluation.
+
+  --verbosity [INFO|DEBUG]        stream handler verbosity level.
+  --help                          Show this message and exit.
+\end{verbatim}
+}
+
+Esta línea de comandos se ha construido usando el módulo
+\textit{Click}\cite{py-click}. En ella se diferencian principalmente 10
+opciones:
+
+\begin{itemize}
+
+    \item \code{--dataset-name} - nombre de la partición de datos a utilizar.
+
+    \item \code{--hidden-layers-info} - secuencia de capas internas. Por
+    ejemplo: \code{4 True, 2 False} sería una configuración con dos capas
+    internas de 4 y 2 neuronas respectivamente en las que la primera capa es
+    entrenable y la segunda no. Esto es, que la primera capa oculta recibirá
+    mutaciones tanto en los pesos como en los sesgos y la segunda no.
+
+    \item \code{--init-population-size} - tamaño de la población de individuos
+    inicial.
+
+    \item \code{--max-generations} - número máximo de generaciones que se
+    ejecutará el algoritmo.
+
+    \item \code{--cx-prob} - probabilidad que dos individuos se crucen entre
+    sí.
+
+    \item \code{--mut-bias-prob} - probabilidad que un individuo entrenable
+    sufra modificaciones en cada gen de los conjuntos de sesgos.
+
+    \item \code{--mut-weights-prob} - probabilidad que un individuo entrenable
+    sufra modificaciones en cada gen de los conjuntos de pesos.
+
+    \item \code{--mut-neuron-prob} - probabilidad que cada individuo de la
+    población sufra un añadido / extracción de neurona en una capa aleatoria.
+
+    \item \code{--mut-layer-prob} - probabilidad que cada individuo de la
+    población sufra un añadido / extracción de última capa del modelo.
+
+    \item \code{--fit-train-prob} - probabilidad que cada individuo de la población entrene previamente a la obtención de métricas.
+
+\end{itemize}
+
+También existe el comando \code{--verbosity} que define la verbosidad de la
+terminal (a parte, se guardará toda la información de salida del algoritmo en
+un archivo localizado en la carpeta \texttt{src/logs}) y \code{--help} que
+muestra la salida antes mostrada.
+
+\section{Utilidades}
+
+Dentro de la carpeta donde se encuentra el código \texttt{src} podemos ver un
+módulo llamado \textit{utils.py}. En este módulo se encuentran varias funciones
+usadas varias veces de propósito general. Entre ellas se encuentran:
+
+\begin{itemize}
+
+  \item \code{read_proben1_partition} - como su propio nombre indica, carga los
+  datos de una de las particiones de Proben1 y los devuelve como un conjunto de
+  arrays multidimensionales de \textit{Numpy}\cite{py-numpy} para su cómoda
+  utilización.
+
+  \item \code{read_all_proben1_partitions} - obtiene todas las particiones de
+  un mismo problema. Por ejemplo
+  ``cancer'' obtendría las particiones ``cancer1'', ``cancer2'' y ``cancer3''.
+
+  \item \code{print_table} - muestra una tabla de python de forma limpia y
+  legible.
+
+  \item \code{print_data_summary} - dada una partición de Proben1 muestra
+  información util sobre ella, como el número de clases, la distribución de
+  ejemplos entre ellas, etc.
+
+\end{itemize}
+
+Estas herramientas conceden facilidades para tener un código más limpio.
+
+\section{Optimización con algoritmos genéticos}
+
+El módulo más importante de código está situado en \texttt{src/ga\_optimization}
+y alberga el algoritmo genético que evolucionará las configuraciones de
+perceptrones multicapa elegidas.
+
+Empezando por la unidad más pequeña de medida de un individuo, el gen está
+definido en el contexto de pesos y sesgos de cada neurona. Cada individuo
+compuesto por capas ocultas mas la externa externa y sus configuraciones está
+inicializado a partir de distribuciones uniformes con valores en el rango
+$[-1.0, 1.0]$. En la creación se le indica qué capas de las ocultas van a ser
+entrenables, cuantos datos de entrada tendrá la red y cuántos datos de salida.
+A parte, evidentemente, del número de neuronas de cada capa. Así, con una
+semilla definida en \texttt{src/common} para permitir reproducibilidad es como
+se construyen los individuos.
+
+La definición de la función de evaluación es como sigue:
+
+\begin{pycode}
+def individual_evaluator(
+    individual: MLPIndividual, trn: Proben1Split, tst: Proben1Split, **kwargs,
+):
+    """Evaluate an individual.
+
+    :param individual: current individual to evaluate.
+    :param trn: training data and labels.
+    :param tst: validation data and labels.
+    :param **kwargs: See below.
+    :Keyword Arguments:
+        - fit_train_prob: probability to fit the train data with some forward
+            pases before predicting.
+        - multi_class: ``True`` if the dataset is for multiclass
+            classification.
+
+    """
+\end{pycode}
+
+Teniendo el individuo, el conjunto que va a ser usado como entrenamiento, el
+conjunto con el que se van a probar los datos y dos argumentos extra (la
+probabilidad de ajuste previo y si el problema es de clasificación multiclase)
+se calcula las medidas que se comentaron en el \autoref{chap:analysis}.
