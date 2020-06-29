@@ -36,8 +36,9 @@ y variación \cite{evolutionary_computation}.
 \section{Objetivos}
 
 En este proyecto se pretende estudiar las distintas formas conseguidas de
-optimizar los parámetros de los \textit{perceptrones multicapa}, partiendo de
-la base del artículo G-Prop \cite{g-prop}.
+optimizar algunos parámetros de los \textit{perceptrones multicapa}, como el
+número de neuronas de cada capa y el número de capas, partiendo de la base del
+artículo G-Prop \cite{g-prop}.
 
 \begin{itemize}
 
