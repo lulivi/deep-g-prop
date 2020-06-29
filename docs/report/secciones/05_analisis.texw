@@ -1,4 +1,4 @@
-\chapter{Análisis del problema}
+\chapter{Análisis del problema} \label{chap:analysis}
 
 En este capítulo se comentarán las pruebas realizadas junto al análisis de los
 resultados obtenidos.
@@ -16,6 +16,35 @@ desbalanceados la precisión puede salir alta pero la sensibilidad saldrá baja.
 Usando cómo parámetro de ponderación el número dos, le damos más importancia a
 la sensibilidad, para evitar lo antes comentado.
 
+En cuanto al entrenamiento y propagación hacia atrás de los modelos se han
+utilizado los siguientes parámetros:
+
+\begin{itemize}
+
+\item Función de activación: método aplicado a la sumatoria de los valores de
+activación de la capa anterior por sus pesos mas un sesgo. La salida de esta
+función define la activación de la neurona actual. Para este parámetro se ha
+utilizado la función de activación ReLU (\textit{rectified linear unit}) que
+cumple la siguiente función dado un valor $x$ la activación de la neurona viene
+dada por $max(x, 0)$. Para la capa de salida, sin embargo, se ha utilizado la
+función Softmax que configura las neuronas de salida de manera que todas las
+activaciones suman 1 y se sitúen en el rango $[0.0, 1.0]$.
+
+\item Optimizador: algoritmo utilizado para entrenar la red neuronal con la
+propagación hacia atrás buscando la minimización de la función de pérdida. Como
+optimizador se ha utilizado SGD, gradiente descendiente estocástico del Inglés,
+que utilizando pequeños grupos de datos (\textit{batches}) calcula las
+modificaciones necesarias en el conjunto de pesos y sesgos global obteniendo
+finalmente el gradiente que se aplicará a los pesos y sesgos.
+
+\item Función de pérdida: también conocida como función de costo o función
+objetivo es la cuál se quiere minimizar, es decir, obtener una mejor
+predictibilidad de los datos por parte del modelo. Se ha elegido como función
+de pérdida la entropía cruzada entre clases partiendo de la función de
+activación de la última capa (softmax).
+
+\end{itemize}
+
 Siempre que se refiera a un número de capas concreto se estará hablando de las
 capas ocultas, dado que la tanto la capa de entrada como la de salida son
 obligatorias y de estructura fija.
@@ -24,6 +53,10 @@ Para las pruebas se han utilizado distintos conjuntos de datos de
 Proben1\cite{Proben1}\footnote{Base de datos dedicada a comparar redes
 neuronales.} para poder comparar los resultados obtenidos con GProp ya
 mencionado en la introducción.
+
+%
+% no structure modification
+%
 
 \section{Evolución de población sin modificación de estructura}
 
