@@ -92,7 +92,8 @@ características de un ejemplo. Los valores de activación de las
 \textit{neuronas} de cada capa vienen dados por la siguiente función:
 
 \[
-a^{(L)}_{i} \equiv f(w^{(L)}_{0} a^{(L-1)}_{0} + w^{(L)}_{1} a^{(L-1)}_{1} + \cdots + w^{(L)}_{i} a^{(L-1)}_{i} + \cdots + w^{(L)}_{n} a^{(L-1)}_{n} + b^{(L)}_{i})
+a^{(L)}_{i} \equiv f(w^{(L)}_{0} a^{(L-1)}_{0} + w^{(L)}_{1} a^{(L-1)}_{1} +
+\cdots + w^{(L)}_{i} a^{(L-1)}_{i} + \cdots + w^{(L)}_{n} a^{(L-1)}_{n} + b^{(L)}_{i})
 \]
 
 ó
