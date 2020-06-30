@@ -153,7 +153,10 @@ def genetic_algorithm(
         DGPLOGGER.info("Stopping the algorithm...")
 
     elapsed_time = time.perf_counter() - time_start
-    DGPLOGGER.debug(f"-- End of evolution in {elapsed_time:.2f} seconds.")
+    DGPLOGGER.debug(
+        f"-- Finished evolution with the generation {current_generation} in "
+        f"{elapsed_time:.2f} seconds."
+    )
     finished_algorithm_summary(initial_population, population, tools.selBest)
     test_individual(
         best_initial_individual, dataset, "Best initial individual"

@@ -233,14 +233,14 @@ class TestGeneticAlgorithm(unittest.TestCase):
         first_weights, best_weights = ga_optimizer.genetic_algorithm(
             [ga_optimizer.types.HiddenLayerInfo(3, True)],
             self.dataset,
-            30,
-            10,
+            15,
+            5,
             0.5,
             0.2,
             0.75,
             0.3,
             0.3,
-            0.4,
+            0.2,
         )
         first_score = ga_optimizer.utils.test_individual(
             first_weights, self.dataset

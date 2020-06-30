@@ -52,7 +52,7 @@ class TestDGPLogger(unittest.TestCase):
 
         mock_dir_path = mock.MagicMock()
         mock_dir_path.__truediv__ = mock.Mock(return_value="composed_path")
-        custom_logger.configure_dgp_logger("INFO", mock_dir_path, stem_sufix)
+        custom_logger.configure_dgp_logger("INFO", stem_sufix, mock_dir_path)
 
         mock_logging.FileHandler.assert_called_with("composed_path")
         mock_logging.StreamHandler.assert_called_once()

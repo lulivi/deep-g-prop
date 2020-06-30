@@ -33,16 +33,16 @@ class DGPLogger(logging.Logger):
     def configure_dgp_logger(
         self,
         log_stream_level: str = "INFO",
+        log_file_stem_sufix: str = None,
         log_file_dir: Path = LOGS_DIR_PATH,
-        log_file_stem_sufix: str = "",
     ) -> None:
         """Configure the DGPLOGGER.
 
         :parma log_stream_level: logging level of the :class:`StreamHandler`.
-        :param log_file_dir: path to the directory in which the
-            :class:`FileHandler` will write the log output.
         :param log_file_stem_sufix: extra text after the date for the file
             name.
+        :param log_file_dir: path to the directory in which the
+            :class:`FileHandler` will write the log output.
         :returns: the configured logger.
 
         """
@@ -80,17 +80,17 @@ class DGPLogger(logging.Logger):
         self.addHandler(stream_handler)
 
         # Configure the file handler
-        stem_sufix = f"_{log_file_stem_sufix}" if log_file_stem_sufix else ""
-        file_handler = logging.FileHandler(
-            log_file_dir / f"{current_date}{stem_sufix}.log"
-        )
-        file_handler.setLevel(logging.DEBUG)
-        file_handler.setFormatter(
-            logging.Formatter(
-                fmt="%(asctime)s|%(message)s", datefmt=datetime_format,
+        if log_file_stem_sufix:
+            file_handler = logging.FileHandler(
+                log_file_dir / f"{current_date}_{log_file_stem_sufix}.log"
             )
-        )
-        self.addHandler(file_handler)
+            file_handler.setLevel(logging.DEBUG)
+            file_handler.setFormatter(
+                logging.Formatter(
+                    fmt="%(asctime)s|%(message)s", datefmt=datetime_format,
+                )
+            )
+            self.addHandler(file_handler)
 
 
 DGPLOGGER = DGPLogger("DeepGProp", logging.DEBUG)

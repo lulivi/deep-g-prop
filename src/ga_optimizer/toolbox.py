@@ -121,8 +121,8 @@ def crossover_operator(ind1: MLPIndividual, ind2: MLPIndividual):
         ind1.layers[layer_index].weights[:, neuron_index],
         ind2.layers[layer_index].weights[:, neuron_index],
     ) = (
-        ind2.layers[layer_index].weights[:, neuron_index].copy(),
-        ind1.layers[layer_index].weights[:, neuron_index].copy(),
+        ind2.layers[layer_index].weights[:, neuron_index],
+        ind1.layers[layer_index].weights[:, neuron_index],
     )
     (
         ind1.layers[layer_index].bias[neuron_index],

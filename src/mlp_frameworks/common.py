@@ -24,7 +24,7 @@ from src.dgp_logger import DGPLOGGER
 CURRENT_FILE_PATH = Path(__file__).resolve()
 CURRENT_FILE_DIR = CURRENT_FILE_PATH.parent
 DGPLOGGER.configure_dgp_logger(
-    "DEBUG", CURRENT_FILE_DIR, CURRENT_FILE_PATH.stem
+    "DEBUG", CURRENT_FILE_PATH.stem, CURRENT_FILE_DIR
 )
 FRAMEWORK_RESULTS_CSV = CURRENT_FILE_DIR / "framework_results.csv"
 

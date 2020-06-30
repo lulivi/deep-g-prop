@@ -115,7 +115,7 @@ def finished_generation_summary(current_generation: int, population: list):
         ["Min", fits[:, 0].min(), fits[:, 1].min()],
         ["Std", fits[:, 0].std(), fits[:, 1].std()],
     ]
-    DGPLOGGER.info(f"    Sumary of generation {current_generation}:")
+    DGPLOGGER.info(f"    Summary of generation {current_generation}:")
     print_table(table, DGPLOGGER.info, floatfmt=(None, ".5f", ".5f"))
 
 
