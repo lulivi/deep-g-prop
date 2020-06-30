@@ -15,6 +15,7 @@
 
 - [Instalación](#instalación)
 - [Utilización](#utilización)
+- [Documentación](#documentación)
 - [Desarrollo](#desarrollo)
 - [Frameworks](#frameworks)
 - [Utilidades](#utilidades)
@@ -60,7 +61,7 @@ vayan a utilizar. Para más información sobre [pip] y [venv] consultar el
   |------------------------------------|--------------------------------------|-------------------------------------------------------------------------------------------------------------------------|
   | Producción                         | [`requirements/prod.txt`]            | Paquetes necesarios para ejecutar código asociado directamente a *DeepGProp*. El archivo [`requirements.txt`] de la raiz del repositorio símplemente instala los paquetes contenidos en este archivo. |
   | Documentación                      | [`requirements/docs.txt`]            | Paquetes necesarios para construir la documentación. Si se usa [Nox], no será necesario instalar estos paquetes a mano. |
-  | Test                               | [`requirements/tests.txt`]           | Paquetes para ejecutar los tests. Si se usa [Nox], no será necesario instalar estos paquetes a mano. Además se deben instalar los programas [pandoc], [aspell] y el [diccionario de español para aspell][aspell-es] para poder ejecutar los tests de documentación. |
+  | Test                               | [`requirements/tests.txt`]           | Paquetes para ejecutar los tests. Si se usa [Nox], no será necesario instalar estos paquetes a mano.                    |
   | Comparativa de Optimizadores       | [`requirements/hp_optimization.txt`] | Paquetes usados en la comparativa de optimizadores de hiper-parámetros.                                                 |
   | Comparativa de Frameworks para MLP | [`requirements/mlp_frameworks.txt`]  | Paquetes usados en la comparativa de frameworks para redes neuronales.                                                  |
 
@@ -70,9 +71,9 @@ vayan a utilizar. Para más información sobre [pip] y [venv] consultar el
   pip install -r <nombre archivo>
   ```
 
-  pudiendo sustituirse `<nombre archivo>` cualquiera de los anteriores.
-  Si se quisiera instalar los paquetes sin usar un entorno virtual (no
-  recomendado) se puede usar el siguiente comando:
+  pudiendo sustituirse `<nombre archivo>` cualquiera de los anteriores. Si se
+  quisiera instalar los paquetes sin usar un entorno virtual (no recomendado)
+  se puede ejecutar el siguiente comando:
 
   ```shell
   python3.7 -m pip install --user -r <nombre archivo>
@@ -99,13 +100,6 @@ Primero instalamos la herramienta [Nox]:
 pip install -U nox
 ```
 
-Una vez instalado, podemos ejecutar el siguiente comando para construir la
-documentación:
-
-```shell
-nox -e build-pdf
-```
-
 Para ejecutar los test:
 
 ```shell
@@ -118,10 +112,42 @@ Para pasar los distintos linters al código:
 nox -k lint
 ```
 
-Para obtener otras opciones posibles con Nox:
+Para mostrar todas las opciones disponibles:
 
 ```shell
 nox -l
+```
+
+## Documentación
+
+Para poder construir en su máquina la documentación o ejecutar los tests de
+ésta, será necesario instalar la lista de paquetes siguiente:
+
+- aspell
+- aspell-es
+- pandoc
+- qpdf
+- texlive-base
+- texlive-latex-recommended
+- texlive-fonts-recommended
+- texlive-fonts-extra
+- texlive-lang-spanish
+- texlive-formats-extra
+
+Para instalarlo en Ubuntu sería:
+
+```shell
+sudo apt install -y aspell aspell-es pandoc qpdf texlive-base \
+                    texlive-latex-recommended texlive-fonts-recommended \
+                    texlive-fonts-extra texlive-lang-spanish \
+                    texlive-formats-extra
+```
+
+Una vez instalados, [Nox] terminara de obtener todo lo necesario y construirá
+la documentación con el siguiente comando:
+
+```shell
+nox -e build-pdf
 ```
 
 ## Desarrollo
