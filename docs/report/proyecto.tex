@@ -32,7 +32,19 @@
     breakanywhere,
     breaklines=true,
     mathescape,
-    bgcolor=grey}
+    bgcolor=grey,
+    fontsize=\small,
+}
+
+\setminted{
+    tabsize=10,
+    linenos=true,
+    breakanywhere,
+    breaklines=true,
+    mathescape,
+    bgcolor=grey,
+    fontsize=\small,
+}
 
 
 %
@@ -55,6 +67,10 @@
    colback=#1,
    #3
 }{#2}
+
+% Algorithms
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
 
 % Dash ligatures
 \usepackage{microtype}
@@ -112,6 +128,9 @@
 \renewcommand{\footrulewidth}{0pt}
 % Customize the height of the header
 \setlength{\headheight}{13.6pt}
+% Customize paragraphs
+\setlength{\parindent}{2em}
+\setlength{\parskip}{1em}
 
 \usepackage{titlesec, blindtext, color}
 \definecolor{gray75}{gray}{0.75}

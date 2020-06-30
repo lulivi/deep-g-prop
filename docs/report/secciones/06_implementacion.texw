@@ -171,4 +171,190 @@ def individual_evaluator(
 Teniendo el individuo, el conjunto que va a ser usado como entrenamiento, el
 conjunto con el que se van a probar los datos y dos argumentos extra (la
 probabilidad de ajuste previo y si el problema es de clasificación multiclase)
-se calcula las medidas que se comentaron en el \autoref{chap:analysis}.
+se calcula las medidas que se comentaron en el \autoref{chap:analysis}. La
+primera parte de la función de evaluación consiste en construir un el modelo
+dada la configuración del individuo. Dependiendo de la probabilidad de ajuste,
+se entrenará el modelo o no.
+
+\begin{pycode}
+    multi_class = kwargs.get("multi_class", False)
+    start_time = time.perf_counter()
+    units_size_list = [
+        layer.config["units"] for layer in individual.layers[:-1]
+    ]
+    DGPLOGGER.debug(
+        f"    Evaluating individual with neuron number: {units_size_list}"
+    )
+    # Create the model with the individual configuration
+    model = Sequential()
+
+    for layer_index, layer in enumerate(individual.layers):
+        model.add(Dense.from_config(layer.config))
+        model.layers[layer_index].set_weights([layer.weights, layer.bias])
+
+    model.compile(
+        optimizer=SGD(),
+        loss=CategoricalCrossentropy()
+        if multi_class
+        else BinaryCrossentropy(),
+    )
+
+    # Train if choosen
+    if random.random() < kwargs.pop("fit_train_prob"):
+        model.fit(
+            trn.X, trn.y_cat, epochs=100, batch_size=16, verbose=0,
+        )
+\end{pycode}
+
+Finalmente, tras la creación del modelo se procede a obtener las medidas
+necesarias. Con los datos predichos, se obtienen la puntuación F2-score y el
+porcentaje de error obtenido. También se muestra un resumen por pantalla.
+
+\begin{pycode}
+    # Predict the scores
+    predicted_y = model.predict_classes(tst.X)
+    f2_score = fbeta_score(
+        tst.y,
+        predicted_y,
+        beta=2,
+        average="micro" if multi_class else "binary",
+    )
+    accuracy = accuracy_score(tst.y, predicted_y, normalize=True)
+    error_perc = (1.0 - accuracy) * 100
+    end_time = time.perf_counter()
+    DGPLOGGER.debug(
+        f"        f2-score={f2_score:.5f}\n"
+        f"        error%={error_perc:.2f}\n"
+        f"        eval time={end_time - start_time: .2f} sec"
+    )
+
+    return (f2_score, error_perc)
+\end{pycode}
+
+A continuación se muestra un ejemplo de uso definiendo un individuo y
+evaluándolo para el problema ``cancer1'':
+
+<<term=False, evaluate=True>>=
+from src.dgp_logger import DGPLOGGER
+from src.ga_optimizer.toolbox import individual_evaluator
+from src.ga_optimizer.types import HiddenLayerInfo, MLPIndividual
+from src.utils import read_proben1_partition
+
+DGPLOGGER.configure_dgp_logger("DEBUG")
+
+dataset = read_proben1_partition("cancer1")
+layer_sequence = [HiddenLayerInfo(4, True)]
+individual = MLPIndividual(dataset.nin, layer_sequence, dataset.nout)
+
+results = individual_evaluator(
+    individual, dataset.trn, dataset.tst, fit_train_prob=1.0, multi_class=False
+)
+@
+
+Una vez se configuradas las herramientas a utilizar (función de evaluación,
+individuo, operaciones, función de adecuación...) y evaluada toda la población
+inicial, se procede con el bucle central
+
+\begin{algorithm}
+    \caption{Genetic Algorithm loop}\label{alg:ga}
+    \begin{algorithmic}[1]
+        \State \textit{evaluate initial population}
+        \While{\textit{max f2\_score less than one and there are generations left}}
+            \If{\textit{max f2\_score hasn't improved in some generations}}
+                \State \textit{Stop algorithm}
+            \EndIf
+            \State \textit{create an offspring from the population}
+            \State \textit{apply crossover to the offspring}
+            \State \textit{apply mutations to the offspring}
+            \State \textit{replace the population with the modified offspring}
+        \EndWhile
+    \end{algorithmic}
+\end{algorithm}
+
+Se usa la medida de F2-score como centinela (a parte del número de generaciones
+evidentemente) por si en algún momento se estanca el incremento de puntuación
+se termine el algoritmo.
+
+La función de cruce ocurre si se dan dos condiciones: que se cumpla la
+probabilidad de cruce entre dos individuos, y que los dos individuos tengan la
+misma forma\footnote{Mismo número de capas y neuronas en cada capa.}.
+
+\begin{pycode}
+def crossover_operator(ind1: MLPIndividual, ind2: MLPIndividual):
+    """Apply crossover betweent two individuals.
+
+    This method will swap a random neuron from a random layer. The neuron
+    associated bias and weights are swapped.
+
+    :param ind1: the first individual.
+    :param ind2: the second individual.
+
+    """
+    layer_index = random.randint(0, len(ind1) - 1)
+    neuron_index = random.randint(0, len(ind1.layers[layer_index].bias) - 1)
+
+    (
+        ind1.layers[layer_index].weights[:, neuron_index],
+        ind2.layers[layer_index].weights[:, neuron_index],
+    ) = (
+        ind2.layers[layer_index].weights[:, neuron_index],
+        ind1.layers[layer_index].weights[:, neuron_index],
+    )
+    (
+        ind1.layers[layer_index].bias[neuron_index],
+        ind2.layers[layer_index].bias[neuron_index],
+    ) = (
+        ind2.layers[layer_index].bias[neuron_index],
+        ind1.layers[layer_index].bias[neuron_index],
+    )
+\end{pycode}
+
+Obteniendo aleatoriamente la capa y la neurona que se va a intercambiar de
+dicha capa se procede a intercambiar pesos y sesgos. En el siguiente código se
+ve una muestra del funcionamiento.
+
+<<term=False, evaluate=True>>=
+import random
+
+from src.dgp_logger import DGPLOGGER
+from src.ga_optimizer.toolbox import crossover_operator
+from src.ga_optimizer.types import HiddenLayerInfo, MLPIndividual
+from src.utils import read_proben1_partition
+
+DGPLOGGER.configure_dgp_logger("DEBUG")
+random.seed(12345)
+
+dataset = read_proben1_partition("cancer1")
+individual_0 = MLPIndividual(dataset.nin, [], dataset.nout)
+individual_1 = MLPIndividual(dataset.nin, [], dataset.nout)
+
+w_0_before = individual_0.layers[0].bias.copy()
+w_1_before = individual_1.layers[0].bias.copy()
+print("\nBefore:")
+print("Individual 0")
+print(individual_0.layers[0].bias)
+print("Individual 1")
+print(individual_1.layers[0].bias)
+
+crossover_operator(individual_0, individual_1)
+
+w_0_after = individual_0.layers[0].bias.copy()
+w_1_after = individual_1.layers[0].bias.copy()
+print("\nAfter:")
+print("Individual 0")
+print(individual_0.layers[0].bias)
+print("Individual 1")
+print(individual_1.layers[0].bias)
+
+print("\nComparison:")
+print("Individual 0 before_bias == after_bias")
+print(w_0_before == w_0_after)
+print("Individual 1 before_bias == after_bias")
+print(w_1_before == w_1_after)
+@
+
+Se observa efectivamente que los sesgos de la neurona 1 de la capa de salida se
+han intercambiado por los del otro individuo.
+
+Continuando con las operaciones encontramos las mutaciones. Existen 4 tipos de
+mutaciones que se le aplican a los individuos:
