@@ -88,7 +88,7 @@ class Proben1Tests(unittest.TestCase):
         )
 
     def test_print_data_summary(self):
-        """Print the choosen data summary."""
+        """Print the chosen data summary."""
         data = np.array(
             [
                 [0.1, 0.1, 0.1],

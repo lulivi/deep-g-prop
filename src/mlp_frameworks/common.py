@@ -83,10 +83,10 @@ result_header = [
 
 
 def cross_validation(estimator, estimator_name, X, y, metrics,) -> List[str]:
-    """Run cross validation to the choosen estimator.
+    """Run cross validation to the chosen estimator.
 
     :param estimator: object to which apply fit and predict, to obtain results.
-    :param estimator_name: name of the choosen estimator.
+    :param estimator_name: name of the chosen estimator.
     :param X: dataset values without the labels.
     :param y: dataset labels.
     :param metrics: metrics which will be applied to the estimator.

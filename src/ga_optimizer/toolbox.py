@@ -78,7 +78,6 @@ def individual_evaluator(
         else BinaryCrossentropy(),
     )
 
-    # Train if choosen
     if random.random() < kwargs.pop("fit_train_prob"):
         model.fit(
             trn.X, trn.y_cat, epochs=100, batch_size=16, verbose=0,
@@ -140,14 +139,17 @@ def layer_mutator(individual: MLPIndividual) -> int:
     :return: wether the layer was added or removed.
 
     """
-    # Choose a random number of neurons
-    new_layer_output_neurons = random.randint(2, 5)
+    # Choose randomly to add or delete a layer. Ensure there are 2 or more
+    # layers in the model before deleting one. The output layer is included in
+    # the count.
+    choice = 1 if len(individual) <= 2 else random.choice((-1, 1))
 
-    # Choose randomly to add or delete a layer
-    choice = random.choice((-1, 1))
     difference = 0
 
     if choice > 0:
+        # Choose a random number of neurons
+        new_layer_output_neurons = random.randint(2, 5)
+        # Obtain current last hidden layer neuron number
         previous_layer_output = individual.layers[-2].config["units"]
         # Insert a new hidden layer into the individual
         individual.append_hidden(
@@ -182,9 +184,8 @@ def layer_mutator(individual: MLPIndividual) -> int:
                 ),
                 axis=0,
             )
-    # Ensure there are 2 or more layers in the model before deleting one
-    elif len(individual) > 2:
-        # Obtain the predecessor output units and delte the choosen layer
+    else:
+        # Obtain the predecessor output units and delte the chosen layer
         removed_predecessor_units = individual.layers[-3].config["units"]
         del individual.layers[-2]
 
@@ -210,8 +211,6 @@ def layer_mutator(individual: MLPIndividual) -> int:
                 ),
                 axis=0,
             )
-    else:
-        choice = 0
 
     # Update output layer input neurons
     individual.layers[-1].config["batch_input_shape"][1] += difference
@@ -231,8 +230,13 @@ def neuron_mutator(individual: MLPIndividual) -> int:
     # We want to ignore output layer so it only adds/pops from a hidden layer
     layer_index = random.randint(0, len(individual) - 2)
 
-    # Choose randomly to add or delete a neuron
-    choice = random.choice((-1, 1))
+    # Choose randomly to add or delete a neuron. If the number of neurons is
+    # two, just add a new one.
+    choice = (
+        1
+        if len(individual.layers[layer_index].bias) <= 2
+        else random.choice((-1, 1))
+    )
 
     if choice > 0:
         # Get previous layer neurons as a reference for creating a new neuron
@@ -240,7 +244,7 @@ def neuron_mutator(individual: MLPIndividual) -> int:
         previous_layer_neurons = individual.layers[layer_index].weights.shape[
             0
         ]
-        # Append a new neuron to the weights and bias of the choosen layer
+        # Append a new neuron to the weights and bias of the chosen layer
         individual.layers[layer_index].weights = np.append(
             individual.layers[layer_index].weights,
             np.random.uniform(-0.5, 0.5, (previous_layer_neurons, 1)),
@@ -251,16 +255,15 @@ def neuron_mutator(individual: MLPIndividual) -> int:
             [random.uniform(-0.5, 0.5)],
             axis=0,
         )
-        # Append a new input entry for the choosen layer in the following layer
+        # Append a new input entry for the chosen layer in the following layer
         next_layer_neurons = len(individual.layers[layer_index + 1].bias)
         individual.layers[layer_index + 1].weights = np.append(
             individual.layers[layer_index + 1].weights,
             np.random.uniform(-0.5, 0.5, (1, next_layer_neurons)),
             axis=0,
         )
-    # Ensure there are 2 or more neurons in the hidden layer
-    elif len(individual.layers[layer_index].bias) > 2:
-        # Remove last neuron weights and bias from the choosen layer
+    else:
+        # Remove last neuron weights and bias from the chosen layer
         individual.layers[layer_index].weights = np.delete(
             individual.layers[layer_index].weights, -1, axis=1
         )
@@ -271,53 +274,27 @@ def neuron_mutator(individual: MLPIndividual) -> int:
         individual.layers[layer_index + 1].weights = np.delete(
             individual.layers[layer_index + 1].weights, -1, axis=0
         )
-    else:
-        choice = 0
 
-    # Update the units in the choosen and next layer config
+    # Update the units in the chosen and next layer config
     individual.layers[layer_index].config["units"] += choice
     individual.layers[layer_index + 1].config["batch_input_shape"][1] += choice
 
     return choice
 
 
-def bias_mutator(individual: MLPIndividual, gen_prob: float) -> int:
-    """Mutate some individual bias genes.
-
-    For each layer bias, obtain a random :class:`np.ndarray`(with values in the
-    range ``[0.0 and 1.0]``) with the same shape as the bias (in this case, a
-    1D numpy array) and mutate the genes that satisfy the ``gen_prob``
-    probability with a value in the range ``[-0.5, 0.5]``
-
-    :param individual: individual to mutate.
-    :param gen_prob: probability of a gen to mutate.
-    :returns: number of genes mutated.
-
-    """
-    mutated_genes = 0
-
-    for layer in individual.layers:
-        if not layer.config["trainable"]:
-            continue
-
-        mask = np.random.rand(*layer.bias.shape) < gen_prob
-        mutated_genes += np.count_nonzero(mask)
-        mutations = np.random.uniform(-0.5, 0.5, layer.bias.shape)
-        mutations[~mask] = 0
-        layer.bias += mutations
-
-    return mutated_genes
-
-
-def weights_mutator(individual: MLPIndividual, gen_prob: float) -> int:
+def weights_mutator(
+    individual: MLPIndividual, attribute: str, gen_prob: float
+) -> int:
     """Mutate some individual weights genes.
 
-    For each layer weights, obtain a random :class:`np.ndarray`(with values in
-    the range ``[0.0 and 1.0]``) with the same shape as the weights and mutate
-    the genes that satisfy the ``gen_prob`` probability with a value in the
-    range ``[-0.5, 0.5]``
+    For each layer weights or bias, obtain a random :class:`np.ndarray`(with
+    values in the range ``[0.0 and 1.0]``) with the same shape as the selected
+    attribute and mutate the genes that satisfy the ``gen_prob`` probability
+    with a value in the range ``[-0.5, 0.5]``
 
     :param individual: individual to mutate.
+    :param attribute: attribute to mutate. Must be either ``weights`` or
+        ``bias``.
     :param gen_prob: probability of a gen to mutate.
     :returns: number of genes mutated.
 
@@ -328,11 +305,14 @@ def weights_mutator(individual: MLPIndividual, gen_prob: float) -> int:
         if not layer.config["trainable"]:
             continue
 
-        mask = np.random.rand(*layer.weights.shape) < gen_prob
+        weights = getattr(layer, attribute)
+        weights_shape = weights.shape
+
+        mask = np.random.rand(*weights_shape) < gen_prob
         mutated_genes += np.count_nonzero(mask)
-        mutations = np.random.uniform(-0.5, 0.5, layer.weights.shape)
+        mutations = np.random.uniform(-0.5, 0.5, weights_shape)
         mutations[~mask] = 0
-        layer.weights += mutations
+        weights += mutations
 
     return mutated_genes
 
@@ -395,12 +375,18 @@ def configure_toolbox(
 
     DGPLOGGER.debug("Register the weights mutate operator...")
     toolbox.register(
-        "mutate_weights", weights_mutator, gen_prob=probabilities["weights"]
+        "mutate_weights",
+        weights_mutator,
+        attribute="weights",
+        gen_prob=probabilities["weights"],
     )
 
     DGPLOGGER.debug("Register the bias mutate operator...")
     toolbox.register(
-        "mutate_bias", bias_mutator, gen_prob=probabilities["bias"]
+        "mutate_bias",
+        weights_mutator,
+        attribute="bias",
+        gen_prob=probabilities["bias"],
     )
 
     DGPLOGGER.debug("register the neuron mutator operator")

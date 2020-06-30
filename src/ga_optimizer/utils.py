@@ -79,6 +79,7 @@ def apply_mutation(
 
         mut_bias_genes = toolbox.mutate_bias(mutant)
         mut_weights_genes = toolbox.mutate_weights(mutant)
+        mutated_individuals += 1
         del mutant.fitness.values
 
         if random.random() < mut_neuron_prob:
@@ -87,15 +88,13 @@ def apply_mutation(
         if random.random() < mut_layer_prob:
             layer_diff = toolbox.mutate_layer(mutant)
 
-        if mut_bias_genes or mut_weights_genes:
-            mutated_individuals += 1
-            DGPLOGGER.debug(
-                f"    For individual {index}:\n"
-                f"        {mut_bias_genes} mutated bias genes\n"
-                f"        {mut_weights_genes} mutated weights genes\n"
-                f"        {neuron_diff} neuron changes\n"
-                f"        {layer_diff} layer changes\n"
-            )
+        DGPLOGGER.debug(
+            f"    For individual {index}:\n"
+            f"        {mut_bias_genes} mutated bias genes\n"
+            f"        {mut_weights_genes} mutated weights genes\n"
+            f"        {neuron_diff} neuron changes\n"
+            f"        {layer_diff} layer changes\n"
+        )
 
     return mutated_individuals
 

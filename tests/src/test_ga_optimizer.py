@@ -231,7 +231,7 @@ class TestGeneticAlgorithm(unittest.TestCase):
     def test_genetic_algorithm(self):
         """Run the genetic algorithm a few times and check if it works."""
         first_weights, best_weights = ga_optimizer.genetic_algorithm(
-            [ga_optimizer.types.HiddenLayerInfo(3, True)],
+            [ga_optimizer.types.HiddenLayerInfo(5, True)],
             self.dataset,
             15,
             5,
@@ -240,7 +240,7 @@ class TestGeneticAlgorithm(unittest.TestCase):
             0.75,
             0.3,
             0.3,
-            0.2,
+            0.1,
         )
         first_score = ga_optimizer.utils.test_individual(
             first_weights, self.dataset

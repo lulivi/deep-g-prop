@@ -132,7 +132,7 @@ def cli(
     fit_train_prob: float,
     verbosity: str,
 ) -> None:
-    """Run a genetic algorithm with the choosen settings.
+    """Run a genetic algorithm with the chosen settings.
 
     :param hidden_layers_info: list of hidden layers basic configuration.
 

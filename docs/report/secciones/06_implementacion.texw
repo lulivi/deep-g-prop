@@ -149,7 +149,7 @@ se construyen los individuos.
 
 La definición de la función de evaluación es como sigue:
 
-\begin{pycode}
+\begin{minted}{python}
 def individual_evaluator(
     individual: MLPIndividual, trn: Proben1Split, tst: Proben1Split, **kwargs,
 ):
@@ -166,7 +166,7 @@ def individual_evaluator(
             classification.
 
     """
-\end{pycode}
+\end{minted}
 
 Teniendo el individuo, el conjunto que va a ser usado como entrenamiento, el
 conjunto con el que se van a probar los datos y dos argumentos extra (la
@@ -176,7 +176,7 @@ primera parte de la función de evaluación consiste en construir un el modelo
 dada la configuración del individuo. Dependiendo de la probabilidad de ajuste,
 se entrenará el modelo o no.
 
-\begin{pycode}
+\begin{minted}{python}
     multi_class = kwargs.get("multi_class", False)
     start_time = time.perf_counter()
     units_size_list = [
@@ -199,18 +199,19 @@ se entrenará el modelo o no.
         else BinaryCrossentropy(),
     )
 
-    # Train if choosen
+    # Train if chosen
     if random.random() < kwargs.pop("fit_train_prob"):
         model.fit(
             trn.X, trn.y_cat, epochs=100, batch_size=16, verbose=0,
         )
-\end{pycode}
+\end{minted}
 
 Finalmente, tras la creación del modelo se procede a obtener las medidas
 necesarias. Con los datos predichos, se obtienen la puntuación F2-score y el
-porcentaje de error obtenido. También se muestra un resumen por pantalla.
+porcentaje de error obtenido. También se muestra un resumen por pantalla y el
+tiempo que ha llevado calcular las puntuaciones.
 
-\begin{pycode}
+\begin{minted}{python}
     # Predict the scores
     predicted_y = model.predict_classes(tst.X)
     f2_score = fbeta_score(
@@ -229,7 +230,7 @@ porcentaje de error obtenido. También se muestra un resumen por pantalla.
     )
 
     return (f2_score, error_perc)
-\end{pycode}
+\end{minted}
 
 A continuación se muestra un ejemplo de uso definiendo un individuo y
 evaluándolo para el problema ``cancer1'':
@@ -279,7 +280,7 @@ La función de cruce ocurre si se dan dos condiciones: que se cumpla la
 probabilidad de cruce entre dos individuos, y que los dos individuos tengan la
 misma forma\footnote{Mismo número de capas y neuronas en cada capa.}.
 
-\begin{pycode}
+\begin{minted}{python}
 def crossover_operator(ind1: MLPIndividual, ind2: MLPIndividual):
     """Apply crossover betweent two individuals.
 
@@ -307,7 +308,7 @@ def crossover_operator(ind1: MLPIndividual, ind2: MLPIndividual):
         ind2.layers[layer_index].bias[neuron_index],
         ind1.layers[layer_index].bias[neuron_index],
     )
-\end{pycode}
+\end{minted}
 
 Obteniendo aleatoriamente la capa y la neurona que se va a intercambiar de
 dicha capa se procede a intercambiar pesos y sesgos. En el siguiente código se
@@ -358,3 +359,338 @@ han intercambiado por los del otro individuo.
 
 Continuando con las operaciones encontramos las mutaciones. Existen 4 tipos de
 mutaciones que se le aplican a los individuos:
+
+\begin{itemize}
+
+    \item Mutación de pesos: aplica ruido a un porcentaje de genes de los pesos
+    de las capas del individuo.
+
+    \item Mutación de sesgos: igual que el anterior, pero en vez de a los
+    pesos, el ruido es aplicado a los genes de los sesgos de cada neurona.
+
+    \item Mutación de neuronas: añade o elimina la última neurona de una capa
+    oculta aleatoria.
+
+    \item Mutación de capas: en este caso, añade o elimina una capa oculta al
+    modelo. El número de neuronas y si se elimina o añade se calcula
+    aleatoriamente.
+
+\end{itemize}
+
+Como la operación de mutación de pesos y sesgos es igual, hay que indicarle qué
+atributo se quiere cambiar.
+
+<<term=False, evaluate=True>>=
+import numpy as np
+
+from src.ga_optimizer.toolbox import weights_mutator, weights_mutator
+from src.ga_optimizer.types import MLPIndividual
+from src.utils import read_proben1_partition
+
+np.random.seed(123)
+
+dataset = read_proben1_partition("cancer1")
+individual = MLPIndividual(dataset.nin, [], dataset.nout)
+weights_before = individual.layers[0].weights.copy()
+
+print("\nBefore mutation")
+print(individual.layers[0].weights)
+
+mutated_genes = weights_mutator(individual, "weights", 0.5)
+weights_after = individual.layers[0].weights.copy()
+
+print(f"\nAfter mutation of {mutated_genes} genes:")
+print(individual.layers[0].weights)
+print("\nComparison of weights difference:")
+print(weights_after - weights_before)
+@
+
+La mutación de un porcentaje de genes en los pesos del individuo se ha
+efectuado correctamente. El resto de genes, que da intacto (diferencia de 0).
+
+En cuanto a la mutación de neuronas (añadido o eliminado de éstas en una capa
+aleatoria), ocurre en dos fases: añadido/eliminado de neuronas de la capa
+seleccionada y modificación del número de entradas de la siguiente capa. Como
+comentábamos, se obtiene aleatoriamente qué capa vamos a modificar, y dentro de
+la capa, si se va a añadir o eliminar una neurona:
+
+\begin{minted}{python}
+def neuron_mutator(individual: MLPIndividual) -> int:
+    """Add/remove one neuron from a random hidden layer.
+
+    Randomly choose whether to add or remove a neuron.
+
+    :param individual: individual to mutate.
+    :returns: whether the neuron was added or removed.
+
+    """
+    # We want to ignore output layer so it only adds/pops from a hidden layer
+    layer_index = random.randint(0, len(individual) - 2)
+
+    # Choose randomly to add or delete a neuron. If the number of neurons is
+    # two, just add a new one.
+    choice = (
+        -1
+        if len(individual.layers[layer_index].bias) <= 2
+        else random.choice((-1, 1))
+    )
+\end{minted}
+
+Si se realiza la opción de añadir neurona, primero se modifican los pesos y
+sesgos añadiendo un nuevo elemento, generado con una distribución uniforme en
+el rango $[-0.5, 0.5]$. Después se añade la nueva entrada a la capa siguiente.
+
+\begin{minted}{python}
+    if choice > 0:
+        # Get previous layer neurons as a reference for creating a new neuron
+        # for this layer
+        previous_layer_neurons = individual.layers[layer_index].weights.shape[
+            0
+        ]
+        # Append a new neuron to the weights and bias of the chosen layer
+        individual.layers[layer_index].weights = np.append(
+            individual.layers[layer_index].weights,
+            np.random.uniform(-0.5, 0.5, (previous_layer_neurons, 1)),
+            axis=1,
+        )
+        individual.layers[layer_index].bias = np.append(
+            individual.layers[layer_index].bias,
+            [random.uniform(-0.5, 0.5)],
+            axis=0,
+        )
+        # Append a new input entry for the chosen layer in the following layer
+        next_layer_neurons = len(individual.layers[layer_index + 1].bias)
+        individual.layers[layer_index + 1].weights = np.append(
+            individual.layers[layer_index + 1].weights,
+            np.random.uniform(-0.5, 0.5, (1, next_layer_neurons)),
+            axis=0,
+        )
+\end{minted}
+
+Si por el contrario vamos a eliminar la última neurona de la capa, se eliminan
+las entradas de los pesos y sesgos de la capa elegida y se quita la entrada
+correspondiente en la capa siguiente.
+
+\begin{minted}{python}
+    else:
+        # Remove last neuron weights and bias from the chosen layer
+        individual.layers[layer_index].weights = np.delete(
+            individual.layers[layer_index].weights, -1, axis=1
+        )
+        individual.layers[layer_index].bias = np.delete(
+            individual.layers[layer_index].bias, -1, axis=0
+        )
+        # Remove the input neuron from the next layer
+        individual.layers[layer_index + 1].weights = np.delete(
+            individual.layers[layer_index + 1].weights, -1, axis=0
+        )
+\end{minted}
+
+Finalmente actualizamos las configuraciones de la capa elegida y la siguiente,
+y devolvemos si el cambio ha sido de añadir o eliminar neurona.
+
+\begin{minted}{python}
+    # Update the units in the chosen and next layer config
+    individual.layers[layer_index].config["units"] += choice
+    individual.layers[layer_index + 1].config["batch_input_shape"][1] += choice
+
+    return choice
+\end{minted}
+
+En el siguiente código vemos el añadido y la eliminación de neuronas:
+
+<<term=False, evaluate=True>>=
+import random
+
+from src.ga_optimizer.toolbox import neuron_mutator
+from src.ga_optimizer.types import HiddenLayerInfo, MLPIndividual
+from src.utils import read_proben1_partition
+
+random.seed(12345)
+
+dataset = read_proben1_partition("cancer1")
+individual = MLPIndividual(
+    dataset.nin, [HiddenLayerInfo(3, True)], dataset.nout
+)
+
+print("\nBefore first mutation. Weights and bias shapes:")
+print(individual.layers[0].weights.shape, individual.layers[0].bias.shape)
+
+neuron_change = neuron_mutator(individual)
+result = "addition" if neuron_change > 0 else "substraction"
+
+print(f"\nAfter the {result} of one neuron. Weights and bias shapes:")
+print(individual.layers[0].weights.shape, individual.layers[0].bias.shape)
+
+neuron_change = neuron_mutator(individual)
+result = "addition" if neuron_change > 0 else "substraction"
+
+print(f"\nAfter the {result} of one neuron. Weights and bias shapes:")
+print(individual.layers[0].weights.shape, individual.layers[0].bias.shape)
+@
+
+Por último, existe la operación de mutar capas ocultas (eliminación y añadido).
+Esta operación sólo puede modificar la última capa oculta del modelo, es decir,
+añadir una nueva capa antes de la capa de salida, o eliminarla. Igual que se
+hace en la mutación de neuronas primero se obtiene un número aleatorio en el
+rango $[-1, 1]$ que decidirá si se añade o quita una capa. También se comprueba
+si solo queda una capa, para entonces añadir obligatoriamente y no dar pie a
+quitar esa única capa oculta.
+
+\begin{minted}{python}
+def layer_mutator(individual: MLPIndividual) -> int:
+    """Add/remove one layer to the model.
+
+    :param individual: individual to mutate.
+    :return: wether the layer was added or removed.
+
+    """
+    # Choose randomly to add or delete a layer. Ensure there are 2 or more
+    # layers in the model before deleting one. The output layer is included in
+    # the count.
+    choice = (
+        1
+        if len(individual) <= 2
+        else random.choice((-1, 1))
+    )
+
+    difference = 0
+\end{minted}
+
+Lo que continúa se puede dividir en dos partes al igual que el operador de
+neuronas. Primero se crea la capa nueva, con un número de neuronas aleatorio
+dentro del rango $[2, 5]$. Esta información se usa para modificar la siguiente
+capa: si por ejemplo teniendo la capa con forma $(9, 3)$ siendo $9$ las
+neuronas de entrada de la capa y $3$ las propias de la capa, añadimos una capa
+que tiene $5$ neuronas, la capa de salida tendría dos conexiones inexistentes.
+Entonces hay ó que añadir neuronas de entrada (de forma similar a como se hace
+en el operador de neuronas) en la siguiente capa, o eliminar las que quedan
+huérfanas:
+
+\begin{minted}{python}
+    if choice > 0:
+        # Choose a random number of neurons
+        new_layer_output_neurons = random.randint(2, 5)
+        # Obtain current last hidden layer neuron number
+        previous_layer_output = individual.layers[-2].config["units"]
+        # Insert a new hidden layer into the individual
+        individual.append_hidden(
+            Layer.uniform(
+                name=f"Hidden{len(individual)}",
+                input_neurons=previous_layer_output,
+                output_neurons=new_layer_output_neurons,
+                trainable=True,
+            )
+        )
+
+        # Obtain the differences between the new layer neurons and the output
+        # layer input neurons and apply necessary changes to this last one
+        output_layer_input_neurons = individual.layers[-1].weights.shape[0]
+        difference = new_layer_output_neurons - output_layer_input_neurons
+
+        # Add input neuron entries
+        if difference > 0:
+            next_layer_neurons = len(individual.layers[-1].bias)
+            individual.layers[-1].weights = np.append(
+                individual.layers[-1].weights,
+                np.random.uniform(-1.0, 1.0, (difference, next_layer_neurons)),
+                axis=0,
+            )
+        # Remove input neuron entries
+        elif difference < 0:
+            individual.layers[-1].weights = np.delete(
+                individual.layers[-1].weights,
+                slice(
+                    output_layer_input_neurons + difference,
+                    output_layer_input_neurons,
+                ),
+                axis=0,
+            )
+\end{minted}
+
+En segundo lugar, si por el contrario se ha decidido eliminar una capa hay que
+obtener las neuronas de la capa anterior a la actual para después de eliminar
+la última capa oculta, configurar correctamente la capa de salida:
+
+\begin{minted}{python}
+    else:
+        # Obtain the predecessor output units and delte the chosen layer
+        removed_predecessor_units = individual.layers[-3].config["units"]
+        del individual.layers[-2]
+
+        # Calculate the difference between the predecesor layer and the output
+        # layer
+        output_layer_input_len = individual.layers[-1].weights.shape[0]
+        difference = removed_predecessor_units - output_layer_input_len
+
+        # Append the neccesary input neuron entries
+        if difference > 0:
+            next_layer_neurons = len(individual.layers[-1].bias)
+            individual.layers[-1].weights = np.append(
+                individual.layers[-1].weights,
+                np.random.uniform(-0.5, 0.5, (difference, next_layer_neurons)),
+                axis=0,
+            )
+        # Remove the leftovers
+        elif difference < 0:
+            individual.layers[-1].weights = np.delete(
+                individual.layers[-1].weights,
+                slice(
+                    output_layer_input_len + difference, output_layer_input_len
+                ),
+                axis=0,
+            )
+\end{minted}
+
+Para finalizar, hay que modificar de nuevo la configuración de la capa de
+salida y devolver el número de capas añadidas/eliminadas.
+
+\begin{minted}{python}
+    # Update output layer input neurons
+    individual.layers[-1].config["batch_input_shape"][1] += difference
+
+    return choice
+\end{minted}
+
+En el siguiente ejemplo se comprueba que efectivamente se añade y elimina la
+última capa satisfactoriamente:
+
+<<term=False, evaluate=True>>=
+import random
+
+from src.ga_optimizer.toolbox import layer_mutator
+from src.ga_optimizer.types import HiddenLayerInfo, MLPIndividual
+from src.utils import read_proben1_partition
+
+random.seed(12345)
+
+dataset = read_proben1_partition("cancer1")
+individual = MLPIndividual(
+    dataset.nin, [HiddenLayerInfo(3, True)], dataset.nout
+)
+
+print("\nBefore first mutatio. The hidden layers:")
+print([layer.config["units"] for layer in individual.layers[:-1]])
+
+layer_change = layer_mutator(individual)
+result = "addition" if layer_change > 0 else "substraction"
+
+print(f"\nAfter the {result} of one laye. The hidden layers:")
+print([layer.config["units"] for layer in individual.layers[:-1]])
+
+layer_change = layer_mutator(individual)
+result = "addition" if layer_change > 0 else "substraction"
+
+print(f"\nAfter the {result} of one laye. The hidden layers:")
+print([layer.config["units"] for layer in individual.layers[:-1]])
+@
+
+A parte de todo lo nombrado anteriormente que es lo más destacable del código,
+existen varias funciones de utilidades, como la de mostrar un resumen de las
+puntuaciones de los individuos después de cada generación, presentar un resumen
+general al terminar el algoritmo, evaluar el mejor individuo de la generación
+inicial y la final, ... Además también se pueden encontrar funciones de apoyo
+que permiten por ejemplo, cuando se va a mutar la población calcular con un
+número aleatorio si se van a mutar las neuronas o las capas. Lo mismo ocurre
+con el cruce entre individuos. Todo el código esta liberado bajo la licencia
+GPLv3\cite{gplv3} y se puede encontrar en GitHub\cite{deep-g-prop}.
