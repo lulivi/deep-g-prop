@@ -110,8 +110,8 @@ def remove_files(
     list(map(partial(remove_file, func_logger=func_logger), path_list,))
 
 
-@nox.session(name="py-clean")
-def py_clean(session: Session) -> None:
+@nox.session(name="clean-py")
+def clean_py(session: Session) -> None:
     """Celean python cache files.
 
     If ``verbose`` is provided in :attr:`Session.posargs`, each file removal
@@ -128,15 +128,13 @@ def py_clean(session: Session) -> None:
             *list(ROOT.glob("**/__pycache__/")),
             *list(ROOT.glob("**/.pytest_cache/")),
             *list(ROOT.glob("**/.mypy_cache/")),
-            *list(ROOT.glob("**/_minted-*/")),
-            *list(ROOT.glob("**/cache/")),
         ],
         lggr,
     )
 
 
-@nox.session(name="doc-clean")
-def docs_clean(session: Session) -> None:
+@nox.session(name="clean-docs")
+def clean_docs(session: Session) -> None:
     """Clean doc construction.
 
     If ``verbose`` is provided in :attr:`Session.posargs`, each file removal
@@ -151,6 +149,8 @@ def docs_clean(session: Session) -> None:
         [
             *list(REPORT_DIR_PATH.glob("_*")),
             REPORT_DIR_PATH / "figures_pweave",
+            *list(REPORT_DIR_PATH.glob("**/*.pkl")),
+            *list(ROOT.glob("**/_minted-*/")),
             *list(REPORT_DIR_PATH.glob("*.bbl")),
             *list(REPORT_DIR_PATH.glob("*.blg")),
             *list(REPORT_DIR_PATH.glob("secciones/*.tex")),
@@ -186,11 +186,14 @@ def chdir(session: Session, dir_path: Path) -> Iterator[Path]:
 
 
 @nox.session(name="build-latex")
-def build_latex(session: Session) -> None:
+def build_latex(session: Session, clean: bool = False) -> None:
     """Create tex files from Pweave sources."""
     session.log("Building latex files and figures through pweave ...")
-    session.install(*docs_requirements)
+    session.install(*docs_requirements, *prod_requirements)
     fig_dir = str(REPORT_DIR_PATH / "figures_pweave")
+
+    if clean:
+        clean_docs(session)
 
     with chdir(session, ROOT):
         for pweave_file in REPORT_DIR_PATH.glob("**/*.texw"):
@@ -224,9 +227,18 @@ def build_latex(session: Session) -> None:
 @nox.session(name="build-pdf")
 def build_pdf(session: Session) -> None:
     """Create pdf file."""
-    show_help(session, {"skip-latex": "Skip Pweave to LaTeX generation."})
+    show_help(
+        session,
+        {
+            "skip-latex": "Skip Pweave to LaTeX generation.",
+            "clean": (
+                "Clean LaTeX and Pweave cache files before creating tex files."
+            ),
+        },
+    )
     if "skip-latex" not in session.posargs:
-        build_latex(session)
+        clean = "clean" in session.posargs
+        build_latex(session, clean)
     session.log("Building pdf through pdflatex ...")
     pdflatex_cmd = [
         "pdflatex",
@@ -252,12 +264,7 @@ def build_pdf(session: Session) -> None:
 # -----------------------------------------------------------------------------
 @nox.session(name="test-docs")
 def test_docs(session: Session) -> None:
-    """Run the documentation related tests.
-
-    If ``skip-latex`` is provided in :attr:`Session.posargs`, no Pweave/latex
-    building will be done before running the tests.
-
-    """
+    """Run the documentation related tests."""
     show_help(session, {"skip-latex": "Skip the latex step."})
     if "skip-latex" in session.posargs:
         session.log("Skipping LaTeX and PDF building for this session.")

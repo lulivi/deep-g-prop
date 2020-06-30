@@ -5,3 +5,4 @@ scikit-learn==0.22.2.post1
 Theano==1.0.4
 Keras==2.3.1
 click==7.1.2
+tabulate==0.8.7

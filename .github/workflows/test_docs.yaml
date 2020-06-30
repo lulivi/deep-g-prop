@@ -30,7 +30,7 @@ jobs:
       - name: Install necessary tools
         run: pip install nox
       - name: Install texlive packages
-        run: sudo apt install -y aspell pandoc qpdf texlive-base texlive-latex-recommended texlive-fonts-recommended texlive-fonts-extra texlive-lang-spanish texlive-formats-extra
+        run: sudo apt install -y aspell aspell-es pandoc qpdf texlive-base texlive-latex-recommended texlive-fonts-recommended texlive-fonts-extra texlive-lang-spanish texlive-formats-extra
       - name: Run doc tests!
         working-directory: ${{ github.workspace }}
         run: nox -e test-docs
