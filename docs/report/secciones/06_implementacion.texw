@@ -65,43 +65,47 @@ opciones:
 
 \begin{itemize}
 
-    \item \code{--dataset-name} - nombre de la partición de datos a utilizar.
+    \item \mintinline{bash}{--dataset-name} - nombre de la partición de datos a
+    utilizar.
 
-    \item \code{--hidden-layers-info} - secuencia de capas internas. Por
-    ejemplo: \code{4 True, 2 False} sería una configuración con dos capas
-    internas de 4 y 2 neuronas respectivamente en las que la primera capa es
-    entrenable y la segunda no. Esto es, que la primera capa oculta recibirá
-    mutaciones tanto en los pesos como en los sesgos y la segunda no.
+    \item \mintinline{bash}{--hidden-layers-info} - secuencia de capas
+    internas. Por ejemplo: \mintinline{bash}{4 True, 2 False} sería una
+    configuración con dos capas internas de 4 y 2 neuronas respectivamente en
+    las que la primera capa es entrenable y la segunda no. Esto es, que la
+    primera capa oculta recibirá mutaciones tanto en los pesos como en los
+    sesgos y la segunda no.
 
-    \item \code{--init-population-size} - tamaño de la población de individuos
-    inicial.
+    \item \mintinline{bash}{--init-population-size} - tamaño de la población de
+    individuos inicial.
 
-    \item \code{--max-generations} - número máximo de generaciones que se
-    ejecutará el algoritmo.
+    \item \mintinline{bash}{--max-generations} - número máximo de generaciones
+    que se ejecutará el algoritmo.
 
-    \item \code{--cx-prob} - probabilidad que dos individuos se crucen entre
-    sí.
+    \item \mintinline{bash}{--cx-prob} - probabilidad que dos individuos se
+    crucen entre sí.
 
-    \item \code{--mut-bias-prob} - probabilidad que un individuo entrenable
-    sufra modificaciones en cada gen de los conjuntos de sesgos.
+    \item \mintinline{bash}{--mut-bias-prob} - probabilidad que un individuo
+    entrenable sufra modificaciones en cada gen de los conjuntos de sesgos.
 
-    \item \code{--mut-weights-prob} - probabilidad que un individuo entrenable
-    sufra modificaciones en cada gen de los conjuntos de pesos.
+    \item \mintinline{bash}{--mut-weights-prob} - probabilidad que un individuo
+    entrenable sufra modificaciones en cada gen de los conjuntos de pesos.
 
-    \item \code{--mut-neuron-prob} - probabilidad que cada individuo de la
-    población sufra un añadido / extracción de neurona en una capa aleatoria.
+    \item \mintinline{bash}{--mut-neuron-prob} - probabilidad que cada
+    individuo de la población sufra un añadido / extracción de neurona en una
+    capa aleatoria.
 
-    \item \code{--mut-layer-prob} - probabilidad que cada individuo de la
-    población sufra un añadido / extracción de última capa del modelo.
+    \item \mintinline{bash}{--mut-layer-prob} - probabilidad que cada individuo
+    de la población sufra un añadido / extracción de última capa del modelo.
 
-    \item \code{--fit-train-prob} - probabilidad que cada individuo de la población entrene previamente a la obtención de métricas.
+    \item \mintinline{bash}{--fit-train-prob} - probabilidad que cada individuo
+    de la población entrene previamente a la obtención de métricas.
 
 \end{itemize}
 
-También existe el comando \code{--verbosity} que define la verbosidad de la
-terminal (a parte, se guardará toda la información de salida del algoritmo en
-un archivo localizado en la carpeta \texttt{src/logs}) y \code{--help} que
-muestra la salida antes mostrada.
+También existe el comando \mintinline{bash}{--verbosity} que define la
+verbosidad de la terminal (a parte, se guardará toda la información de salida
+del algoritmo en un archivo localizado en la carpeta \texttt{src/logs}) y
+\mintinline{bash}{--help} que muestra la salida antes mostrada.
 
 \section{Utilidades}
 
@@ -111,29 +115,29 @@ usadas multiples veces de propósito general. Entre ellas se encuentran:
 
 \begin{itemize}
 
-  \item \code{read_proben1_partition} - como su propio nombre indica, carga los
-  datos de una de las particiones de Proben1 y los devuelve como un conjunto de
-  arrays multidimensionales de \textit{Numpy}\cite{py-numpy} para su cómoda
-  utilización.
+  \item \mintinline{bash}{--read_proben1_partition} - como su propio nombre
+  indica, carga los datos de una de las particiones de Proben1 y los devuelve
+  como un conjunto de arrays multidimensionales de
+  \textit{Numpy}\cite{py-numpy} para su cómoda utilización.
 
-  \item \code{read_all_proben1_partitions} - obtiene todas las particiones de
-  un mismo problema. Por ejemplo
-  ``cancer'' obtendría las particiones ``cancer1'', ``cancer2'' y ``cancer3''.
+  \item \mintinline{bash}{--read_all_proben1_partitions} - obtiene todas las
+  particiones de un mismo problema. Por ejemplo ``cancer'' obtendría las
+  particiones ``cancer1'', ``cancer2'' y ``cancer3''.
 
-  \item \code{print_table} - muestra una tabla de python de forma limpia y
-  legible.
+  \item \mintinline{bash}{--print_table} - muestra una tabla de python de forma
+  limpia y legible.
 
-  \item \code{print_data_summary} - dada una partición de Proben1 muestra
-  información util sobre ella, como el número de clases, la distribución de
-  ejemplos entre ellas, etc.
+  \item \mintinline{bash}{--print_data_summary} - dada una partición de Proben1
+  muestra información util sobre ella, como el número de clases, la
+  distribución de ejemplos entre ellas, etc.
 
 \end{itemize}
 
 \section{Optimización con algoritmos genéticos}
 
-El módulo más importante de código está situado en \texttt{src/ga\_optimization}
-y alberga el algoritmo genético que evolucionará las configuraciones de
-perceptrones multicapa elegidas.
+El módulo más importante de código está situado en
+\texttt{src/ga\_optimization} y alberga el algoritmo genético que evolucionará
+las configuraciones de perceptrones multicapa elegidas.
 
 Empezando por la unidad más pequeña de medida de un individuo, el gen está
 definido en el contexto de pesos y sesgos de cada neurona. Cada individuo
