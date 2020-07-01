@@ -107,7 +107,7 @@ muestra la salida antes mostrada.
 
 Dentro de la carpeta donde se encuentra el código \texttt{src} podemos ver un
 módulo llamado \textit{utils.py}. En este módulo se encuentran varias funciones
-usadas varias veces de propósito general. Entre ellas se encuentran:
+usadas multiples veces de propósito general. Entre ellas se encuentran:
 
 \begin{itemize}
 
@@ -128,8 +128,6 @@ usadas varias veces de propósito general. Entre ellas se encuentran:
   ejemplos entre ellas, etc.
 
 \end{itemize}
-
-Estas herramientas conceden facilidades para tener un código más limpio.
 
 \section{Optimización con algoritmos genéticos}
 
@@ -264,7 +262,7 @@ inicial, se procede con el bucle central
             \If{\textit{max f2\_score hasn't improved in some generations}}
                 \State \textit{Stop algorithm}
             \EndIf
-            \State \textit{create an offspring from the population}
+            \State \textit{select the offspring from the population}
             \State \textit{apply crossover to the offspring}
             \State \textit{apply mutations to the offspring}
             \State \textit{replace the population with the modified offspring}
@@ -275,6 +273,10 @@ inicial, se procede con el bucle central
 Se usa la medida de F2-score como centinela (a parte del número de generaciones
 evidentemente) por si en algún momento se estanca el incremento de puntuación
 se termine el algoritmo.
+
+Primero se selecciona la descendencia que será cruzada y mutada con la función
+de selección: mediante torneos de tres individuos elegidos aleatoriamente de la
+población, el mejor de ellos ocupará un lugar en la nueva descendencia.
 
 La función de cruce ocurre si se dan dos condiciones: que se cumpla la
 probabilidad de cruce entre dos individuos, y que los dos individuos tengan la
