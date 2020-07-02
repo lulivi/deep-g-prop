@@ -124,6 +124,7 @@ Para poder construir en su máquina la documentación o ejecutar los tests de
 ésta, será necesario instalar la lista de paquetes siguiente:
 
 - aspell
+- aspell-en
 - aspell-es
 - pandoc
 - qpdf
@@ -133,6 +134,7 @@ Para poder construir en su máquina la documentación o ejecutar los tests de
 - texlive-fonts-extra
 - texlive-lang-spanish
 - texlive-formats-extra
+- texlive-science
 
 Para instalarlo en Ubuntu sería:
 

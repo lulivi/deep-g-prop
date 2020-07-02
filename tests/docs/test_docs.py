@@ -34,9 +34,10 @@ class ReportTests(unittest.TestCase):
         self.assertFalse(
             errors.strip(), "There where errors during the spell check."
         )
-        self.assertFalse(output.split(), "List of wrong words is not empty.")
+        self.assertFalse(
+            set(output.split()), "List of wrong words is not empty."
+        )
 
-    @unittest.skip("Not finished documentation")
     def test_pdf_pages_number(self):
         """Check if report has the minimun number of pages."""
         number_of_pages = int(
@@ -64,7 +65,7 @@ class ReportTests(unittest.TestCase):
         if not cls.plain_report_path.exists():
             sys.exit(
                 "Latex plain report not found. Ensure to run 'nox -e "
-                "build-plain' before running the tests."
+                "build-latex' before running the tests."
             )
 
         cls.pdf_report_path = REPORT_DIR_PATH / "proyecto.pdf"
@@ -72,7 +73,7 @@ class ReportTests(unittest.TestCase):
         if not cls.pdf_report_path.exists():
             sys.exit(
                 "Latex PDF report not found. Ensure to run 'nox -e "
-                "build-docs' before running the tests."
+                "build-pdf' before running the tests."
             )
 
         aspell_extra_dict = ASPELL_DIR_PATH / "personal.aspell.en.pws"

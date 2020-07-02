@@ -1,7 +1,160 @@
 \chapter{Planificación}
 
+En este capítulo se comentará la metodología usada para el desarrollo del
+trabajo.
+
 \section{Metodología utilizada}
 
-\section{Temporización}
+Este proyecto se ha desarrollado con una metodología basada en tests conocida
+como TDD (\textit{test-driven development})\cite{tdd} que mediante la escritura
+de test unitarios se intenta alcanzar un código robusto y con buena cobertura.
+El procedimiento se puede resumir en los siguientes pasos:
+
+\begin{itemize}
+
+    \item \textit{Escritura del test} - el primer paso es escribir un test
+    relacionado con una funcionalidad del programa.
+
+    \item \textit{Fallo del test} - dado que aún no hemos codificado esa
+    funcionalidad antes nombrada, el test debe de fallar.
+
+    \item \textit{Escribir código para pasar el test} - lo más simple posible,
+    que permita la ejecución satisfactoria del test.
+
+    \item \textit{Refactorizar el código} - añadir lo necesario a la
+    funcionalidad.
+
+    \item \textit{Repetir} - los pasos anteriores acumulando test unitarios.
+
+\end{itemize}
+
+Los pasos se pueden reconocer sencillamente en la \autoref{fig:tdd}.
+
+\begin{figure}[h]
+    \centering
+    \caption{Diagrama del proceso de evolución de los algoritmos genéticos.}
+    \label{fig:tdd}
+
+    \begin{tikzpicture}[
+        node distance=1.5cm,
+        every node/.style={fill=white, font=\sffamily},
+        align=center
+    ]
+        % Nodes position
+        \node (start)         [startLoop]
+                                {Inicio};
+        \node (addTest)       [process, below of=start, yshift=-0.5cm]
+                                {Añadir un test simple};
+        \node (addSimpleCode) [process, below of=addTest, yshift=-0.5cm]
+                                {Crear código para pasar el test};
+        \node (refactorCode)  [process, below of=addSimpleCode, yshift=-0.5cm]
+                                {Refactorizar el código};
+        \node (repeat)        [repeat, right of=addSimpleCode, xshift=5cm]
+                                {Volver a empezar};
+
+        % Arrow specification
+        \draw[->]         (start) -- (addTest);
+        \draw[->]       (addTest) -- (addSimpleCode);
+        \draw[->] (addSimpleCode) -- (refactorCode);
+        \draw[->]  (refactorCode) -- (repeat);
+        \draw[->]        (repeat) -- (addTest);
+    \end{tikzpicture}
+
+    \vspace*{0.5cm}
+
+\end{figure}
 
 \section{Seguimiento del desarrollo}
+
+Para llevar a cabo un seguimiento del proyecto se ha utilizado la plataforma
+GitHub\cite{github}, donde se encuentra todo lo relacionado con el
+trabajo\cite{deep-g-prop}. Esta plataforma que ya albergaba más de 100 millones
+de repositorios en 2019, posibilita un desarrollo cómodo gracias a la cantidad
+de herramientas que provee. Entre ellas, en este trabajo se utilizan los
+\textit{milestones}, los \textit{issues} y los proyectos de GitHub.
+
+\paragraph*{\textit{Issue}} Estos elementos asociados a los repositorios
+permiten publicar informes de errores, sugerir mejoras sobre el software,
+debatir temas... todo esto relacionado con el repositorio en cuestión.
+
+\paragraph*{Milestones} Los \textit{milestones} (traducidos al español, hitos)
+son puntos importantes en el tiempo que marcan el final de la realización de un
+grupo de \textit{issues} con elementos en común.
+
+\paragraph*{Proyectos de GitHub} A parte de los conceptos antes nombrados,
+GitHub también pone a disposición unas herramientas llamadas Proyectos. Los
+Proyectos ayudan a organizar los \textit{issues} y tener una visión global de
+en qué estado se encuentra el repositorio. La vista de los Proyectos es una
+implementación de la metodología de desarrollo ágil \textit{Kanban}, que
+mediante su tablero (conocido como \textit{Kanban board}) permite colocar los
+\textit{issues} en distintas columnas con funciones diferentes. Un ejemplo de
+utilización del tablero sería definir tres columnas: una para las tareas en las
+que aún no se ha empezado a trabajar, la segunda que contendría los que están
+en proceso de desarrollo, y finalmente la de los \textit{issues} terminados.
+
+La planificación de los \textit{issues} más relevantes la he plasmado en la
+\autoref{char:gantt}. Ahí se puede ver la distribución de \textit{Milestones} y
+el englobado por grupos de \textit{issues} similares.
+
+\begin{figure}[tbp]
+    \centering
+    \caption{Diagrama Gantt de la distribución de tiempo}
+    \label{char:gantt}
+
+        \begin{ganttchart}[
+            vgrid,
+            hgrid,
+            y unit chart=0.6cm,
+            x unit=0.35cm,
+            bar label font=\tiny,
+            milestone label font=\tiny\itshape\bfseries *,
+            group label font=\footnotesize\bfseries,
+            link label font=\tiny,
+            group left shift=0,
+            group right shift=0,
+            group peaks tip position=0,
+            group peaks tip position=0,
+            newline shortcut=true,
+            group label node/.append style={align=left},
+            milestone label node/.append style={align=left},
+        ]{0}{26}
+            \gantttitle{Diagrama de Grantt}{26} \\
+
+            \ganttgroup{Metodología\\experimental}{1}{5} \\
+            \ganttbar[name=readme]{README}{1}{5} \\
+            \ganttbar[name=datasets]{Datasets}{1}{2} \\
+            \ganttbar[name=automation]{Automation}{1}{3} \\
+            \ganttbar[name=frameworks]{Frameworks}{2}{5} \\
+            \ganttbar[name=tests]{Tests}{4}{20} \\
+
+            \ganttmilestone{Metodología\\experimental}{5} \\\\
+
+            \ganttgroup{Codificación\\del problema}{6}{20} \\
+            \ganttbar[name=gasimple]{GA simple}{6}{10} \\
+            \ganttbar[name=evol]{Evolucion MLP}{11}{14} \\
+            \ganttbar[name=reprod]{Reproduccion result}{15}{17} \\
+            \ganttbar[name=databig]{Datasets mas grandes}{18}{20} \\
+
+            \ganttmilestone{GA simple}{10} \\
+            \ganttmilestone{Evolucionar\\framework}{15} \\
+            \ganttmilestone{Reproducción\\resultados}{20} \\\\
+
+             \ganttgroup{Escritura de la\\documentación}{1}{25} \\
+            \ganttbar[name=prefacio]{Prefacio}{1}{5} \\
+            \ganttbar[name=planificacion]{Planificación}{1}{5} \\
+            \ganttbar[name=introduccion]{Introducción}{2}{6} \\
+            \ganttbar[name=implementacion]{Implementación}{6}{14} \\
+            \ganttbar[name=descripcion]{Descripción}{6}{9} \\
+            \ganttbar[name=estadodelarte]{Estado del arte}{10}{14} \\
+            \ganttbar[name=analisis]{Análisis}{12}{20} \\
+            \ganttbar[name=conclusiones]{Conclusiones}{21}{24} \\
+            \ganttmilestone{Escritura\\documentación}{25}
+
+            \ganttlink[link mid=.20]{automation}{tests}
+            \ganttlink[link mid=.10]{frameworks}{gasimple}
+            \ganttlink[link mid=.40]{gasimple}{evol}
+            \ganttlink[link mid=.40]{frameworks}{implementacion}
+            \ganttlink[link mid=.40]{analisis}{conclusiones}
+        \end{ganttchart}
+
+\end{figure}
