@@ -43,6 +43,10 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3.7
+      - name: Export neccesary variables
+        run: |
+          echo "::set-env name=PYTHONPATH::${{github.workspace}}"
+          echo "::set-env name=KERAS_BACKEND::theano"
       - name: Install necessary tools
         run: pip install nox
       - name: Perform linting

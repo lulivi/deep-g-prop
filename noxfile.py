@@ -137,12 +137,12 @@ def clean_docs(session: Session) -> None:
 
     remove_files(
         [
-            *list(REPORT_DIR_PATH.glob("_*")),
-            REPORT_DIR_PATH / "figures_pweave",
-            *list(FIGURES_DIR_PATH.glob("*.[!tex]*")),
-            *list(REPORT_DIR_PATH.glob("**/*.pkl")),
             *list(ROOT.glob("**/_minted-*/")),
+            *list(REPORT_DIR_PATH.glob("_*")),
+            *list(REPORT_DIR_PATH.glob("**/*.pkl")),
             *list(REPORT_DIR_PATH.glob("secciones/*.tex")),
+            *list(FIGURES_DIR_PATH.glob("*.[!tex]*")),
+            REPORT_DIR_PATH / "figures_pweave",
             REPORT_DIR_PATH / f"{REPORT_NAME}.bbl",
             REPORT_DIR_PATH / f"{REPORT_NAME}.blg",
             REPORT_DIR_PATH / f"{REPORT_NAME}.txt",
