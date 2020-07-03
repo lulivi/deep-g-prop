@@ -97,7 +97,7 @@ def individual_evaluator(
     DGPLOGGER.debug(
         f"        f2-score={f2_score:.5f}\n"
         f"        error%={error_perc:.2f}\n"
-        f"        eval time={end_time - start_time: .2f} sec"
+        f"        evaluation time={end_time - start_time: .2f} sec"
     )
 
     return (f2_score, error_perc)

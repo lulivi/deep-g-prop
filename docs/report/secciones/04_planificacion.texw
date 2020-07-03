@@ -34,34 +34,8 @@ Los pasos se pueden reconocer sencillamente en la \autoref{fig:tdd}.
     \centering
     \caption{Diagrama del proceso de evolución de los algoritmos genéticos.}
     \label{fig:tdd}
-
-    \begin{tikzpicture}[
-        node distance=1.5cm,
-        every node/.style={fill=white, font=\sffamily},
-        align=center
-    ]
-        % Nodes position
-        \node (start)         [startLoop]
-                                {Inicio};
-        \node (addTest)       [process, below of=start, yshift=-0.5cm]
-                                {Añadir un test simple};
-        \node (addSimpleCode) [process, below of=addTest, yshift=-0.5cm]
-                                {Crear código para pasar el test};
-        \node (refactorCode)  [process, below of=addSimpleCode, yshift=-0.5cm]
-                                {Refactorizar el código};
-        \node (repeat)        [repeat, right of=addSimpleCode, xshift=5cm]
-                                {Volver a empezar};
-
-        % Arrow specification
-        \draw[->]         (start) -- (addTest);
-        \draw[->]       (addTest) -- (addSimpleCode);
-        \draw[->] (addSimpleCode) -- (refactorCode);
-        \draw[->]  (refactorCode) -- (repeat);
-        \draw[->]        (repeat) -- (addTest);
-    \end{tikzpicture}
-
     \vspace*{0.5cm}
-
+    \includegraphics{tdd.pdf}
 \end{figure}
 
 \section{Seguimiento del desarrollo}
@@ -100,61 +74,6 @@ el englobado por grupos de \textit{issues} similares.
     \centering
     \caption{Diagrama Gantt de la distribución de tiempo}
     \label{char:gantt}
-
-        \begin{ganttchart}[
-            vgrid,
-            hgrid,
-            y unit chart=0.6cm,
-            x unit=0.35cm,
-            bar label font=\tiny,
-            milestone label font=\tiny\itshape\bfseries *,
-            group label font=\footnotesize\bfseries,
-            link label font=\tiny,
-            group left shift=0,
-            group right shift=0,
-            group peaks tip position=0,
-            group peaks tip position=0,
-            newline shortcut=true,
-            group label node/.append style={align=left},
-            milestone label node/.append style={align=left},
-        ]{0}{26}
-            \gantttitle{Diagrama de Grantt}{26} \\
-
-            \ganttgroup{Metodología\\experimental}{1}{5} \\
-            \ganttbar[name=readme]{README}{1}{5} \\
-            \ganttbar[name=datasets]{Datasets}{1}{2} \\
-            \ganttbar[name=automation]{Automation}{1}{3} \\
-            \ganttbar[name=frameworks]{Frameworks}{2}{5} \\
-            \ganttbar[name=tests]{Tests}{4}{20} \\
-
-            \ganttmilestone{Metodología\\experimental}{5} \\\\
-
-            \ganttgroup{Codificación\\del problema}{6}{20} \\
-            \ganttbar[name=gasimple]{GA simple}{6}{10} \\
-            \ganttbar[name=evol]{Evolucion MLP}{11}{14} \\
-            \ganttbar[name=reprod]{Reproduccion result}{15}{17} \\
-            \ganttbar[name=databig]{Datasets mas grandes}{18}{20} \\
-
-            \ganttmilestone{GA simple}{10} \\
-            \ganttmilestone{Evolucionar\\framework}{15} \\
-            \ganttmilestone{Reproducción\\resultados}{20} \\\\
-
-             \ganttgroup{Escritura de la\\documentación}{1}{25} \\
-            \ganttbar[name=prefacio]{Prefacio}{1}{5} \\
-            \ganttbar[name=planificacion]{Planificación}{1}{5} \\
-            \ganttbar[name=introduccion]{Introducción}{2}{6} \\
-            \ganttbar[name=implementacion]{Implementación}{6}{14} \\
-            \ganttbar[name=descripcion]{Descripción}{6}{9} \\
-            \ganttbar[name=estadodelarte]{Estado del arte}{10}{14} \\
-            \ganttbar[name=analisis]{Análisis}{12}{20} \\
-            \ganttbar[name=conclusiones]{Conclusiones}{21}{24} \\
-            \ganttmilestone{Escritura\\documentación}{25}
-
-            \ganttlink[link mid=.20]{automation}{tests}
-            \ganttlink[link mid=.10]{frameworks}{gasimple}
-            \ganttlink[link mid=.40]{gasimple}{evol}
-            \ganttlink[link mid=.40]{frameworks}{implementacion}
-            \ganttlink[link mid=.40]{analisis}{conclusiones}
-        \end{ganttchart}
-
+    \vspace*{0.5cm}
+    \includegraphics{gantt.pdf}
 \end{figure}

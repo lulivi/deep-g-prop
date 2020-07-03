@@ -1,6 +1,5 @@
 """Automation module to run from documentation builds to tests."""
 import contextlib
-import sys
 
 from functools import partial
 from pathlib import Path
@@ -12,23 +11,14 @@ import nox
 from nox.command import CommandFailed
 from nox.sessions import Session
 
-try:
-    from settings import (
-        FILTER_DIR_PATH,
-        REPORT_DIR_PATH,
-        REPORT_NAME,
-        ROOT,
-        REQUIREMENTS_DIR_PATH,
-    )
-except ModuleNotFoundError:
-    sys.path.append(str(Path(__file__).resolve().parent))
-    from settings import (
-        FILTER_DIR_PATH,
-        REPORT_DIR_PATH,
-        REPORT_NAME,
-        REQUIREMENTS_DIR_PATH,
-        ROOT,
-    )
+from settings import (
+    FIGURES_DIR_PATH,
+    FILTER_DIR_PATH,
+    REPORT_DIR_PATH,
+    REPORT_NAME,
+    REQUIREMENTS_DIR_PATH,
+    ROOT,
+)
 
 # Configure nox
 nox.options.sessions = ["test-docs", "test-src", "lint"]
@@ -149,11 +139,12 @@ def clean_docs(session: Session) -> None:
         [
             *list(REPORT_DIR_PATH.glob("_*")),
             REPORT_DIR_PATH / "figures_pweave",
+            *list(FIGURES_DIR_PATH.glob("*.[!tex]*")),
             *list(REPORT_DIR_PATH.glob("**/*.pkl")),
             *list(ROOT.glob("**/_minted-*/")),
-            *list(REPORT_DIR_PATH.glob("*.bbl")),
-            *list(REPORT_DIR_PATH.glob("*.blg")),
             *list(REPORT_DIR_PATH.glob("secciones/*.tex")),
+            REPORT_DIR_PATH / f"{REPORT_NAME}.bbl",
+            REPORT_DIR_PATH / f"{REPORT_NAME}.blg",
             REPORT_DIR_PATH / f"{REPORT_NAME}.txt",
             REPORT_DIR_PATH / f"{REPORT_NAME}.aux",
             REPORT_DIR_PATH / f"{REPORT_NAME}.log",
@@ -239,6 +230,19 @@ def build_pdf(session: Session) -> None:
     if "skip-latex" not in session.posargs:
         clean = "clean" in session.posargs
         build_latex(session, clean)
+
+    session.log("Building figures...")
+    with chdir(session, FIGURES_DIR_PATH):
+        for latex_file in FIGURES_DIR_PATH.glob("*.tex"):
+            session.run(
+                "pdflatex",
+                "-interaction=nonstopmode",
+                "-shell-escape",
+                str(latex_file),
+                silent=True,
+                external=True,
+            )
+
     session.log("Building pdf through pdflatex ...")
     pdflatex_cmd = [
         "pdflatex",

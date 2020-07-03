@@ -17,13 +17,19 @@ class ReportTests(unittest.TestCase):
             stdout=subprocess.PIPE,
         )
         process1 = subprocess.Popen(
-            ["aspell", "--lang=es_ES", "list"],
+            ["aspell", "--lang=es_ES", "--ignore-case", "list"],
             cwd=ROOT,
             stdin=process0.stdout,
             stdout=subprocess.PIPE,
         )
         process2 = subprocess.Popen(
-            ["aspell", "--lang=en_US", "list", *self.aspell_extra_args],
+            [
+                "aspell",
+                "--lang=en_US",
+                "--ignore-case",
+                "list",
+                *self.aspell_extra_args,
+            ],
             cwd=ROOT,
             stdin=process1.stdout,
             stdout=subprocess.PIPE,

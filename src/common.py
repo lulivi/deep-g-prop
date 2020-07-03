@@ -1,3 +1,4 @@
 """Common globals for the code."""
+from os import environ
 
-SEED = 12345
+SEED = int(environ.get("SEED", 12345))

@@ -118,7 +118,6 @@ cache/
 _minted-*
 docs/report/*.txt
 docs/report/secciones/*.tex
-docs/report/figures
 
 # VS code
 *.vscode/

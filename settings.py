@@ -7,8 +7,9 @@ ROOT = Path(__file__).resolve().parent
 try:
     # Documentation
     ASPELL_DIR_PATH = (ROOT / "docs" / "aspell").resolve(strict=True)
-    REPORT_DIR_PATH = (ROOT / "docs" / "report").resolve(strict=True)
     FILTER_DIR_PATH = (ROOT / "docs" / "filters").resolve(strict=True)
+    REPORT_DIR_PATH = (ROOT / "docs" / "report").resolve(strict=True)
+    FIGURES_DIR_PATH = (REPORT_DIR_PATH / "figures").resolve(strict=True)
     # Code
     REQUIREMENTS_DIR_PATH = (ROOT / "requirements").resolve(strict=True)
     SOURCE_DIR_PATH = (ROOT / "src").resolve(strict=True)

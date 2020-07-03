@@ -228,7 +228,7 @@ tiempo que ha llevado calcular las puntuaciones.
     DGPLOGGER.debug(
         f"        f2-score={f2_score:.5f}\n"
         f"        error%={error_perc:.2f}\n"
-        f"        eval time={end_time - start_time: .2f} sec"
+        f"        evaluation time={end_time - start_time: .2f} sec"
     )
 
     return (f2_score, error_perc)
@@ -523,13 +523,13 @@ print("\nBefore first mutation. Weights and bias shapes:")
 print(individual.layers[0].weights.shape, individual.layers[0].bias.shape)
 
 neuron_change = neuron_mutator(individual)
-result = "addition" if neuron_change > 0 else "substraction"
+result = "addition" if neuron_change > 0 else "subtraction"
 
 print(f"\nAfter the {result} of one neuron. Weights and bias shapes:")
 print(individual.layers[0].weights.shape, individual.layers[0].bias.shape)
 
 neuron_change = neuron_mutator(individual)
-result = "addition" if neuron_change > 0 else "substraction"
+result = "addition" if neuron_change > 0 else "subtraction"
 
 print(f"\nAfter the {result} of one neuron. Weights and bias shapes:")
 print(individual.layers[0].weights.shape, individual.layers[0].bias.shape)
@@ -675,17 +675,17 @@ individual = MLPIndividual(
     dataset.nin, [HiddenLayerInfo(3, True)], dataset.nout
 )
 
-print("\nBefore first mutatio. The hidden layers:")
+print("\nBefore first mutation. The hidden layers:")
 print([layer.config["units"] for layer in individual.layers[:-1]])
 
 layer_change = layer_mutator(individual)
-result = "addition" if layer_change > 0 else "substraction"
+result = "addition" if layer_change > 0 else "subtraction"
 
 print(f"\nAfter the {result} of one laye. The hidden layers:")
 print([layer.config["units"] for layer in individual.layers[:-1]])
 
 layer_change = layer_mutator(individual)
-result = "addition" if layer_change > 0 else "substraction"
+result = "addition" if layer_change > 0 else "subtraction"
 
 print(f"\nAfter the {result} of one laye. The hidden layers:")
 print([layer.config["units"] for layer in individual.layers[:-1]])
