@@ -35,9 +35,10 @@ jobs:
             texlive-base texlive-latex-recommended texlive-fonts-recommended \
             texlive-fonts-extra texlive-lang-spanish texlive-formats-extra \
             texlive-science
+      - name: Export neccesary variables
+        run: |
+          echo "::set-env name=PYTHONPATH::${{github.workspace}}"
+          echo "::set-env name=KERAS_BACKEND::theano"
       - name: Run doc tests!
         working-directory: ${{ github.workspace }}
-        env:
-          PYTHONPATH: ${{ github.workspace }}
-          KERAS_BACKEND: theano
         run: nox -e test-docs
