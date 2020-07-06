@@ -45,8 +45,8 @@ artículo G-Prop \cite{g-prop}.
 \item Estudiar la materia relacionada con optimización de parámetros de
 \textit{perceptrones multicapa} con \textit{algoritmos genéticos}.
 
-\item Encontrar la forma de obtener una mejora considerable de rendimiento
-partiendo de los \textit{perceptrones multicapa}.
+\item Obtener como salida del algoritmo un modelo optimizado en número de
+capas, neuronas y pesos para distintos problemas.
 
 \end{itemize}
 
