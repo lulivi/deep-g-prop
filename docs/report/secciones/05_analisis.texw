@@ -8,15 +8,18 @@ sirven para comparar unas ejecuciones con otras son: el porcentaje de error al
 predecir, la puntuación de el conjunto de neuronas por capa y la métrica F2
 score.
 
-El porcentaje de error (en Inglés \it{accuracy error}) viene dado por el número
-de ejemplos bien clasificados dividido entre el número de ejemplos totales. Es
-la medida principal utilizada en GProp\cite{g-prop} para la comparación con
-otros algoritmos, intentando minimizar ésta. Tanto en la publicación como en
-este trabajo también se busca minimizar el número de neuronas del perceptrón
-multicapa para así obtener una solución más sencilla y óptima. Dado que no solo
-se realizan pruebas con una sola capa oculta, la puntuación de las neuronas
-viene dada por la siguiente expresión:
-
+El porcentaje de error (en Inglés \textit{accuracy error}) viene dado por el
+número de ejemplos bien clasificados dividido entre el número de ejemplos
+totales. Es la medida principal utilizada en GProp\cite{g-prop} para la
+comparación con otros algoritmos, intentando minimizar ésta. Tanto en la
+publicación como en este trabajo también se busca minimizar el número de
+neuronas del perceptrón multicapa para así obtener una solución más sencilla y
+óptima. Dado que no solo se realizan pruebas con una sola capa oculta, la
+puntuación de las neuronas viene dada por la expresión de la
+\autoref{eq:hidden-score}, siendo $nhl$ el número de capas ocultas que tiene el
+modelo y $nu_{i}$ el número de neuronas de la capa $i$. Con esta operación se
+busca primero minimizar el número de capas y después el número de neuronas de
+cada capa.
 
 \begin{figure}
     \centering
@@ -29,19 +32,15 @@ viene dada por la siguiente expresión:
     \end{equation}
 \end{figure}
 
-Siendo $nhl$ el número de capas ocultas que tiene el modelo y $nu_{i}$ el
-número de neuronas de la capa $i$. Con esta operación se busca primero
-minimizar el número de capas y después el número de neuronas de cada capa.
-
 La métrica F2 score es una definida como la media armónica ponderada entre
-precisión (\it{precision})\footnote{Fracción de instancias que son de la clase
-relevante. Esto es: el número de ejemplos que pertenecen a la clase relevante
-dividido por el número total de ejemplos que se han predicho.} y sensibilidad
-(\it{recall})\footnote{Fracción de instancias de la clase relevante que se han
-clasificado bien.}. Por un lado, si los datos están desbalanceados la precisión
-puede salir alta pero la sensibilidad saldrá baja. Usando cómo parámetro de
-ponderación el número dos, le damos más importancia a la sensibilidad, para
-evitar lo antes comentado.
+precisión (\textit{precision})\footnote{Fracción de instancias que son de la
+clase relevante. Esto es: el número de ejemplos que pertenecen a la clase
+relevante dividido por el número total de ejemplos que se han predicho.} y
+sensibilidad (\textit{recall})\footnote{Fracción de instancias de la clase
+relevante que se han clasificado bien.}. Por un lado, si los datos están
+desbalanceados la precisión puede salir alta pero la sensibilidad saldrá baja.
+Usando cómo parámetro de ponderación el número dos, le damos más importancia a
+la sensibilidad, para evitar lo antes comentado.
 
 En cuanto al entrenamiento y propagación hacia atrás de los modelos se han
 utilizado los siguientes parámetros:
@@ -51,21 +50,21 @@ utilizado los siguientes parámetros:
     \item Función de activación: método aplicado a la sumatoria de los valores
     de activación de la capa anterior por sus pesos mas un sesgo. La salida de
     esta función define la activación de la neurona actual. Para este parámetro
-    se ha utilizado la función de activación ReLU (\it{rectified linear unit})
-    que cumple la siguiente función dado un valor $x$ la activación de la
-    neurona viene dada por $max(x, 0)$. Para la capa de salida, sin embargo, se
-    ha utilizado la función Softmax que configura las neuronas de salida de
+    se ha utilizado la función de activación ReLU (\textit{rectified linear
+    unit}) que cumple la siguiente función dado un valor $x$ la activación de
+    la neurona viene dada por $max(x, 0)$. Para la capa de salida, sin embargo,
+    se ha utilizado la función Softmax que configura las neuronas de salida de
     manera que todas las activaciones suman 1 y se sitúen en el rango
     $[0.0, 1.0]$.
 
 \item Optimizador: algoritmo utilizado para entrenar la red neuronal con la
     propagación hacia atrás buscando la minimización de la función de pérdida.
     Como optimizador se ha utilizado SGD, gradiente descendiente estocástico
-    del Inglés, que utilizando pequeños grupos de datos (\it{batches}) calcula
-    las modificaciones necesarias en el conjunto de pesos y sesgos global
-    obteniendo finalmente el gradiente que se aplicará a éstos para así mejorar
-    las capacidades de clasificación del modelo con respecto a los datos de
-    entrenamiento.
+    del Inglés, que utilizando pequeños grupos de datos (\textit{batches})
+    calcula las modificaciones necesarias en el conjunto de pesos y sesgos
+    global obteniendo finalmente el gradiente que se aplicará a éstos para así
+    mejorar las capacidades de clasificación del modelo con respecto a los
+    datos de entrenamiento.
 
 \item Función de pérdida: también conocida como función de costo o función
 objetivo es la cuál se quiere minimizar, es decir, obtener una mejor
@@ -81,9 +80,9 @@ necesarias y de estructura fija.
 
 Para las pruebas se han utilizado tanto algunos conjuntos de datos de
 Proben1\cite{Proben1}\footnote{Base de datos dedicada a comparar redes
-neuronales} como otros conjuntos de datos conocidos (por ejemplo, \it{Spambase}
-ó \it{Glass} encontrados en la web de UCI\cite{uci}) para poder comparar los
-resultados obtenidos con GProp ya mencionado en la
+neuronales} como otros conjuntos de datos conocidos (por ejemplo,
+\textit{Spambase} ó \textit{Glass} encontrados en la web de UCI\cite{uci}) para
+poder comparar los resultados obtenidos con GProp ya mencionado en la
 introducción\autoref{chap:introduction}.
 
 Los datos mostrados en la mayoría de las tablas constituyen la media de cinco
@@ -110,8 +109,8 @@ modificar los pesos contenidos en las capas ocultas. Se han elegido los valores
 de número de neuronas y número de capas manualmente.
 
 Comprobando las dos primeras tablas podemos observar datos muy similares para
-el porcentaje de error obtenido en el problema \it{cancer1}. Obteniendo mejor
-resultado el algoritmo sin modificar las capas internas
+el porcentaje de error obtenido en el problema \textit{cancer1}. Obteniendo
+mejor resultado el algoritmo sin modificar las capas internas
 (\autoref{tab:fixed-7-1-const-can1}) con un $2.86\%$ de error frente al
 $3.09\%$ (en \autoref{tab:fixed-7-1-noconst-can1}) de la población con capas
 internas modificadas podemos suponer que dada la pequeña cantidad de individuos
@@ -130,7 +129,7 @@ cómo efectivamente ahí si mejora.
     \caption{
         Resultados de test del mejor individuo final tras 10 generaciones con
         20 individuos iniciales y 7 neuronas por individuo haciendo operaciones
-        sobre las capas internas para el problema \it{cancer1}.
+        sobre las capas internas para el problema \textit{cancer1}.
     }
     \label{tab:fixed-7-1-noconst-can1}
     \begin{tabular}{rlll}
@@ -147,7 +146,7 @@ cómo efectivamente ahí si mejora.
     \caption{
         Resultados de test del mejor individuo final tras 10 generaciones con
         20 individuos iniciales y 7 neuronas por individuo sin hacer
-        operaciones sobre las capas internas para el problema \it{cancer1}.
+        operaciones sobre las capas internas para el problema \textit{cancer1}.
     }
     \label{tab:fixed-7-1-const-can1}
     \begin{tabular}{rlll}
@@ -164,7 +163,7 @@ cómo efectivamente ahí si mejora.
     \caption{
         Resultados de test del mejor individuo inicial en una población de 20
         individuos con 7 neuronas en 1 capa oculta cada uno para el problema
-        \it{cancer1}.
+        \textit{cancer1}.
     }
     \label{tab:fixed-7-1-inicial-can1}
     \begin{tabular}{rlll}
@@ -187,7 +186,7 @@ error.
     \caption{
         Resultados de validación y test del mejor individuo inicial en una
         población de 50 individuos con 8 neuronas en cada una de las 2 capas
-        ocultas durante 20 generaciones para el problema \it{cancer1}.
+        ocultas durante 20 generaciones para el problema \textit{cancer1}.
     }
     \label{tab:fixed-8-2-comp-can1}
     \begin{tabular}{rllll}
@@ -201,7 +200,7 @@ error.
 \end{table}
 
 Por el contrario, si comparamos el primer ejemplo con los datos obtenidos para
-el problema \it{cancer2}, parece que sí que mejora el algoritmo al no mantener
+el problema \textit{cancer2}, parece que sí que mejora el algoritmo al no mantener
 constantes los pesos de la capa oculta (véanse las tablas
 \ref{tab:fixed-7-1-noconst-can2} y \ref{tab:fixed-7-1-const-can2}).
 
@@ -210,7 +209,7 @@ constantes los pesos de la capa oculta (véanse las tablas
     \caption{
         Resultados de test del mejor individuo final tras 10 generaciones con
         20 individuos iniciales y 7 neuronas por individuo haciendo operaciones
-        sobre las capas internas para el problema \it{cancer2}.
+        sobre las capas internas para el problema \textit{cancer2}.
     }
     \label{tab:fixed-7-1-noconst-can2}
     \begin{tabular}{rlll}
@@ -227,7 +226,7 @@ constantes los pesos de la capa oculta (véanse las tablas
     \caption{
         Resultados de test del mejor individuo final tras 10 generaciones con
         20 individuos iniciales y 7 neuronas por individuo sin hacer
-        operaciones sobre las capas internas para el problema \it{cancer2}.
+        operaciones sobre las capas internas para el problema \textit{cancer2}.
     }
     \label{tab:fixed-7-1-const-can2}
     \begin{tabular}{rlll}
@@ -253,19 +252,19 @@ cambiando el número de neuronas de cada individuo a medida que avanzan las
 generaciones.
 
 En la \autoref{tab:gprop-deepgprop-cancer} podemos observar los resultados
-obtenidos tanto por \it{G-Prop} como \it{DeepGProp} para la siguiente
+obtenidos tanto por \textit{G-Prop} como \textit{DeepGProp} para la siguiente
 configuración: población de 20 individuos, máximo de 10 generaciones, tamaño
 inicial de neuronas entre 2 y 20 y probabilidad de cruce de $0.5$. En general
-se ve mejor rendimiento para el algoritmo \it{G-Prop} con un número de neuronas
-menor en todos los casos y mejores resultados de precisión en las particiones 1
-y 2. Aun así, los datos son bastante similares y vemos una clara mejora por
-parte de \it{DeepGProp} en la segunda partición. Se intuye que \it{G-Prop}
-sortea mejor los mínimos locales que \it{DeepGProp}.
+se ve mejor rendimiento para el algoritmo \textit{G-Prop} con un número de
+neuronas menor en todos los casos y mejores resultados de precisión en las
+particiones 1 y 2. Aun así, los datos son bastante similares y vemos una clara
+mejora por parte de \textit{DeepGProp} en la segunda partición. Se intuye que
+\textit{G-Prop} sortea mejor los mínimos locales que \textit{DeepGProp}.
 
 \begin{table}
     \centering
     \caption{
-        Comparación de los resultados obtenidos en los problemas de \it{cancer}
+        Comparación de los resultados obtenidos en los problemas de \textit{cancer}
         por DeepGProp y GProp.
     }
     \label{tab:gprop-deepgprop-cancer}
@@ -281,23 +280,23 @@ sortea mejor los mínimos locales que \it{DeepGProp}.
     \end{tabular}
 \end{table}
 
-Continuando con el problema \it{DNA Helicases}, igual que en los resultados
+Continuando con el problema \textit{DNA Helicases}, igual que en los resultados
 anteriores, se ha obtenido la media de 5 ejecuciones con distintas semillas
 (ver inicio del \autoref{chap:analysis}). Observando los resultados de la
 \autoref{tab:gprop-deepgprop-miniheli} vemos una gran diferencia en todos los
-campos. La precisión alcanzada por \it{DeepGProp} es inmensamente inferior a la
-que consigue \it{G-Prop} ejecutando con el mismo máximo de generaciones. De
-forma similar, aunque se han aumentado las generaciones para la segunda prueba
-de 10 a 50, no cambia demasiado el resultado, quedando igualmente muy por
-encima de \it{G-Prop}. Aunque en problemas con número de entradas pequeño
-parece que se desenvuelven de forma similar, al aumentar las características
-del problema se diferencian mucho el uno del otro.
+campos. La precisión alcanzada por \textit{DeepGProp} es inmensamente inferior
+a la que consigue \textit{G-Prop} ejecutando con el mismo máximo de
+generaciones. De forma similar, aunque se han aumentado las generaciones para
+la segunda prueba de 10 a 50, no cambia demasiado el resultado, quedando
+igualmente muy por encima de \textit{G-Prop}. Aunque en problemas con número de
+entradas pequeño parece que se desenvuelven de forma similar, al aumentar las
+características del problema se diferencian mucho el uno del otro.
 
 \begin{table}
     \centering
     \caption{
         Comparación de los resultados obtenidos en los problemas de
-        \it{Helicases} por DeepGProp y GProp.
+        \textit{Helicases} por DeepGProp y GProp.
     }
     \label{tab:gprop-deepgprop-miniheli}
     \begin{tabular}{rllll}
@@ -312,8 +311,8 @@ del problema se diferencian mucho el uno del otro.
 Aparte se aprecia claramente la diferencia entre los datos de validación
 (\autoref{tab:deepgprop-miniheli-validation}) y los de test comentados
 anteriormente. Está ocurriendo un sobre ajuste a los datos de validación muy
-grande de media. En el caso anterior del conjunto de \it{cancer} no existe tal
-diferencia entre validación y test como existe para el programa \it{DNA
+grande de media. En el caso anterior del conjunto de \textit{cancer} no existe
+tal diferencia entre validación y test como existe para el programa \textit{DNA
 Helicases}. Se probará en la siguiente sección que con número variable de capas
 debería mejorar el resultado.
 
