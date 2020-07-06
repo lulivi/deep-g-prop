@@ -1,19 +1,7 @@
 """GA individual and misc object classes."""
-from typing import Any, Dict, List, NamedTuple
+from typing import Any, Dict, List
 
 import numpy as np
-
-
-class HiddenLayerInfo(NamedTuple):
-    """Define the hidden layer basic info for layer creation.
-
-    :ivar neurons: number of neurons of the layer.
-    :ivar trainable: ``True`` if the layer is trainable at fit time.
-
-    """
-
-    neurons: int
-    trainable: bool
 
 
 class Layer:
@@ -46,7 +34,6 @@ class Layer:
         name: str,
         input_neurons: int,
         output_neurons: int,
-        trainable: bool = True,
         activation: str = "relu",
     ):
         """Create a new layer using a :func:`np.random.uniform` distribution.
@@ -63,7 +50,7 @@ class Layer:
         )
         bias = np.random.uniform(-1.0, 1.0, size=(output_neurons,))
         config = cls._get_layer_config(
-            name, input_neurons, output_neurons, trainable, activation
+            name, input_neurons, output_neurons, activation
         )
         return cls(config, weights, bias)
 
@@ -74,7 +61,6 @@ class Layer:
         name: str,
         input_neurons: int,
         output_neurons: int,
-        trainable: bool = True,
         activation: str = "relu",
     ):
         """Create a new layer using the :func:`np.zeros` function.
@@ -89,17 +75,13 @@ class Layer:
         weights = np.zeros((input_neurons, output_neurons))
         bias = np.zeros((output_neurons,))
         config = cls._get_layer_config(
-            name, input_neurons, output_neurons, trainable, activation
+            name, input_neurons, output_neurons, activation
         )
         return cls(config, weights, bias)
 
     @staticmethod
     def _get_layer_config(
-        name: str,
-        input_neurons: int,
-        output_neurons: int,
-        trainable: bool,
-        activation: str,
+        name: str, input_neurons: int, output_neurons: int, activation: str,
     ):
         """Obtain a :class:`Dense` class configuration.
 
@@ -111,7 +93,7 @@ class Layer:
         """
         return {
             "name": name,
-            "trainable": trainable,
+            "trainable": True,
             "batch_input_shape": [None, input_neurons],
             "dtype": "float32",
             "units": output_neurons,
@@ -140,8 +122,7 @@ class Layer:
         :param layer_weights: list with weights and bias.
 
         """
-        self.weights = layer_weights[0]
-        self.bias = layer_weights[1]
+        self.weights, self.bias = layer_weights
 
 
 class MLPIndividual:
@@ -150,38 +131,40 @@ class MLPIndividual:
     def __init__(
         self,
         model_input: int,
-        hidden_layer_sequence: List[HiddenLayerInfo],
+        hidden_layers: List[int],
+        constant_hidden_layers: bool,
         model_output: int,
     ) -> None:
         """Define the base model.
 
         :param model_input: number of caracteristic the data has.
-        :param hidden_layer_sequence: a list of :class:`HiddenLayerInfo` tuples
-            with each hidden layer information.
+        :param hidden_layer_sequence: a list of layers sizes.
+        :param constant_hidden_layers: ``True`` if the hidden layers wouldn't
+            be changed.
         :param model_output: number of output neurons.
 
         """
         self._layers: List[Layer] = []
         next_input = model_input
 
-        for layer_index, layer_info in enumerate(hidden_layer_sequence):
+        for layer_index, neurons_number in enumerate(hidden_layers):
             self._layers.append(
                 Layer.uniform(
                     name=f"Hidden{layer_index}",
                     input_neurons=next_input,
-                    output_neurons=layer_info.neurons,
-                    trainable=layer_info.trainable,
+                    output_neurons=neurons_number,
                     activation="relu",
                 )
             )
-            next_input = layer_info.neurons
+            next_input = neurons_number
+
+        self._constant_hidden_layers = constant_hidden_layers
 
         self._layers.append(
             Layer.uniform(
                 name="OutputLayer",
                 input_neurons=next_input,
                 output_neurons=model_output,
-                trainable=True,
                 activation="softmax",
             )
         )
@@ -211,6 +194,16 @@ class MLPIndividual:
         """
         return self._layers
 
+    @property
+    def constant_hidden_layers(self) -> bool:
+        """Tell if the hidden layers are mutable.
+
+        :returns: ``True`` if the hidden layers can change, ``False``
+            elsewhere.
+
+        """
+        return self._constant_hidden_layers
+
     def can_mate(self, other: "MLPIndividual") -> bool:
         """Check if the current individual can mate with ``other``.
 
@@ -232,7 +225,11 @@ class MLPIndividual:
 
     def __str__(self) -> str:
         """Serialize as a string the object."""
-        str_representation = f"{self.__class__.__name__}:"
+        str_representation = (
+            f"{self.__class__.__name__}:"
+            "\n-- Constant hidden layers --"
+            f"\n{str(self._constant_hidden_layers)}"
+        )
 
         for index, layer in enumerate(self.layers):
             str_representation += (

@@ -5,8 +5,10 @@ backends
 backpropagation
 bayesiana
 bfgs
+const
 cx
 dataset
+datasets
 deap
 deepgprop
 desbalanceados
@@ -15,9 +17,11 @@ entrenable
 entrenables
 ga
 gantt
+getrandbits
 gplv
 gprop
 guervós
+helicases
 hiperparámetros
 init
 julián
@@ -47,6 +51,7 @@ perceptron
 perceptrón
 perceptrones
 perceptrons
+populatialgoritmoon
 preprocesamiento
 proben
 py
@@ -60,11 +65,13 @@ sklearn
 skorch
 sobreajuste
 softmax
+spambase
 src
 sumatoria
 tensorflow
 texample
 theano
+uci
 util
 utils
 villafranca

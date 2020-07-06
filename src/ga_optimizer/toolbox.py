@@ -6,7 +6,7 @@ Setup the initializer, evaluator, crossover and mutation operators.
 import random
 import time
 
-from typing import Callable, Dict, List
+from typing import Callable, Tuple, Union
 
 import numpy as np
 
@@ -18,26 +18,34 @@ from keras.optimizers import SGD
 from sklearn.metrics import accuracy_score, fbeta_score
 
 from src.dgp_logger import DGPLOGGER
-from src.ga_optimizer.types import HiddenLayerInfo, Layer, MLPIndividual
+from src.ga_optimizer.types import Layer, MLPIndividual
 from src.utils import Proben1Partition, Proben1Split
 
 
 def individual_initializer(
     individual_class: Callable,
-    model_input: int,
-    hidden_layer_sequence: List[int],
-    model_output: int,
+    nin_nout: Tuple[int, int],
+    neuron_layer_ranges: Tuple[Tuple[int, int], Tuple[int, int]],
+    constant_hidden_layers: int,
 ):
     """Initialize an individual with uniform.
 
     :param individual_class: individual class.
     :param model_input: number of neurons in the input layer.
-    :param hidden_layer_sequence: :class:`HiddenLayerInfo` list of layers.
+    :param max_neurons: top limit for the random neurons generator.
+    :param max_layers: top limit for the random layers generator.
     :param model_output: number of classes to predict.
     layer configuration and weights..
 
     """
-    return individual_class(model_input, hidden_layer_sequence, model_output)
+    hidden_layers = np.random.randint(
+        neuron_layer_ranges[0][0],
+        neuron_layer_ranges[0][1] + 1,
+        random.randint(*neuron_layer_ranges[1]),
+    ).tolist()
+    return individual_class(
+        nin_nout[0], hidden_layers, constant_hidden_layers, nin_nout[1]
+    )
 
 
 def individual_evaluator(
@@ -48,12 +56,9 @@ def individual_evaluator(
     :param individual: current individual to evaluate.
     :param trn: training data and labels.
     :param tst: validation data and labels.
-    :param **kwargs: See below.
-    :Keyword Arguments:
-        - fit_train_prob: probability to fit the train data with some forward
-            pases before predicting.
-        - multi_class: ``True`` if the dataset is for multiclass
-            classification.
+    :param multi_class: ``True`` if the dataset is for multiclass
+        classification.
+    :returns: the fitness values.
 
     """
     multi_class = kwargs.get("multi_class", False)
@@ -78,10 +83,9 @@ def individual_evaluator(
         else BinaryCrossentropy(),
     )
 
-    if random.random() < kwargs.pop("fit_train_prob"):
-        model.fit(
-            trn.X, trn.y_cat, epochs=100, batch_size=16, verbose=0,
-        )
+    model.fit(
+        trn.X, trn.y_cat, epochs=100, batch_size=16, verbose=0,
+    )
 
     # Predict the scores
     predicted_y = model.predict_classes(tst.X)
@@ -91,49 +95,63 @@ def individual_evaluator(
         beta=2,
         average="micro" if multi_class else "binary",
     )
-    accuracy = accuracy_score(tst.y, predicted_y, normalize=True)
-    error_perc = (1.0 - accuracy) * 100
-    end_time = time.perf_counter()
+    error_perc = (
+        1.0 - accuracy_score(tst.y, predicted_y, normalize=True)
+    ) * 100
+    neuron_layer_score = sum(units_size_list) * len(units_size_list)
     DGPLOGGER.debug(
-        f"        f2-score={f2_score:.5f}\n"
         f"        error%={error_perc:.2f}\n"
-        f"        evaluation time={end_time - start_time: .2f} sec"
+        f"        neuron/layer-score={neuron_layer_score:.2f}\n"
+        f"        f2-score={f2_score:.5f}\n"
+        f"        evaluation time={time.perf_counter() - start_time: .2f} sec"
     )
 
-    return (f2_score, error_perc)
+    return (error_perc, neuron_layer_score, f2_score)
 
 
 def crossover_operator(ind1: MLPIndividual, ind2: MLPIndividual):
     """Apply crossover betweent two individuals.
 
-    This method will swap a random neuron from a random layer. The neuron
-    associated bias and weights are swapped.
+    This method will swap neurons with two random points from a random layer.
+    The neurons associated bias and weights are swapped.
 
     :param ind1: the first individual.
     :param ind2: the second individual.
+    :returns: a tuple with  the cross points and the crossed layer.
 
     """
-    layer_index = random.randint(0, len(ind1) - 1)
-    neuron_index = random.randint(0, len(ind1.layers[layer_index].bias) - 1)
+    # Choose randomly the layer index to swap. If the hidden layers of any of
+    # the two individuals are constant, swap neurons from the output layer
+    # neuron in the output layer.
+    layer_index = (
+        len(ind1) - 1
+        if ind1.constant_hidden_layers or ind2.constant_hidden_layers
+        else random.randint(0, len(ind1) - 1)
+    )
+    cx_pts = random.sample(range(len(ind1.layers[layer_index].bias)), 2)
 
     (
-        ind1.layers[layer_index].weights[:, neuron_index],
-        ind2.layers[layer_index].weights[:, neuron_index],
+        ind1.layers[layer_index].weights[:, cx_pts[0] : cx_pts[1]],
+        ind2.layers[layer_index].weights[:, cx_pts[0] : cx_pts[1]],
     ) = (
-        ind2.layers[layer_index].weights[:, neuron_index],
-        ind1.layers[layer_index].weights[:, neuron_index],
+        ind2.layers[layer_index].weights[:, cx_pts[0] : cx_pts[1]].copy(),
+        ind1.layers[layer_index].weights[:, cx_pts[0] : cx_pts[1]].copy(),
     )
     (
-        ind1.layers[layer_index].bias[neuron_index],
-        ind2.layers[layer_index].bias[neuron_index],
+        ind1.layers[layer_index].bias[cx_pts[0] : cx_pts[1]],
+        ind2.layers[layer_index].bias[cx_pts[0] : cx_pts[1]],
     ) = (
-        ind2.layers[layer_index].bias[neuron_index],
-        ind1.layers[layer_index].bias[neuron_index],
+        ind2.layers[layer_index].bias[cx_pts[0] : cx_pts[1]].copy(),
+        ind1.layers[layer_index].bias[cx_pts[0] : cx_pts[1]].copy(),
     )
+
+    return cx_pts, layer_index
 
 
 def layer_mutator(individual: MLPIndividual) -> int:
     """Add/remove one layer to the model.
+
+    Compute whether to append a new hidden layer or pop the last one.
 
     :param individual: individual to mutate.
     :return: wether the layer was added or removed.
@@ -157,7 +175,6 @@ def layer_mutator(individual: MLPIndividual) -> int:
                 name=f"Hidden{len(individual)}",
                 input_neurons=previous_layer_output,
                 output_neurons=new_layer_output_neurons,
-                trainable=True,
             )
         )
 
@@ -221,7 +238,7 @@ def layer_mutator(individual: MLPIndividual) -> int:
 def neuron_mutator(individual: MLPIndividual) -> int:
     """Add/remove one neuron from a random hidden layer.
 
-    Randomly choose whether to add or remove a neuron.
+    For a random layer append a new neuron or pop the last one.
 
     :param individual: individual to mutate.
     :returns: whether the neuron was added or removed.
@@ -301,10 +318,13 @@ def weights_mutator(
     """
     mutated_genes = 0
 
-    for layer in individual.layers:
-        if not layer.config["trainable"]:
-            continue
+    layer_list = (
+        [individual.layers[-1]]
+        if individual.constant_hidden_layers
+        else individual.layers
+    )
 
+    for layer in layer_list:
         weights = getattr(layer, attribute)
         weights_shape = weights.shape
 
@@ -319,16 +339,25 @@ def weights_mutator(
 
 # pylint: disable=no-member
 def configure_toolbox(
-    hidden_layers_info: List[HiddenLayerInfo],
-    dataset: Proben1Partition,
-    probabilities: Dict[str, float],
+    dataset: Proben1Partition, **config: Union[float, bool, tuple]
 ):
-    """Register all neccesary objects and functions.
+    r"""Register all neccesary objects and functions.
 
-    :param hidden_layers_info: list of hidden layers basic configuration.
     :param dataset: data to work with.
-    :param probabilities: list of mutation probabilities for weights and genes
-        and application probability fortrain fitting.
+    :param \**config: diversed configuration parameters.
+
+    :Keyword Arguments:
+        - *neurons_range* --  max and min values given for the neurons random
+            generator for each layer.
+        - *layers_range* --  max and min values given for the layers random
+            generator.
+        - *mut_bias_prob* --  probability to mutate the individual bias
+            genes.
+        - *mut_weights_prob* --  probability to mutate the individual weights
+            genes.
+        - *const_hidden_layers* --  ``True`` if the no crossover or mutation
+            can be applied to the hidden layers.
+
     :returns: the toolbox with the registered functions.
 
     """
@@ -337,7 +366,7 @@ def configure_toolbox(
     # --------------------------------
     DGPLOGGER.debug("-- Register necessary functions and elements")
     DGPLOGGER.debug("Register the fitness measure...")
-    creator.create("FitnessMulti", base.Fitness, weights=(1.0, -0.5))
+    creator.create("FitnessMulti", base.Fitness, weights=(-1.0, -0.5, 0.5))
 
     DGPLOGGER.debug("Register the individual...")
     creator.create("Individual", MLPIndividual, fitness=creator.FitnessMulti)
@@ -348,9 +377,9 @@ def configure_toolbox(
         "individual",
         individual_initializer,
         creator.Individual,
-        dataset.nin,
-        hidden_layers_info,
-        dataset.nout,
+        (dataset.nin, dataset.nout),
+        (config["neurons_range"], config["layers_range"]),
+        config["const_hidden_layers"],
     )
 
     # define the population to be a list of individuals
@@ -367,26 +396,25 @@ def configure_toolbox(
         trn=dataset.trn,
         tst=dataset.val,
         multi_class=dataset.nout > 2,
-        fit_train_prob=probabilities["fit"],
     )
 
     DGPLOGGER.debug("Register the crossover operator...")
     toolbox.register("crossover", crossover_operator)
-
-    DGPLOGGER.debug("Register the weights mutate operator...")
-    toolbox.register(
-        "mutate_weights",
-        weights_mutator,
-        attribute="weights",
-        gen_prob=probabilities["weights"],
-    )
 
     DGPLOGGER.debug("Register the bias mutate operator...")
     toolbox.register(
         "mutate_bias",
         weights_mutator,
         attribute="bias",
-        gen_prob=probabilities["bias"],
+        gen_prob=config["mut_bias_prob"],
+    )
+
+    DGPLOGGER.debug("Register the weights mutate operator...")
+    toolbox.register(
+        "mutate_weights",
+        weights_mutator,
+        attribute="weights",
+        gen_prob=config["mut_weights_prob"],
     )
 
     DGPLOGGER.debug("register the neuron mutator operator")
@@ -394,8 +422,5 @@ def configure_toolbox(
 
     DGPLOGGER.debug("register the layer mutator operator")
     toolbox.register("mutate_layer", layer_mutator)
-
-    DGPLOGGER.debug("Register the selector function...")
-    toolbox.register("select", tools.selTournament, tournsize=3)
 
     return toolbox

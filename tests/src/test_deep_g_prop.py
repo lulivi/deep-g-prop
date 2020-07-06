@@ -9,11 +9,11 @@ from src.deep_g_prop import cli
 
 
 class TestDeepGPropCli(unittest.TestCase):
-    """Tests for the MLPIndividual class."""
+    """Tests for the DeepGProp CLI."""
 
     @mock.patch("src.deep_g_prop.DGPLOGGER")
     def test_cli_dataset_not_found(self, mock_dgplogger):
-        """Model path could not be found."""
+        """Non existen dataset."""
         dataset_name = "nonexistent"
         runner = CliRunner()
         with mock.patch("src.deep_g_prop.genetic_algorithm"):
@@ -23,40 +23,58 @@ class TestDeepGPropCli(unittest.TestCase):
         mock_dgplogger.configure_dgp_logger.assert_not_called()
 
     @mock.patch("src.deep_g_prop.DGPLOGGER")
-    def test_cli_wrong_hidden_sequence(self, mock_dgplogger):
-        """Model path could not be found."""
-        test_hidden_sequence = "wrong This"
+    def test_cli_wrong_neurons_range(self, mock_dgplogger):
+        """Non valid neurons range."""
+        test_neurons_range = -2, 7
         runner = CliRunner()
         with mock.patch("src.deep_g_prop.genetic_algorithm"):
             result = runner.invoke(
-                cli, ["--hidden-sequence", test_hidden_sequence]
+                cli, ["--neurons-range", *test_neurons_range]
             )
 
         self.assertEqual(result.exit_code, 2, result.stdout)
         mock_dgplogger.configure_dgp_logger.assert_not_called()
 
     @mock.patch("src.deep_g_prop.DGPLOGGER")
+    def test_cli_wrong_layers_range(self, mock_dgplogger):
+        """Non valid layers range."""
+        test_layers_range = 2, 1
+        runner = CliRunner()
+        with mock.patch("src.deep_g_prop.genetic_algorithm"):
+            result = runner.invoke(cli, ["--layers-range", *test_layers_range])
+
+        self.assertEqual(result.exit_code, 2, result.stdout)
+        mock_dgplogger.configure_dgp_logger.assert_not_called()
+
+    @mock.patch("src.deep_g_prop.DGPLOGGER")
     def test_cli_ok(self, mock_dgplogger):
-        """Model is found."""
+        """Everything ok."""
         argv = [
-            "--init-population-size",
-            "1",
-            "--max-generations",
-            "1",
-            "--cx-prob",
-            "1.1",
-            "--mut-bias-prob",
-            "1.1",
-            "--mut-weights-prob",
-            "1.1",
-            "--mut-neuron-prob",
-            "1.1",
-            "--mut-layer-prob",
-            "1.1",
-            "--fit-train-prob",
-            "0.5",
-            "--verbosity",
-            "DEBUG",
+            "-d",
+            "cancer1",
+            "-ip",
+            20,
+            "-mg",
+            10,
+            "-nr",
+            2,
+            2,
+            "-lr",
+            1,
+            1,
+            "-cx",
+            0.5,
+            "-b",
+            0.5,
+            "-w",
+            0.5,
+            "-n",
+            0.5,
+            "-l",
+            0.5,
+            "-c",
+            "-v",
+            "info",
         ]
         runner = CliRunner()
         with mock.patch("src.deep_g_prop.genetic_algorithm"):

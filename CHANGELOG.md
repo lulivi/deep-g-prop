@@ -12,10 +12,15 @@ El formato se basa en
 
 - Añadidos operadores de agregar/quitar neuronas/capas.
 
+- Nueva herramienta para obtener conjuntos de datos tipo Proben1 a partir de
+  problemas tipo Spambase (todo incluido en un csv).
+
 ### Modificado
 
 - Refactorizado módulo `ga_optimizer`. Ahora admite como entrada una secuencia
   que transformará en configuraciones de capas.
+
+- Arreglado problema con la función de fintess y el cruce de individuos.
 
 ### Eliminado
 

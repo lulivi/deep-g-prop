@@ -17,6 +17,8 @@ from src.utils import print_table
 def evaluate_population(population: list, evaluate_fn: Callable) -> None:
     """Evaluate the population.
 
+    Apply the evaluation method to every individual of the population.
+
     :param population: list of individuals.
     :param evaluate_fn: function to evaluate the population.
 
@@ -24,7 +26,6 @@ def evaluate_population(population: list, evaluate_fn: Callable) -> None:
     fitnesses = map(evaluate_fn, population)
 
     for ind, fit in zip(population, fitnesses):
-
         ind.fitness.values = fit
 
 
@@ -32,6 +33,9 @@ def apply_crossover(
     population: list, cx_prob: float, crossover_fn: Callable
 ) -> int:
     """Crossover the population by 2 with a probability.
+
+    Apply crossover to ``cx_prob`` percentage of the population in pairs if
+    both individuals can mate toguether.
 
     :param population: list of individuals.
     :param cx_prob: mate probability.
@@ -46,13 +50,15 @@ def apply_crossover(
     ):
         if random.random() < cx_prob and child1.can_mate(child2):
             crossed_individuals += 1
-            DGPLOGGER.debug(
-                f"    Applying crossover for the {crossover_index} couple "
-                f"({crossover_index * 2}, {crossover_index * 2+1}))."
-            )
-            crossover_fn(child1, child2)
+            cx_pt, layer_index = crossover_fn(child1, child2)
             del child1.fitness.values
             del child2.fitness.values
+            DGPLOGGER.debug(
+                f"    Applying crossover for the {crossover_index} couple "
+                f"({crossover_index * 2}, {crossover_index * 2+1})).\n"
+                f"        Crossed from neuron {cx_pt[0]} to {cx_pt[1]} in "
+                f"layer {layer_index}"
+            )
 
     return crossed_individuals
 
@@ -60,15 +66,19 @@ def apply_crossover(
 def apply_mutation(
     population: list,
     toolbox: base.Toolbox,
-    mut_neuron_prob: float,
-    mut_layer_prob: float,
+    mut_neurons_prob: float,
+    mut_layers_prob: float,
 ) -> int:
     """Mutate the population with probabilities.
 
+    Mutate weights and bias elements for every individual. Then randomly mutate
+    neuron count for ``mut_neurons_prob`` individuals and layer count for
+    ``mut_layers_prob`` individuals.
+
     :param population: list of individuals.
     :param toolbox: object where the mutation operators are defined.
-    :param mut_neuron_prob: probability to mute a neuron (append/pop).
-    :param mut_layer_prob: probability to mute a layer (append/pop).
+    :param mut_neurons_prob: probability to mute a neuron (append/pop).
+    :param mut_layers_prob: probability to mute a layer (append/pop).
     :returns: the number of individuals mutated.
 
     """
@@ -82,11 +92,13 @@ def apply_mutation(
         mutated_individuals += 1
         del mutant.fitness.values
 
-        if random.random() < mut_neuron_prob:
-            neuron_diff = toolbox.mutate_neuron(mutant)
+        # Ensure that we don't modify the hidden layers if they are constant
+        if not mutant.constant_hidden_layers:
+            if random.random() < mut_neurons_prob:
+                neuron_diff = toolbox.mutate_neuron(mutant)
 
-        if random.random() < mut_layer_prob:
-            layer_diff = toolbox.mutate_layer(mutant)
+            if random.random() < mut_layers_prob:
+                layer_diff = toolbox.mutate_layer(mutant)
 
         DGPLOGGER.debug(
             f"    For individual {index}:\n"
@@ -99,7 +111,9 @@ def apply_mutation(
     return mutated_individuals
 
 
-def finished_generation_summary(current_generation: int, population: list):
+def finished_generation_summary(
+    current_generation: int, population: list, best_fit: tuple
+):
     """Print a summary of the current generation.
 
     :param current_generation: index of the generation.
@@ -108,20 +122,23 @@ def finished_generation_summary(current_generation: int, population: list):
     """
     fits = np.array([ind.fitness.values for ind in population])
     table = [
-        ["Statistic", "F2 score", "Accuracy error %"],
-        ["Max", fits[:, 0].max(), fits[:, 1].max()],
-        ["Avg", fits[:, 0].mean(), fits[:, 1].mean()],
-        ["Min", fits[:, 0].min(), fits[:, 1].min()],
-        ["Std", fits[:, 0].std(), fits[:, 1].std()],
+        ["Statistic", "Accuracy error %", "Neuron/Layer score", "F2 score"],
+        ["Max", *fits.max(0)],
+        ["Avg", *fits.mean(0)],
+        ["Min", *fits.min(0)],
+        ["Std", *fits.std(0)],
+        ["Best", *best_fit],
     ]
     DGPLOGGER.info(f"    Summary of generation {current_generation}:")
-    print_table(table, DGPLOGGER.info, floatfmt=(None, ".5f", ".5f"))
+    print_table(table, DGPLOGGER.info, floatfmt=(None, ".2f", ".2f", ".5f"))
 
 
 def finished_algorithm_summary(
     initial_population, final_population, best_individual_selector
 ):
     """Print a summary of the hole process.
+
+    Show last population hidden layer info, first and last population fitness.
 
     :param initial_population: list of initial individuals.
     :param final_population: list of final individuals.
@@ -143,9 +160,14 @@ def finished_algorithm_summary(
         ]
     )
     table_common_attributes = {
-        "headers": ["Index", "F2 score", "Accuracy error %"],
+        "headers": [
+            "Index",
+            "Accuracy error %",
+            "Neuron/Layer score",
+            "F2 score",
+        ],
         "print_fn": DGPLOGGER.debug,
-        "floatfmt": ("i", ".5f", ".2f"),
+        "floatfmt": ("i", ".2f", ".2f", ".5f"),
     }
 
     for index, individual in enumerate(
@@ -190,7 +212,7 @@ def finished_algorithm_summary(
     print_table(
         final_pop_neurons_table,
         print_fn=DGPLOGGER.debug,
-        floatfmt=(None, *[".2f" for idx in range(max_layer_ind)]),
+        floatfmt=(None, ".2f", ".2f", ".5f"),
     )
 
 
@@ -211,44 +233,25 @@ def test_individual(
     DGPLOGGER.info(
         "Predicting the validation and test data with the best individual."
     )
-    val_scores_no_train = individual_evaluator(
-        individual,
-        dataset.trn,
-        dataset.val,
-        multi_class=dataset.nout > 2,
-        fit_train_prob=0.0,
+    val_scores = individual_evaluator(
+        individual, dataset.trn, dataset.val, multi_class=dataset.nout > 2,
     )
-    val_scores_train = individual_evaluator(
-        individual,
-        dataset.trn,
-        dataset.val,
-        multi_class=dataset.nout > 2,
-        fit_train_prob=1.0,
-    )
-    tst_scores_no_train = individual_evaluator(
-        individual,
-        dataset.trn,
-        dataset.tst,
-        multi_class=dataset.nout > 2,
-        fit_train_prob=0.0,
-    )
-    tst_scores_train = individual_evaluator(
-        individual,
-        dataset.trn,
-        dataset.tst,
-        multi_class=dataset.nout > 2,
-        fit_train_prob=1.0,
+    tst_scores = individual_evaluator(
+        individual, dataset.trn, dataset.tst, multi_class=dataset.nout > 2,
     )
     individual_table = [
-        ["Validation (no train)", *val_scores_no_train],
-        ["Validation (train)", *val_scores_train],
-        ["Test (no train)", *tst_scores_no_train],
-        ["Test (train)", *tst_scores_train],
+        ["Validation", *val_scores],
+        ["Test", *tst_scores],
     ]
     print_table(
         individual_table,
         print_fn=DGPLOGGER.info,
-        floatfmt=(None, ".5f", ".2f"),
-        headers=["Partition", "F2 score", "Accuracy error %"],
+        floatfmt=(None, ".2f", ".2f", ".5f"),
+        headers=[
+            "Partition",
+            "Accuracy error %",
+            "Neuron/layer score",
+            "F2 score",
+        ],
     )
-    return tst_scores_train
+    return tst_scores

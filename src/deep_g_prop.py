@@ -1,11 +1,12 @@
 """Multilayer perceptron testing with Keras."""
 from logging import DEBUG
-from typing import List
+from typing import Tuple
 
 import click
 
+from src.common import SEED
 from src.dgp_logger import DGPLOGGER
-from src.ga_optimizer import HiddenLayerInfo, genetic_algorithm
+from src.ga_optimizer import genetic_algorithm
 from src.types import Proben1Partition
 from src.utils import (
     DatasetNotFoundError,
@@ -13,189 +14,211 @@ from src.utils import (
     read_proben1_partition,
 )
 
-
-class HiddenLayerInfoList(click.ParamType):
-    """Custom click type to match a hidden layer sequence."""
-
-    name = "hidden layer info sequence"
-
-    @staticmethod
-    def _get_layer_info(layer_info_str):
-        """Return a hidden layer info object from a string."""
-        neurons_str, trainable_str = layer_info_str.split()
-        return HiddenLayerInfo(
-            int(neurons_str), click.BOOL(trainable_str.strip()),
-        )
-
-    def convert(self, value, param, ctx):
-        """Conver from string to a :class:`List[HiddenLayerInfo]`."""
-        try:
-            return list(map(self._get_layer_info, value.split(",")))
-        except ValueError:
-            self.fail(
-                f"{value!r} is not a valid hidden layer sequence. It sould be "
-                "'<num_neurons> <traineable>[, <neurons> <traineable> [...]]'"
-                ". For example: '4 True, 2 False, 6 True'",
-                param,
-                ctx,
-            )
+DEF_DATASET_NAME = "cancer1"
+DEF_INIT_POPULATION = 20
+DEF_MAX_GENERATIONS = 10
+DEF_NEURONS_RANGE = (2, 20)
+DEF_LAYERS_RANGE = (1, 3)
+DEF_MUT_CX = 0.5
+DEF_MUT_BIAS = 0.2
+DEF_MUT_WEIGHTS = 0.75
+DEF_MUT_NEURON = 0.3
+DEF_MUT_LAYER = 0.3
+DEF_CONST_HIDDEN = False
+DEF_VERBOSITY = "info"
 
 
 @click.command()
 @click.option(
+    "-d",
     "--dataset-name",
     type=click.STRING,
-    default="cancer1",
-    help="name of the proben1 partition located in src/datasets/",
-)
-@click.option(
-    "--hidden-layers-info",
-    type=HiddenLayerInfoList(),
-    default="3 True",
+    default=DEF_DATASET_NAME,
     help=(
-        'sequence of hidden layer configuration in the form of "4 True, 2'
-        ' False" to have two hidden layers: the first one trainable with 4 '
-        "neurons and the second one non-trainable with 2."
+        "name of the proben1 partition located in src/datasets/. Default: "
+        f"'{DEF_DATASET_NAME}'"
     ),
 )
 @click.option(
-    "--init-population-size",
+    "-ip",
+    "--init-pop",
     type=click.INT,
-    default=50,
-    help="number of individuals for the first population.",
+    default=DEF_INIT_POPULATION,
+    help=(
+        "number of individuals for the first population. Default: "
+        f"'{DEF_INIT_POPULATION}'."
+    ),
 )
 @click.option(
-    "--max-generations",
+    "-mg",
+    "--max-gen",
     type=click.INT,
-    default=300,
-    help="maximun number of generations.",
+    default=DEF_MAX_GENERATIONS,
+    help=f"maximun number of generations. Default: '{DEF_MAX_GENERATIONS}'.",
 )
 @click.option(
+    "-nr",
+    "--neurons-range",
+    type=(int, int),
+    default=DEF_NEURONS_RANGE,
+    help=(
+        "neurons number range for each hidden layer. Default: "
+        f"'{DEF_NEURONS_RANGE}'."
+    ),
+)
+@click.option(
+    "-lr",
+    "--layers-range",
+    type=(int, int),
+    default=DEF_LAYERS_RANGE,
+    help=f"hidden layers number range. Default: '{DEF_LAYERS_RANGE}'.",
+)
+@click.option(
+    "-cx",
     "--cx-prob",
     type=click.FLOAT,
-    default=0.5,
-    help="probability for two individuals to mate.",
+    default=DEF_MUT_CX,
+    help=(
+        f"probability for two individuals to mate. Default: '{DEF_MUT_CX}'."
+    ),
 )
 @click.option(
-    "--mut-bias-prob",
+    "-b",
+    "--mut-bias",
     type=click.FLOAT,
-    default=0.2,
-    help="probability to mutate each individual bias gene.",
+    default=DEF_MUT_BIAS,
+    help=(
+        "probability to mutate each individual bias gene. Default: "
+        f"'{DEF_MUT_BIAS}'."
+    ),
 )
 @click.option(
-    "--mut-weights-prob",
+    "-w",
+    "--mut-weights",
     type=click.FLOAT,
-    default=0.75,
-    help="probability to mutate each individual weight gene.",
+    default=DEF_MUT_WEIGHTS,
+    help=(
+        "probability to mutate each individual weight gene. Default: "
+        f"'{DEF_MUT_WEIGHTS}'."
+    ),
 )
 @click.option(
-    "--mut-neuron-prob",
+    "-n",
+    "--mut-neurons",
     type=click.FLOAT,
-    default=0.3,
+    default=DEF_MUT_NEURON,
     help=(
         "probability to add/remove the last neuron of a random layer for an "
-        "individual."
+        f"individual. Default: '{DEF_MUT_NEURON}'."
     ),
 )
 @click.option(
-    "--mut-layer-prob",
+    "-l",
+    "--mut-layers",
     type=click.FLOAT,
-    default=0.3,
-    help="probability to add/remove the last layer from an individual.",
-)
-@click.option(
-    "--fit-train-prob",
-    type=click.FLOAT,
-    default=0.3,
+    default=DEF_MUT_LAYER,
     help=(
-        "probability to fit the training data for each individual in each "
-        "evaluation."
+        "probability to add/remove the last layer from an individual. "
+        f"Default: '{DEF_MUT_LAYER}'."
     ),
 )
 @click.option(
+    "-c",
+    "--const-hidden",
+    is_flag=True,
+    default=DEF_CONST_HIDDEN,
+    help=(
+        "whether to apply crossover and mutation operators to the hidden "
+        f"layers. Default: '{DEF_CONST_HIDDEN}'."
+    ),
+)
+@click.option(
+    "-v",
     "--verbosity",
-    type=click.Choice(("INFO", "DEBUG")),
-    default="INFO",
+    type=click.Choice(("critical", "info", "debug")),
+    default="info",
     help="stream handler verbosity level.",
 )
-# pylint: disable=too-many-arguments
+@click.option(
+    "-s",
+    "--seed",
+    type=click.INT,
+    default=SEED,
+    help="stream handler verbosity level.",
+)
+# pylint: disable=too-many-arguments,too-many-locals
 def cli(
     dataset_name: str,
-    hidden_layers_info: List[HiddenLayerInfo],
-    init_population_size: int,
-    max_generations: int,
+    init_pop: int,
+    max_gen: int,
+    neurons_range: Tuple[int, int],
+    layers_range: Tuple[int, int],
     cx_prob: float,
-    mut_bias_prob: float,
-    mut_weights_prob: float,
-    mut_neuron_prob: float,
-    mut_layer_prob: float,
-    fit_train_prob: float,
+    mut_bias: float,
+    mut_weights: float,
+    mut_neurons: float,
+    mut_layers: float,
+    const_hidden: bool,
     verbosity: str,
-) -> None:
+    seed: int,
+) -> None:  # noqa: D301
     """Run a genetic algorithm with the chosen settings.
 
-    :param hidden_layers_info: list of hidden layers basic configuration.
-
-    :param dataset: data to work with.
-
-    :param init_population_size: initial population size.
-
-    :param max_generations: maximun number of generations to run.
-
+    \f:param dataset_name: data to work with.
+    :param init_pop: initial population size.
+    :param max_gen: maximun number of generations to run.
+    :param neurons_range: max and min values given for the neurons random "
+        generator for each layer.
+    :param layers_range: max and min values given for the layers random "
+        generator.
     :param cx_prob: probability to mate two individuals.
-
-    :param mut_bias_prob: probability to mutate the individual bias genes.
-
-    :param mut_weights_prob: probability to mutate the individual weights
-        genes.
-
-    :param mut_neuron_prob: probability to add/remove a neuron from the model.
-
-    :param mut_layer_prob: probability to add/remove a layer from the model.
-
-    :param fit_train_prob: probability to fit the training data for each
-        individual in each evaluation.
-
+    :param mut_bias: probability to mutate the individual bias genes.
+    :param mut_weights: probability to mutate the individual weights genes.
+    :param mut_neurons: probability to add/remove a neuron from the model.
+    :param mut_layers: probability to add/remove a layer from the model.
+    :param const_hidden: ``True`` if the no crossover or mutation can be
+        applied to the hidden layers.
     :param verbosity: terminal log verbosity.
+    :param seed: random generators seed.
 
     """
-    # Load the dataset
+    if neurons_range[0] < 1 or neurons_range[0] > neurons_range[1]:
+        print("antonioooo")
+        raise click.BadParameter(
+            "Wrong neurons range given. It must be inside the range [1, inf). "
+            f"Given: '{neurons_range}'.",
+            param_hint="--neurons-range",
+        )
+
+    if layers_range[0] < 1 or layers_range[0] > layers_range[1]:
+        raise click.BadParameter(
+            "Wrong hidden layers range given. It must be inside the range [1, "
+            f"inf). Given: '{layers_range}'.",
+            param_hint="--neurons-range",
+        )
+
     try:
         dataset: Proben1Partition = read_proben1_partition(dataset_name)
     except DatasetNotFoundError as error:
-        DGPLOGGER.critical(
-            "There was an error when reading proben1 partition "
-            f"'{dataset_name}': {error}"
-        )
         raise click.BadParameter(
             "Could not find some or any of the partition provided by "
             f"'{dataset_name}'.",
             param_hint="--dataset-name",
         ) from error
 
-    hidden_layers_str = "_".join(
-        [
-            f"{hidden.neurons}{'t' if hidden.trainable else 'n'}"
-            for hidden in hidden_layers_info
-        ]
+    neurons_range_str = ",".join(str(x) for x in neurons_range)
+    layers_range_str = ",".join(str(x) for x in layers_range)
+
+    file_name = (
+        f"{dataset_name}d_{neurons_range_str}nr_{layers_range_str}lr_"
+        f"{init_pop}ip_{max_gen}mg_{cx_prob}cp_{mut_bias}mbp_{mut_weights}mwp_"
+        f"{mut_neurons}mnp_{mut_layers}mlp_{const_hidden}c_{seed}s"
     )
-    file_name = f"{dataset_name}_{hidden_layers_str}"
 
-    if mut_neuron_prob > 0.0:
-        file_name += "_neur"
-
-    if mut_layer_prob > 0.0:
-        file_name += "_lay"
-
-    if fit_train_prob > 0.0:
-        file_name += "_fit"
-
-    # Configure log file handler
     DGPLOGGER.configure_dgp_logger(
         log_stream_level=verbosity, log_file_stem_sufix=file_name
     )
 
-    # Data summary
     DGPLOGGER.title(level=DEBUG, msg="Printing dataset sumary:")
     print_data_summary(
         dataset.trn.X, dataset.trn.y, "Train", print_fn=DGPLOGGER.info
@@ -208,33 +231,33 @@ def cli(
     )
 
     DGPLOGGER.title(msg="Selected configuration values")
-    DGPLOGGER.info(
-        f"-- Hidden layer sequence configuration: {hidden_layers_info}"
-    )
-    DGPLOGGER.info(f"-- Dataset name: {dataset.name}")
-    DGPLOGGER.info(f"-- Initial population size: {init_population_size}")
-    DGPLOGGER.info(f"-- Maximun number of generations: {max_generations}")
-    DGPLOGGER.info(f"-- Cossover probability: {cx_prob}")
-    DGPLOGGER.info(f"-- Bias gene mutation probability: {mut_bias_prob}")
-    DGPLOGGER.info(f"-- Weights gene mutation probability: {mut_weights_prob}")
-    DGPLOGGER.info(f"-- Neuron mutation probability: {mut_neuron_prob}")
-    DGPLOGGER.info(f"-- Layer mutation probability: {mut_layer_prob}")
-    DGPLOGGER.info(
-        f"-- Fit train before predicting probability: {fit_train_prob}"
-    )
 
-    # Call the genetic algorithm
+    DGPLOGGER.info(f"-- Dataset name: {dataset.name}")
+    DGPLOGGER.info(f"-- Initial population size: {init_pop}")
+    DGPLOGGER.info(f"-- Maximun number of generations: {max_gen}")
+    DGPLOGGER.info(f"-- Neurons per hidden layer range: {neurons_range}")
+    DGPLOGGER.info(f"-- Hidden layers number range: {layers_range}")
+    DGPLOGGER.info(f"-- Cossover probability: {cx_prob}")
+    DGPLOGGER.info(f"-- Bias gene mutation probability: {mut_bias}")
+    DGPLOGGER.info(f"-- Weights gene mutation probability: {mut_weights}")
+    DGPLOGGER.info(f"-- Neuron mutation probability: {mut_neurons}")
+    DGPLOGGER.info(f"-- Layer mutation probability: {mut_layers}")
+    DGPLOGGER.info(f"-- Constant hidden layers: {const_hidden}")
+    DGPLOGGER.info(f"-- Seed: {seed}")
+
     genetic_algorithm(
-        hidden_layers_info=hidden_layers_info,
         dataset=dataset,
-        init_population_size=init_population_size,
-        max_generations=max_generations,
+        init_population_size=init_pop,
+        max_generations=max_gen,
+        neurons_range=neurons_range,
+        layers_range=layers_range,
         cx_prob=cx_prob,
-        mut_bias_prob=mut_bias_prob,
-        mut_weights_prob=mut_weights_prob,
-        mut_neuron_prob=mut_neuron_prob,
-        mut_layer_prob=mut_layer_prob,
-        fit_train_prob=fit_train_prob,
+        mut_bias_prob=mut_bias,
+        mut_weights_prob=mut_weights,
+        mut_neuron_prob=mut_neurons,
+        mut_layer_prob=mut_layers,
+        const_hidden_layers=const_hidden,
+        seed=seed,
     )
 
 

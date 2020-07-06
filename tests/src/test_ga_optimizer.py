@@ -28,15 +28,11 @@ class TestLayer(unittest.TestCase):
         test_name = "layer1"
         test_in = 2
         test_out = 1
-        test_trainable = True
-        layer = ga_optimizer.types.Layer.uniform(
-            test_name, test_in, test_out, test_trainable
-        )
+        layer = ga_optimizer.types.Layer.uniform(test_name, test_in, test_out)
 
         self.assertDictContainsSubset(
             {
                 "name": test_name,
-                "trainable": test_trainable,
                 "batch_input_shape": [None, test_in],
                 "units": test_out,
             },
@@ -51,15 +47,11 @@ class TestLayer(unittest.TestCase):
         test_name = "layer1"
         test_in = 2
         test_out = 1
-        test_trainable = True
-        layer = ga_optimizer.types.Layer.zeros(
-            test_name, test_in, test_out, test_trainable
-        )
+        layer = ga_optimizer.types.Layer.zeros(test_name, test_in, test_out)
 
         self.assertDictContainsSubset(
             {
                 "name": test_name,
-                "trainable": test_trainable,
                 "batch_input_shape": [None, test_in],
                 "units": test_out,
             },
@@ -101,10 +93,11 @@ class TestMLPIndividual(unittest.TestCase):
     def test_init(self, mock_layer):
         """Test the constructor."""
         test_in = 3
-        test_hidden = [ga_optimizer.types.HiddenLayerInfo(2, True)]
+        test_hidden = [2]
+        test_constant = True
         test_out = 2
         individual = ga_optimizer.types.MLPIndividual(
-            test_in, test_hidden, test_out
+            test_in, test_hidden, test_constant, test_out
         )
 
         self.assertEqual(
@@ -114,14 +107,16 @@ class TestMLPIndividual(unittest.TestCase):
             individual.layers[1].weights,
             mock_layer.uniform.return_value.weights,
         )
+        self.assertTrue(individual.constant_hidden_layers)
 
     def test_len(self):
         """Test the len magic method."""
         test_in = 3
-        test_hidden = [ga_optimizer.types.HiddenLayerInfo(2, True)]
+        test_hidden = [2]
+        test_constant = True
         test_out = 2
         individual = ga_optimizer.types.MLPIndividual(
-            test_in, test_hidden, test_out
+            test_in, test_hidden, test_constant, test_out
         )
 
         self.assertEqual(len(individual.layers), 2)
@@ -129,10 +124,11 @@ class TestMLPIndividual(unittest.TestCase):
     def test_append(self):
         """Test the layer adder."""
         test_in = 3
-        test_hidden = [ga_optimizer.types.HiddenLayerInfo(2, True)]
+        test_hidden = [2]
+        test_constant = True
         test_out = 2
         individual = ga_optimizer.types.MLPIndividual(
-            test_in, test_hidden, test_out
+            test_in, test_hidden, test_constant, test_out
         )
 
         self.assertEqual(len(individual.layers), 2)
@@ -140,13 +136,9 @@ class TestMLPIndividual(unittest.TestCase):
         test_layer_name = "hehe"
         test_layer_in = 2
         test_layer_out = 5
-        test_layer_trainable = False
         individual.append_hidden(
             ga_optimizer.types.Layer.zeros(
-                test_layer_name,
-                test_layer_in,
-                test_layer_out,
-                test_layer_trainable,
+                test_layer_name, test_layer_in, test_layer_out,
             )
         )
 
@@ -155,17 +147,19 @@ class TestMLPIndividual(unittest.TestCase):
     def test_can_mate_ok(self):
         """Check if two individuals can mate."""
         test_in_1 = 3
-        test_hidden_1 = [ga_optimizer.types.HiddenLayerInfo(2, True)]
+        test_hidden_1 = [2]
+        test_constant_1 = True
         test_out_1 = 2
         individual_1 = ga_optimizer.types.MLPIndividual(
-            test_in_1, test_hidden_1, test_out_1
+            test_in_1, test_hidden_1, test_constant_1, test_out_1
         )
 
         test_in_2 = 3
-        test_hidden_2 = [ga_optimizer.types.HiddenLayerInfo(2, True)]
+        test_hidden_2 = [2]
+        test_constant_2 = True
         test_out_2 = 2
         individual_2 = ga_optimizer.types.MLPIndividual(
-            test_in_2, test_hidden_2, test_out_2
+            test_in_2, test_hidden_2, test_constant_2, test_out_2
         )
 
         self.assertTrue(individual_1.can_mate(individual_2))
@@ -173,20 +167,19 @@ class TestMLPIndividual(unittest.TestCase):
     def test_can_mate_diff_len(self):
         """Check if two individuals can mate."""
         test_in_1 = 3
-        test_hidden_1 = [
-            ga_optimizer.types.HiddenLayerInfo(2, True),
-            ga_optimizer.types.HiddenLayerInfo(3, True),
-        ]
+        test_hidden_1 = [5]
+        test_constant_1 = True
         test_out_1 = 2
         individual_1 = ga_optimizer.types.MLPIndividual(
-            test_in_1, test_hidden_1, test_out_1
+            test_in_1, test_hidden_1, test_constant_1, test_out_1
         )
 
         test_in_2 = 3
-        test_hidden_2 = [ga_optimizer.types.HiddenLayerInfo(2, True)]
+        test_hidden_2 = [2]
+        test_constant_2 = True
         test_out_2 = 2
         individual_2 = ga_optimizer.types.MLPIndividual(
-            test_in_2, test_hidden_2, test_out_2
+            test_in_2, test_hidden_2, test_constant_2, test_out_2
         )
 
         self.assertFalse(individual_1.can_mate(individual_2))
@@ -194,19 +187,19 @@ class TestMLPIndividual(unittest.TestCase):
     def test_can_mate_diff_shape(self):
         """Check if two individuals can mate."""
         test_in_1 = 3
-        test_hidden_1 = [
-            ga_optimizer.types.HiddenLayerInfo(4, True),
-        ]
+        test_hidden_1 = [2, 3]
+        test_constant_1 = True
         test_out_1 = 2
         individual_1 = ga_optimizer.types.MLPIndividual(
-            test_in_1, test_hidden_1, test_out_1
+            test_in_1, test_hidden_1, test_constant_1, test_out_1
         )
 
         test_in_2 = 3
-        test_hidden_2 = [ga_optimizer.types.HiddenLayerInfo(2, True)]
+        test_hidden_2 = [4]
+        test_constant_2 = True
         test_out_2 = 2
         individual_2 = ga_optimizer.types.MLPIndividual(
-            test_in_2, test_hidden_2, test_out_2
+            test_in_2, test_hidden_2, test_constant_2, test_out_2
         )
 
         self.assertFalse(individual_1.can_mate(individual_2))
@@ -214,12 +207,11 @@ class TestMLPIndividual(unittest.TestCase):
     def test_str(self):
         """Test the representation methods."""
         test_in = 3
-        test_hidden = [
-            ga_optimizer.types.HiddenLayerInfo(4, True),
-        ]
+        test_hidden = [4]
+        test_constant = True
         test_out = 2
         individual = ga_optimizer.types.MLPIndividual(
-            test_in, test_hidden, test_out
+            test_in, test_hidden, test_constant, test_out
         )
 
         self.assertEqual(repr(individual), str(individual))
@@ -231,16 +223,18 @@ class TestGeneticAlgorithm(unittest.TestCase):
     def test_genetic_algorithm(self):
         """Run the genetic algorithm a few times and check if it works."""
         first_weights, best_weights = ga_optimizer.genetic_algorithm(
-            [ga_optimizer.types.HiddenLayerInfo(5, True)],
             self.dataset,
-            15,
             5,
+            10,
+            (6, 6),
+            (1, 3),
             0.5,
             0.2,
             0.75,
             0.3,
             0.3,
-            0.1,
+            False,
+            123112432,
         )
         first_score = ga_optimizer.utils.test_individual(
             first_weights, self.dataset
@@ -248,8 +242,8 @@ class TestGeneticAlgorithm(unittest.TestCase):
         best_score = ga_optimizer.utils.test_individual(
             best_weights, self.dataset
         )
-        self.assertGreater(best_score[0], first_score[0])
-        self.assertLess(best_score[1], first_score[1])
+        self.assertLess(best_score[0], first_score[0])
+        self.assertGreater(best_score[2], first_score[2])
 
     def setUp(self):
         """Setup the model to run the algorithm."""

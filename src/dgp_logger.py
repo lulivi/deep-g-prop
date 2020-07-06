@@ -56,7 +56,7 @@ class DGPLogger(logging.Logger):
             :returns: the logging level as integer.
 
             """
-            validated_level = logging.getLevelName(level)
+            validated_level = logging.getLevelName(str(level).upper())
             return (
                 validated_level
                 if isinstance(validated_level, int)
@@ -64,7 +64,6 @@ class DGPLogger(logging.Logger):
             )
 
         datetime_format = "%y%b%d_%H%M%S"
-        current_date = datetime.now().strftime(datetime_format)
 
         # Configure the stream handler
         stream_handler = logging.StreamHandler()
@@ -81,6 +80,7 @@ class DGPLogger(logging.Logger):
 
         # Configure the file handler
         if log_file_stem_sufix:
+            current_date = datetime.now().strftime("%y%m%d_%H%M%S")
             file_handler = logging.FileHandler(
                 log_file_dir / f"{current_date}_{log_file_stem_sufix}.log"
             )

@@ -23,39 +23,51 @@ Lo cual mostraría por pantalla algo similar a:
 \begin{verbatim}
 Usage: deep_g_prop.py [OPTIONS]
 
+  Run a genetic algorithm with the chosen settings.
+
 Options:
-  --dataset-name TEXT             name of the proben1 partition located in
-                                  src/datasets/
+  -d, --dataset-name TEXT         name of the proben1 partition located in
+                                  src/datasets/. Default: 'cancer1'
 
-  --hidden-layers-info HIDDEN LAYER INFO SEQUENCE
-                                  sequence of hidden layer configuration in
-                                  the form of "4 True, 2 False" to have two
-                                  hidden layers: the first one trainable with
-                                  4 neurons and the second one non-trainable
-                                  with 2.
+  -ip, --init-pop INTEGER         number of individuals for the first
+                                  population. Default: '20'.
 
-  --init-population-size INTEGER  number of individuals for the first
-                                  population.
+  -mg, --max-gen INTEGER          maximun number of generations. Default:
+                                  '10'.
 
-  --max-generations INTEGER       maximun number of generations.
-  --cx-prob FLOAT                 probability for two individuals to mate.
-  --mut-bias-prob FLOAT           probability to mutate each individual bias
-                                  gene.
+  -nr, --neurons-range <INTEGER INTEGER>...
+                                  neurons number range for each hidden layer.
+                                  Default: '(2, 20)'.
 
-  --mut-weights-prob FLOAT        probability to mutate each individual weight
-                                  gene.
+  -lr, --layers-range <INTEGER INTEGER>...
+                                  hidden layers number range. Default: '(1,
+                                  3)'.
 
-  --mut-neuron-prob FLOAT         probability to add/remove the last neuron of
-                                  a random layer for an individual.
+  -cx, --cx-prob FLOAT            probability for two individuals to mate.
+                                  Default: '0.5'.
 
-  --mut-layer-prob FLOAT          probability to add/remove the last layer
-                                  from an individual.
+  -b, --mut-bias FLOAT            probability to mutate each individual bias
+                                  gene. Default: '0.2'.
 
-  --fit-train-prob FLOAT          probability to fit the training data for
-                                  each individual in each evaluation.
+  -w, --mut-weights FLOAT         probability to mutate each individual weight
+                                  gene. Default: '0.75'.
 
-  --verbosity [INFO|DEBUG]        stream handler verbosity level.
+  -n, --mut-neurons FLOAT         probability to add/remove the last neuron of
+                                  a random layer for an individual. Default:
+                                  '0.3'.
+
+  -l, --mut-layers FLOAT          probability to add/remove the last layer
+                                  from an individual. Default: '0.3'.
+
+  -c, --const-hidden              whether to apply crossover and mutation
+                                  operators to the hidden layers. Default:
+                                  'False'.
+
+  -v, --verbosity [critical|info|debug]
+                                  stream handler verbosity level.
+  -s, --seed INTEGER              stream handler verbosity level.
   --help                          Show this message and exit.
+  
 \end{verbatim}
 }
 
@@ -65,47 +77,48 @@ opciones:
 
 \begin{itemize}
 
-    \item \mintinline{bash}{--dataset-name} - nombre de la partición de datos a
-    utilizar.
+    \item \code{--dataset-name} - nombre de la partición de datos a utilizar.
 
-    \item \mintinline{bash}{--hidden-layers-info} - secuencia de capas
-    internas. Por ejemplo: \mintinline{bash}{4 True, 2 False} sería una
-    configuración con dos capas internas de 4 y 2 neuronas respectivamente en
-    las que la primera capa es entrenable y la segunda no. Esto es, que la
-    primera capa oculta recibirá mutaciones tanto en los pesos como en los
-    sesgos y la segunda no.
+    \item \code{--init-pop} - tamaño de la población de individuos inicial.
+    
+    \item \code{--max-gen} - número máximo de generaciones que se ejecutará el
+    algoritmo.
 
-    \item \mintinline{bash}{--init-population-size} - tamaño de la población de
-    individuos inicial.
+    \item \code{--neurons-range} - límites máximo y mínimo para calcular
+    aleatoriamente el número de neuronas para cada capa de cada individuo.
 
-    \item \mintinline{bash}{--max-generations} - número máximo de generaciones
-    que se ejecutará el algoritmo.
+    \item \code{--layers-range} - límites máximo y mínimo para calcular
+    aleatoriamente el número de capas de cada individuo.
+    
+    \item \code{--cx-prob} - probabilidad que dos individuos se crucen entre
+    sí.
 
-    \item \mintinline{bash}{--cx-prob} - probabilidad que dos individuos se
-    crucen entre sí.
+    \item \code{--mut-bias} - probabilidad que un individuo
+    sufra modificaciones en cada gen de los conjuntos de sesgos.
 
-    \item \mintinline{bash}{--mut-bias-prob} - probabilidad que un individuo
-    entrenable sufra modificaciones en cada gen de los conjuntos de sesgos.
+    \item \code{--mut-weights} - probabilidad que un individuo
+    sufra modificaciones en cada gen de los conjuntos de pesos.
 
-    \item \mintinline{bash}{--mut-weights-prob} - probabilidad que un individuo
-    entrenable sufra modificaciones en cada gen de los conjuntos de pesos.
+    \item \code{--mut-neurons} - probabilidad que cada individuo de la
+    población sufra un añadido / extracción de neurona en una capa aleatoria.
 
-    \item \mintinline{bash}{--mut-neuron-prob} - probabilidad que cada
-    individuo de la población sufra un añadido / extracción de neurona en una
-    capa aleatoria.
+    \item \code{--mut-layers} - probabilidad que cada individuo de la
+    población sufra un añadido / extracción de última capa del modelo.
 
-    \item \mintinline{bash}{--mut-layer-prob} - probabilidad que cada individuo
-    de la población sufra un añadido / extracción de última capa del modelo.
+    \item \code{--const-hidden} - \textit{flag} que define si los individuos de
+    la población tendrán las capas ocultas fijas, es decir, que no van a ser
+    modificadas ni por mutaciones, ni cruces entre individuos.
 
-    \item \mintinline{bash}{--fit-train-prob} - probabilidad que cada individuo
-    de la población entrene previamente a la obtención de métricas.
+    \item \code{--seed} - semilla a utilizar por los generadores de números
+    aleatorios (el módulo \textit{random} y \textit{numpy.random}). Por defecto
+    utiliza la definida en \texttt{src/common.py}.
 
 \end{itemize}
 
-También existe el comando \mintinline{bash}{--verbosity} que define la
-verbosidad de la terminal (a parte, se guardará toda la información de salida
-del algoritmo en un archivo localizado en la carpeta \texttt{src/logs}) y
-\mintinline{bash}{--help} que muestra la salida antes mostrada.
+También existe el comando \code{--verbosity} que define la verbosidad de la
+terminal (a parte, se guardará toda la información de salida del algoritmo en
+un archivo localizado en la carpeta \texttt{src/logs}) y \code{--help} que
+muestra el texto de ayuda como se comentó antes.
 
 \section{Utilidades}
 
@@ -115,23 +128,30 @@ usadas multiples veces de propósito general. Entre ellas se encuentran:
 
 \begin{itemize}
 
-  \item \mintinline{bash}{--read_proben1_partition} - como su propio nombre
-  indica, carga los datos de una de las particiones de Proben1 y los devuelve
-  como un conjunto de arrays multidimensionales de
-  \textit{Numpy}\cite{py-numpy} para su cómoda utilización.
+  \item \code{--read_proben1_partition} - como su propio nombre indica, carga
+  los datos de una de las particiones de Proben1 y los devuelve como un
+  conjunto de arrays multidimensionales de \textit{Numpy}\cite{py-numpy} para
+  su cómoda utilización.
 
-  \item \mintinline{bash}{--read_all_proben1_partitions} - obtiene todas las
-  particiones de un mismo problema. Por ejemplo ``cancer'' obtendría las
-  particiones ``cancer1'', ``cancer2'' y ``cancer3''.
+  \item \code{--read_all_proben1_partitions} - obtiene todas las particiones de
+  un mismo problema. Por ejemplo
+  ``cancer'' obtendría las   particiones ``cancer1'',
+  ``cancer2'' y ``cancer3''.
 
-  \item \mintinline{bash}{--print_table} - muestra una tabla de python de forma
-  limpia y legible.
+  \item \code{--print_table} - muestra una tabla de python de forma limpia y
+  legible.
 
-  \item \mintinline{bash}{--print_data_summary} - dada una partición de Proben1
-  muestra información util sobre ella, como el número de clases, la
-  distribución de ejemplos entre ellas, etc.
+  \item \code{--print_data_summary} - dada una partición de Proben1 muestra
+  información util sobre ella, como el número de clases, la distribución de
+  ejemplos entre ellas, etc.
 
 \end{itemize}
+
+También se puede localizar el módulo \textit{dataset\_to\_proben1.py}, que ha
+sido utilizado para obtener particiones de tipo Proben1 con datasets completos
+como \textit{Spambase}. Es una línea de comandos muy sencilla a la que se le
+pasa el archivo a convertir, y se obtiene 3 particiones con entrenamiento,
+validación y test cada una.
 
 \section{Optimización con algoritmos genéticos}
 
@@ -143,11 +163,11 @@ Empezando por la unidad más pequeña de medida de un individuo, el gen está
 definido en el contexto de pesos y sesgos de cada neurona. Cada individuo
 compuesto por capas ocultas mas la externa externa y sus configuraciones está
 inicializado a partir de distribuciones uniformes con valores en el rango
-$[-1.0, 1.0]$. En la creación se le indica qué capas de las ocultas van a ser
-entrenables, cuantos datos de entrada tendrá la red y cuántos datos de salida.
-A parte, evidentemente, del número de neuronas de cada capa. Así, con una
-semilla definida en \texttt{src/common} para permitir reproducibilidad es como
-se construyen los individuos.
+$[-1.0, 1.0]$. En la creación se le indican las capas ocultas que va a tener,
+si las capas ocultas van a ser modificables, cuántos datos de entrada tendrá la
+red y cuántos datos de salida. A parte, evidentemente, del número de neuronas
+de cada capa. Así, con una semilla definida anteriormente para permitir
+reproducibilidad es como se construyen los individuos.
 
 La definición de la función de evaluación es como sigue:
 
@@ -160,23 +180,18 @@ def individual_evaluator(
     :param individual: current individual to evaluate.
     :param trn: training data and labels.
     :param tst: validation data and labels.
-    :param **kwargs: See below.
-    :Keyword Arguments:
-        - fit_train_prob: probability to fit the train data with some forward
-            pases before predicting.
-        - multi_class: ``True`` if the dataset is for multiclass
-            classification.
+    :param multi_class: ``True`` if the dataset is for multiclass
+        classification.
+    :returns: the fitness values.
 
     """
 \end{minted}
 
 Teniendo el individuo, el conjunto que va a ser usado como entrenamiento, el
-conjunto con el que se van a probar los datos y dos argumentos extra (la
-probabilidad de ajuste previo y si el problema es de clasificación multiclase)
-se calcula las medidas que se comentaron en el \autoref{chap:analysis}. La
-primera parte de la función de evaluación consiste en construir un el modelo
-dada la configuración del individuo. Dependiendo de la probabilidad de ajuste,
-se entrenará el modelo o no.
+conjunto con el que se van a probar los datos y si el problema es de
+clasificación multiclase, se calculan las medidas que se comentaron en el
+\autoref{chap:analysis}. La primera parte de la función de evaluación consiste
+en construir un el modelo dada la configuración del individuo.
 
 \begin{minted}{python}
     multi_class = kwargs.get("multi_class", False)
@@ -201,17 +216,15 @@ se entrenará el modelo o no.
         else BinaryCrossentropy(),
     )
 
-    # Train if chosen
-    if random.random() < kwargs.pop("fit_train_prob"):
-        model.fit(
-            trn.X, trn.y_cat, epochs=100, batch_size=16, verbose=0,
-        )
+    model.fit(
+        trn.X, trn.y_cat, epochs=100, batch_size=16, verbose=0,
+    )
 \end{minted}
 
-Finalmente, tras la creación del modelo se procede a obtener las medidas
-necesarias. Con los datos predichos, se obtienen la puntuación F2-score y el
-porcentaje de error obtenido. También se muestra un resumen por pantalla y el
-tiempo que ha llevado calcular las puntuaciones.
+Tras la creación del modelo se procede a obtener las medidas necesarias. Con
+los datos predichos, se obtienen la puntuación F2-score y el porcentaje de
+error obtenido. También se muestra un resumen por pantalla y el tiempo que ha
+llevado calcular las puntuaciones.
 
 \begin{minted}{python}
     # Predict the scores
@@ -222,16 +235,18 @@ tiempo que ha llevado calcular las puntuaciones.
         beta=2,
         average="micro" if multi_class else "binary",
     )
-    accuracy = accuracy_score(tst.y, predicted_y, normalize=True)
-    error_perc = (1.0 - accuracy) * 100
-    end_time = time.perf_counter()
+    error_perc = (
+        1.0 - accuracy_score(tst.y, predicted_y, normalize=True)
+    ) * 100
+    neuron_layer_score = sum(units_size_list) * len(units_size_list) - 1
     DGPLOGGER.debug(
-        f"        f2-score={f2_score:.5f}\n"
         f"        error%={error_perc:.2f}\n"
-        f"        evaluation time={end_time - start_time: .2f} sec"
+        f"        neuron/layer-score={neuron_layer_score:.2f}\n"
+        f"        f2-score={f2_score:.5f}\n"
+        f"        evaluation time={time.perf_counter() - start_time: .2f} sec"
     )
 
-    return (f2_score, error_perc)
+    return (error_perc, neuron_layer_score, f2_score)
 \end{minted}
 
 A continuación se muestra un ejemplo de uso definiendo un individuo y
@@ -240,100 +255,120 @@ evaluándolo para el problema ``cancer1'':
 <<term=False, evaluate=True>>=
 from src.dgp_logger import DGPLOGGER
 from src.ga_optimizer.toolbox import individual_evaluator
-from src.ga_optimizer.types import HiddenLayerInfo, MLPIndividual
+from src.ga_optimizer.types import MLPIndividual
 from src.utils import read_proben1_partition
 
 DGPLOGGER.configure_dgp_logger("DEBUG")
 
 dataset = read_proben1_partition("cancer1")
-layer_sequence = [HiddenLayerInfo(4, True)]
-individual = MLPIndividual(dataset.nin, layer_sequence, dataset.nout)
+hidden_layers_sequence = [4]
+constant_hidden_layers = False
+individual = MLPIndividual(
+    dataset.nin, hidden_layers_sequence, constant_hidden_layers, dataset.nout
+)
 
 results = individual_evaluator(
     individual, dataset.trn, dataset.tst, fit_train_prob=1.0, multi_class=False
 )
 @
 
-Una vez se configuradas las herramientas a utilizar (función de evaluación,
+Una vez configuradas las herramientas a utilizar (función de evaluación,
 individuo, operaciones, función de adecuación...) y evaluada toda la población
-inicial, se procede con el bucle central
+inicial, se procede con el bucle central.
+
+Se usa la puntuación conjunta ideal como centinela junto con el número de
+generaciones. También existe una comprobación por si no se ha mejorado el
+resultado en 10 generaciones, se para el algoritmo, porque posiblemente haya
+llegado a un mínimo local. Tras las comprobaciones de parada se selecciona la
+descendencia que será cruzada y mutada con la función de selección: obtener los
+mejores individuos de la población para luego reemplazar los peores. Se usa la
+mitad de la población como descendencia.
 
 \begin{algorithm}
     \caption{Genetic Algorithm loop}\label{alg:ga}
     \begin{algorithmic}[1]
-        \State \textit{evaluate initial population}
-        \While{\textit{max f2\_score less than one and there are generations left}}
-            \If{\textit{max f2\_score hasn't improved in some generations}}
+        \State \textit{evaluate initial populatialgoritmoon}
+        \While{\textit{max fit is less than ideal and there are generations left}}
+            \If{\textit{max fit hasn't improved in some generations}}
                 \State \textit{Stop algorithm}
             \EndIf
-            \State \textit{select the offspring from the population}
+            \State \textit{select the offspring from the best population individuals}
             \State \textit{apply crossover to the offspring}
             \State \textit{apply mutations to the offspring}
-            \State \textit{replace the population with the modified offspring}
+            \State \textit{replace the worst population individuals with the modified offspring}
         \EndWhile
     \end{algorithmic}
 \end{algorithm}
 
-Se usa la medida de F2-score como centinela (a parte del número de generaciones
-evidentemente) por si en algún momento se estanca el incremento de puntuación
-se termine el algoritmo.
-
-Primero se selecciona la descendencia que será cruzada y mutada con la función
-de selección: mediante torneos de tres individuos elegidos aleatoriamente de la
-población, el mejor de ellos ocupará un lugar en la nueva descendencia.
-
 La función de cruce ocurre si se dan dos condiciones: que se cumpla la
 probabilidad de cruce entre dos individuos, y que los dos individuos tengan la
-misma forma\footnote{Mismo número de capas y neuronas en cada capa.}.
+misma estructura\footnote{Mismo número de capas y neuronas en cada capa}.
 
 \begin{minted}{python}
 def crossover_operator(ind1: MLPIndividual, ind2: MLPIndividual):
     """Apply crossover betweent two individuals.
 
-    This method will swap a random neuron from a random layer. The neuron
-    associated bias and weights are swapped.
+    This method will swap neurons with two random points from a random layer.
+    The neurons associated bias and weights are swapped.
 
     :param ind1: the first individual.
     :param ind2: the second individual.
+    :returns: a tuple with  the cross points and the crossed layer.
 
     """
-    layer_index = random.randint(0, len(ind1) - 1)
-    neuron_index = random.randint(0, len(ind1.layers[layer_index].bias) - 1)
+    # Choose randomly the layer index to swap. If the hidden layers of any of
+    # the two individuals are constant, swap neurons from the output layer
+    # neuron in the output layer.
+    layer_index = (
+        len(ind1) - 1
+        if ind1.constant_hidden_layers or ind2.constant_hidden_layers
+        else random.randint(0, len(ind1) - 1)
+    )
+    cx_pts = random.sample(range(len(ind1.layers[layer_index].bias)), 2)
 
     (
-        ind1.layers[layer_index].weights[:, neuron_index],
-        ind2.layers[layer_index].weights[:, neuron_index],
+        ind1.layers[layer_index].weights[:, cx_pts[0] : cx_pts[1]],
+        ind2.layers[layer_index].weights[:, cx_pts[0] : cx_pts[1]],
     ) = (
-        ind2.layers[layer_index].weights[:, neuron_index],
-        ind1.layers[layer_index].weights[:, neuron_index],
+        ind2.layers[layer_index].weights[:, cx_pts[0] : cx_pts[1]].copy(),
+        ind1.layers[layer_index].weights[:, cx_pts[0] : cx_pts[1]].copy(),
     )
     (
-        ind1.layers[layer_index].bias[neuron_index],
-        ind2.layers[layer_index].bias[neuron_index],
+        ind1.layers[layer_index].bias[cx_pts[0] : cx_pts[1]],
+        ind2.layers[layer_index].bias[cx_pts[0] : cx_pts[1]],
     ) = (
-        ind2.layers[layer_index].bias[neuron_index],
-        ind1.layers[layer_index].bias[neuron_index],
+        ind2.layers[layer_index].bias[cx_pts[0] : cx_pts[1]].copy(),
+        ind1.layers[layer_index].bias[cx_pts[0] : cx_pts[1]].copy(),
     )
+
+    return cx_pts, layer_index
 \end{minted}
 
-Obteniendo aleatoriamente la capa y la neurona que se va a intercambiar de
-dicha capa se procede a intercambiar pesos y sesgos. En el siguiente código se
-ve una muestra del funcionamiento.
+Obteniendo aleatoriamente la capa en la que se va a aplicar el intercambio y
+seleccionando dos índices de neuronas en esa capa se procede a intercambiar
+pesos y sesgos. En el siguiente código se ve una muestra del funcionamiento.
+Cabe destacar que si alguno de los dos individuos tiene las capas ocultas
+fijas, se selecciona la capa de salida para el cruce.
 
 <<term=False, evaluate=True>>=
 import random
 
 from src.dgp_logger import DGPLOGGER
 from src.ga_optimizer.toolbox import crossover_operator
-from src.ga_optimizer.types import HiddenLayerInfo, MLPIndividual
+from src.ga_optimizer.types import MLPIndividual
 from src.utils import read_proben1_partition
 
 DGPLOGGER.configure_dgp_logger("DEBUG")
 random.seed(12345)
 
 dataset = read_proben1_partition("cancer1")
-individual_0 = MLPIndividual(dataset.nin, [], dataset.nout)
-individual_1 = MLPIndividual(dataset.nin, [], dataset.nout)
+const_hidden_layers = False
+individual_0 = MLPIndividual(
+    dataset.nin, [], const_hidden_layers, dataset.nout
+)
+individual_1 = MLPIndividual(
+    dataset.nin, [], const_hidden_layers, dataset.nout
+)
 
 w_0_before = individual_0.layers[0].bias.copy()
 w_1_before = individual_1.layers[0].bias.copy()
@@ -363,7 +398,7 @@ print(w_1_before == w_1_after)
 Se observa efectivamente que los sesgos de la neurona 1 de la capa de salida se
 han intercambiado por los del otro individuo.
 
-Continuando con las operaciones encontramos las mutaciones. Existen 4 tipos de
+Continuando con las operaciones llegamos a las mutaciones. Existen 4 tipos de
 mutaciones que se le aplican a los individuos:
 
 \begin{itemize}
@@ -384,19 +419,64 @@ mutaciones que se le aplican a los individuos:
 \end{itemize}
 
 Como la operación de mutación de pesos y sesgos es igual, hay que indicarle qué
-atributo se quiere cambiar.
+atributo se quiere cambiar. Primero se obtienen las capas a las que se le va a
+aplicar la mutación. Si nuestro individuo tiene las capas ocultas constantes,
+solo aplicaremos mutación a la capa de salida. En caso contrario, se le
+aplicará a todo.
+
+\begin{minted}{python}
+def weights_mutator(
+    individual: MLPIndividual, attribute: str, gen_prob: float
+) -> int:
+    """Mutate some individual weights genes.
+
+    For each layer weights or bias, obtain a random :class:`np.ndarray`(with
+    values in the range ``[0.0 and 1.0]``) with the same shape as the selected
+    attribute and mutate the genes that satisfy the ``gen_prob`` probability
+    with a value in the range ``[-0.5, 0.5]``
+
+    :param individual: individual to mutate.
+    :param attribute: attribute to mutate. Must be either ``weights`` or
+        ``bias``.
+    :param gen_prob: probability of a gen to mutate.
+    :returns: number of genes mutated.
+
+    """
+    mutated_genes = 0
+
+    layer_list = (
+        [individual.layers[-1]]
+        if individual.constant_hidden_layers
+        else individual.layers
+    )
+
+    for layer in layer_list:
+        weights = getattr(layer, attribute)
+        weights_shape = weights.shape
+
+        mask = np.random.rand(*weights_shape) < gen_prob
+        mutated_genes += np.count_nonzero(mask)
+        mutations = np.random.uniform(-0.5, 0.5, weights_shape)
+        mutations[~mask] = 0
+        weights += mutations
+
+    return mutated_genes
+\end{minted}
+
+En el siguiente ejemplo vemos en acción la mutación de genes:
 
 <<term=False, evaluate=True>>=
 import numpy as np
 
-from src.ga_optimizer.toolbox import weights_mutator, weights_mutator
+from src.ga_optimizer.toolbox import weights_mutator
 from src.ga_optimizer.types import MLPIndividual
 from src.utils import read_proben1_partition
 
 np.random.seed(123)
 
 dataset = read_proben1_partition("cancer1")
-individual = MLPIndividual(dataset.nin, [], dataset.nout)
+const_hidden_layers = False
+individual = MLPIndividual(dataset.nin, [], const_hidden_layers, dataset.nout)
 weights_before = individual.layers[0].weights.copy()
 
 print("\nBefore mutation")
@@ -412,7 +492,7 @@ print(weights_after - weights_before)
 @
 
 La mutación de un porcentaje de genes en los pesos del individuo se ha
-efectuado correctamente. El resto de genes, que da intacto (diferencia de 0).
+efectuado correctamente. El resto de genes, queda intacto (diferencia de 0).
 
 En cuanto a la mutación de neuronas (añadido o eliminado de éstas en una capa
 aleatoria), ocurre en dos fases: añadido/eliminado de neuronas de la capa
@@ -436,7 +516,7 @@ def neuron_mutator(individual: MLPIndividual) -> int:
     # Choose randomly to add or delete a neuron. If the number of neurons is
     # two, just add a new one.
     choice = (
-        -1
+        1
         if len(individual.layers[layer_index].bias) <= 2
         else random.choice((-1, 1))
     )
@@ -509,14 +589,15 @@ En el siguiente código vemos el añadido y la eliminación de neuronas:
 import random
 
 from src.ga_optimizer.toolbox import neuron_mutator
-from src.ga_optimizer.types import HiddenLayerInfo, MLPIndividual
+from src.ga_optimizer.types import MLPIndividual
 from src.utils import read_proben1_partition
 
 random.seed(12345)
 
 dataset = read_proben1_partition("cancer1")
+const_hidden_layers = False
 individual = MLPIndividual(
-    dataset.nin, [HiddenLayerInfo(3, True)], dataset.nout
+    dataset.nin, [3], const_hidden_layers, dataset.nout
 )
 
 print("\nBefore first mutation. Weights and bias shapes:")
@@ -547,6 +628,8 @@ quitar esa única capa oculta.
 def layer_mutator(individual: MLPIndividual) -> int:
     """Add/remove one layer to the model.
 
+    Compute whether to append a new hidden layer or pop the last one.
+
     :param individual: individual to mutate.
     :return: wether the layer was added or removed.
 
@@ -554,11 +637,7 @@ def layer_mutator(individual: MLPIndividual) -> int:
     # Choose randomly to add or delete a layer. Ensure there are 2 or more
     # layers in the model before deleting one. The output layer is included in
     # the count.
-    choice = (
-        1
-        if len(individual) <= 2
-        else random.choice((-1, 1))
-    )
+    choice = 1 if len(individual) <= 2 else random.choice((-1, 1))
 
     difference = 0
 \end{minted}
@@ -585,7 +664,6 @@ huérfanas:
                 name=f"Hidden{len(individual)}",
                 input_neurons=previous_layer_output,
                 output_neurons=new_layer_output_neurons,
-                trainable=True,
             )
         )
 
@@ -665,15 +743,14 @@ En el siguiente ejemplo se comprueba que efectivamente se añade y elimina la
 import random
 
 from src.ga_optimizer.toolbox import layer_mutator
-from src.ga_optimizer.types import HiddenLayerInfo, MLPIndividual
+from src.ga_optimizer.types import MLPIndividual
 from src.utils import read_proben1_partition
 
 random.seed(12345)
 
 dataset = read_proben1_partition("cancer1")
-individual = MLPIndividual(
-    dataset.nin, [HiddenLayerInfo(3, True)], dataset.nout
-)
+const_hidden_layers = False
+individual = MLPIndividual(dataset.nin, [3], const_hidden_layers, dataset.nout)
 
 print("\nBefore first mutation. The hidden layers:")
 print([layer.config["units"] for layer in individual.layers[:-1]])
