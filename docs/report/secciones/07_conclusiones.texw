@@ -1,2 +1,60 @@
 \chapter{Conclusiones y trabajos futuros}
 
+El algoritmo DeepGProp presentado en este trabajo pretende servir como una
+herramienta sencilla pero completa. Implementando operaciones típicas de los
+algoritmos genéticos como el cruce de individuos y la mutación de genes (en
+este caso pesos) además añade la función de añadir o eliminar neuronas a los
+individuos (ya presente en G-Prop\cite{g-prop}) y una nueva funcionalidad para
+agregar y eliminar nuevas capas. Con este cambio, se busca proponer nuevas
+soluciones a problemas que requieran más de una capa interna.
+
+Si es cierto que DeepGProp encuentra soluciones similares para problemas como
+\emph{Cancer}, se observa un bajo rendimiento para otros con más dificultad
+como \emph{DNA Helicases}. Esto seguramente es debido al método de propagación
+hacia atrás que utiliza G-Prop (\emph{Quick-Prop}) ya que tiene la capacidad de
+sortear los mínimos locales (cosa que afecta demasiado a DeepGProp).
+
+Existen varios aspectos con un amplio margen de mejora en DeepGProp, entre
+ellos: entrenamiento o ajuste, mutación de capas, función \emph{fitness} y la
+interfaz de línea de comandos.
+
+En primer lugar como se ha comentado anteriormente y se pudo ver en el
+\autoref{chap:analysis}, DeepGProp peca de no obtener demasiados buenos
+resultados a la hora de predecir problemas un poco más complicados que
+\emph{Cancer}. Como se ha observado en los problemas de \emph{DNA Helicases} y
+\emph{Spambase} a la hora de entrenar el modelo para predecir el test, éste cae
+en mínimos locales destacados aún con la ayuda del algoritmo Stochastic
+Gradient Descent. Así, pienso que debo explorar otras soluciones más adecuadas
+a los perceptrones multicapa.
+
+Continuando con la nueva operación introducida a partir de G-Prop, la mutación
+de capas, como se puede ver es un poco limitada. Solo puede aplicarse en la
+última capa oculta y no en mitad o al principio. Ya que introducir una nueva
+capa con pesos aleatorios supone una variación que puede dar como resultado
+generalizar el individuo con respecto a los datos de entrenamiento es posible
+que el añadir la capacidad de seleccionar distintas posiciones para las nuevas
+capas ocultas mejoren los resultados. Lo mismo ocurre para la eliminación de
+capas.
+
+La función \emph{fitness} tiene también margen de mejora. Dado que la
+implementación de la librería utilizada para desarrollar el algoritmo genético
+(DEAP) define la comparación entre individuos con el simple orden
+lexicográfico, es necesario colocar en las primeras posiciones las medidas más
+importantes lo que le resta importancia a los pesos de éstas. Si la comparación
+fuera por ejemplo la suma de cada medida multiplicada por su peso, sería
+indistinto el orden que tuvieran en la definición de la función. Un caso en que
+esto es importante es al añadir una nueva medida para el entrenamiento. Habría
+que evaluar nuevamente la importancia de cada métrica y ordenarlas acordes a la
+clasificación.
+
+Por último y no menos importante, creo que la línea de comandos actual aunque
+es usable y relativamente completa debería permitir la introducción de otros
+datos significativos como: optimizador para realizar la propagación hacia
+atrás, función de perdida, permitir señalar multiples conjuntos de datos para
+ejecutar de una vez entre... otras.
+
+Como reflexión final cabe comentar que ha sido un proyecto muy interesante en
+el que he aprendido cantidad de facetas sobre las redes neuronales y los
+algoritmos genéticos y en general sobre la materia del \emph{machine learning}.
+Me gustaría seguir desarrollando el trabajo explorando nuevos métodos de
+optimización e integraciones que se puedan hacer con el algoritmo programado.
