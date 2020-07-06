@@ -332,7 +332,9 @@ def lint(session: Session) -> None:
     with chdir(session, ROOT):
         session.run("mypy", *python_files, silent=False)
         session.run("flake8", *python_files, silent=False)
-        session.run("pycodestyle", *python_files, silent=False)
+        session.run(
+            "pycodestyle", "--ignore=E203,W503", *python_files, silent=False
+        )
         session.run("pydocstyle", *python_files, silent=False)
         session.run(
             "black",
