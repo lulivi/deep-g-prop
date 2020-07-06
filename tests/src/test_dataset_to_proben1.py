@@ -27,10 +27,10 @@ class TestDatasetToProben1(unittest.TestCase):
         mock_np.split.return_value = ("train", "validation", "test")
         runner = CliRunner()
         with mock.patch("src.dataset_to_proben1.pd"):
-            result = runner.invoke(
-                cli, [str(PROBEN1_DIR_PATH / "spambase.csv")]
-            )
-        print(str(PROBEN1_DIR_PATH / "spambase.csv"))
+            with mock.patch("src.dataset_to_proben1.shuffle"):
+                result = runner.invoke(
+                    cli, [str(PROBEN1_DIR_PATH / "spambase.csv")]
+                )
 
         self.assertEqual(result.exit_code, 0, result.stdout)
 

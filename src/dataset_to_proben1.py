@@ -5,6 +5,8 @@ import click
 import numpy as np
 import pandas as pd
 
+from sklearn.utils import shuffle
+
 from src.common import SEED
 
 
@@ -28,6 +30,8 @@ def cli(file_path: Path):
             param_hint="FILE_PATH",
         )
 
+    np.random.seed(SEED)
+
     dataset_path = file_path.resolve()
     dataset_directory = dataset_path.parent
     dataset_name = dataset_path.stem
@@ -38,7 +42,7 @@ def cli(file_path: Path):
     for partition in range(1, 4):
         # pylint: disable=unbalanced-tuple-unpacking
         trn, val, tst = np.split(
-            dataframe.sample(frac=1, random_state=SEED),
+            shuffle(dataframe),
             [int(0.5 * len(dataframe)), int(0.75 * len(dataframe))],
         )
         np.savetxt(

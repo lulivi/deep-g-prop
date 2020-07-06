@@ -182,10 +182,10 @@ def cli(
     :param seed: random generators seed.
 
     """
-    if neurons_range[0] < 1 or neurons_range[0] > neurons_range[1]:
+    if neurons_range[0] < 2 or neurons_range[0] > neurons_range[1]:
         print("antonioooo")
         raise click.BadParameter(
-            "Wrong neurons range given. It must be inside the range [1, inf). "
+            "Wrong neurons range given. It must be inside the range [2, inf). "
             f"Given: '{neurons_range}'.",
             param_hint="--neurons-range",
         )
