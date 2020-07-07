@@ -64,7 +64,7 @@ utilizado para la búsqueda.
 \subsection{Evolutionary Search}
 
 Ya se comentó sobre los algoritmos genéticos en el
-\autoref{chap:problem-description}. Éstos pueden ser utilizados de manera
+\autoref{chap:introduction}. Éstos pueden ser utilizados de manera
 similar a las herramientas anteriores nombradas, acotando los cruces y
 mutaciones a la tabla de parámetros definida.
 
@@ -143,7 +143,11 @@ medidas. Se han obtenido las siguientes puntuaciones para llevar la evaluación:
 A parte también se ha medido el tiempo total de ajuste del estimador. Esta va a
 ser una medida crítica a la hora de elegir el \textit{framework} idóneo para el
 trabajo, ya que la red neuronal se va re-ejecutar multiples veces con distintos
-cambios.
+cambios. Todos los resultados mostrados en esta sección son en base al código
+localizado en el directorio \code{src/mlp_frameworks}, donde encontramos un
+archivo \code{common.py} que contiene todas las variables y métodos comunes
+utilizados en los distintos módulos para cada framework. Éstos últimos están
+divididos en \code{mlp_keras.py}, \code{mlp_sklearn.py} y \code{mlp_skorch.py}.
 
 Cabe destacar, que todas las medidas mostradas en las tablas de comparaciones
 (\ref{tab:mlp-comp-times}, \ref{tab:mlp-comp-accuracy},
@@ -233,8 +237,8 @@ para trabajar con los pesos, activaciones y neuronas ocultas como Keras, por
 ejemplo.
 
 Es entendible que carezca de estas facilidades dado que no es un proyecto
-centrado en los perceptrones multicapa exclusivamente, sino en cantidad de
-diferentes estimadores y multitud de utilidades como se comentó al inicio.
+centrado en las redes neuronales exclusivamente, sino en cantidad de diferentes
+estimadores y multitud de utilidades como se comentó al inicio.
 
 \subsection{skorch}
 

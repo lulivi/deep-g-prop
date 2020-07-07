@@ -109,7 +109,7 @@ modificar los pesos contenidos en las capas ocultas. Se han elegido los valores
 de número de neuronas y número de capas manualmente.
 
 Comprobando las dos primeras tablas podemos observar datos muy similares para
-el porcentaje de error obtenido en el problema \emph{cancer1}. Obteniendo
+el porcentaje de error obtenido en el problema \emph{cancer1}\cite{uci}. Obteniendo
 mejor resultado el algoritmo sin modificar las capas internas
 (\autoref{tab:fixed-7-1-const-can1}) con un $2.86\%$ de error frente al
 $3.09\%$ (en \autoref{tab:fixed-7-1-noconst-can1}) de la población con capas
@@ -280,17 +280,18 @@ mejora por parte de \emph{DeepGProp} en la segunda partición. Se intuye que
     \end{tabular}
 \end{table}
 
-Continuando con el problema \emph{DNA Helicases}, igual que en los resultados
-anteriores, se ha obtenido la media de 5 ejecuciones con distintas semillas
-(ver inicio del \autoref{chap:analysis}). Observando los resultados de la
-\autoref{tab:gprop-deepgprop-miniheli} vemos una gran diferencia en todos los
-campos. La precisión alcanzada por \emph{DeepGProp} es inmensamente inferior
-a la que consigue \emph{G-Prop} ejecutando con el mismo máximo de
-generaciones. De forma similar, aunque se han aumentado las generaciones para
-la segunda prueba de 10 a 50, no cambia demasiado el resultado, quedando
-igualmente muy por encima de \emph{G-Prop}. Aunque en problemas con número de
-entradas pequeño parece que se desenvuelven de forma similar, al aumentar las
-características del problema se diferencian mucho el uno del otro.
+Continuando con el problema \emph{DNA Helicases}\cite{dna-heliases}, igual que
+en los resultados anteriores, se ha obtenido la media de 5 ejecuciones con
+distintas semillas (ver inicio del \autoref{chap:analysis}). Observando los
+resultados de la \autoref{tab:gprop-deepgprop-miniheli} vemos una gran
+diferencia en todos los campos. La precisión alcanzada por \emph{DeepGProp} es
+inmensamente inferior a la que consigue \emph{G-Prop} ejecutando con el mismo
+máximo de generaciones. De forma similar, aunque se han aumentado las
+generaciones para la segunda prueba de 10 a 50, no cambia demasiado el
+resultado, quedando igualmente muy por encima de \emph{G-Prop}. Aunque en
+problemas con número de entradas pequeño parece que se desenvuelven de forma
+similar, al aumentar las características del problema se diferencian mucho el
+uno del otro.
 
 \begin{table}
     \centering
@@ -353,12 +354,13 @@ generaciones. Aún así, sigue siendo mejor de lejos \emph{G-Prop}.
     }
     \label{tab:gprop-deepgprop-miniheli-multihidden}
     \begin{tabular}{rllll}
-        \textbf{Algorithm (\# layers)} & \textbf{}   & \textbf{Accuracy error \%} & \textbf{\# neurons/hidden layers score}     & \textbf{F2 score}\\
+        \textbf{Algorithm} &  & \textbf{Acc error \%} & \textbf{\# neurons/hidden layers}     & \textbf{F2 score}\\
+        \textbf{(\# layers)}& &                       & \textbf{score}                        &                   \\
         \hline
-        \textbf{G-Prop (1)}               & 10 gen & $6\ \pm\ 3$        & $7.3\ \pm\ 3.9$     & $--$                    \\
-        \textbf{DeepGProp (1)}        & 10 gen & $25.67\ \pm\ 5.23$ & $11.80\ \pm\ 6.01$  & $0.70976\ \pm\ 0.07727$ \\
-                                      & 50 gen & $21.00\ \pm\ 5.01$ & $15.00\ \pm\ 4.38$  & $0.72556\ \pm\ 0.06024$ \\
-        \textbf{DeepGProp (>1)}       & 50 gen & $18.67\ \pm\ 2.45$ & $23.80\ \pm\ 24.25$ & $0.82569\ \pm\ 0.04718$ \\
+        \textbf{G-Prop (1)}       & 10 gen & $6\ \pm\ 3$        & $7.3\ \pm\ 3.9$     & $--$                    \\
+        \textbf{DeepGProp (1)}     & 10 gen & $25.67\ \pm\ 5.23$ & $11.80\ \pm\ 6.01$  & $0.70976\ \pm\ 0.07727$ \\
+                                   & 50 gen & $21.00\ \pm\ 5.01$ & $15.00\ \pm\ 4.38$  & $0.72556\ \pm\ 0.06024$ \\
+        \textbf{DeepGProp (>1)}    & 50 gen & $18.67\ \pm\ 2.45$ & $23.80\ \pm\ 24.25$ & $0.82569\ \pm\ 0.04718$ \\
     \end{tabular}
 \end{table}
 

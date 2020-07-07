@@ -1,52 +1,212 @@
 \chapter{Introducción} \label{chap:introduction}
 
-La \textit{clasificación supervisada} es una parte de la \textit{IA}
-(\textit{inteligencia artificial}) que busca clasificar datos en diferentes
-grupos a partir de sus características. Los \textit{clasificadores automáticos}
-son \textit{metaheurísticas} que mediante \textit{aprendizaje automático} y, a
+La \emph{clasificación supervisada} es una parte de la \emph{IA}
+(\emph{inteligencia artificial}) que busca clasificar datos en diferentes
+grupos a partir de sus características. Los \emph{clasificadores automáticos}
+son \emph{metaheurísticas} que mediante \emph{aprendizaje automático} y, a
 partir de las características de un ejemplo, lo etiquetan con el subgrupo que
 le corresponde. Una clase de modelo computacional que se utiliza para el
-\textit{aprendizaje supervisado} el el de las \textit{redes neuronales
+\emph{aprendizaje supervisado} es el de las \emph{redes neuronales
 artificiales}. Este modelo permite estudiar problemas en el que algoritmos
-simples de \textit{machine learning} no tienen éxito, como el reconocimiento de
+simples de \emph{machine learning} no tienen éxito, como el reconocimiento de
 voz o de imágenes \cite[p.~15]{goodfellow}. El problema de estos modelos es su
 configuración: es tan compleja que supone una inversión de tiempo y recursos
 inmensa.
 
-Dentro de las \textit{redes neuronales} existe un grupo denominado
-\textit{perceptrón multicapa}. Un \textit{perceptrón multicapa} está compuesto
-por \textit{neuronas} agrupadas en capas y completamente conectadas entre
-dichas capas. Una \textit{neurona artificial} o \textit{perceptrón} se puede
+Dentro de las \emph{redes neuronales} existe un grupo denominado
+\emph{perceptrón multicapa}. Un \emph{perceptrón multicapa} está compuesto
+por \emph{neuronas} agrupadas en capas y completamente conectadas entre
+dichas capas. Una \emph{neurona artificial} o \emph{perceptrón} se puede
 definir como una función que recibe valores de entrada y devuelve un número,
 que indica el nivel de activación \cite[Chapter~1]{nielsen}. Cada uno de estos
-valores viene dado por una \textit{neurona} de la capa anterior (menos si se
+valores viene dado por una \emph{neurona} de la capa anterior (menos si se
 trata de la capa de entrada), un peso correspondiente a cada conexión entre
-\textit{neuronas}, y un sesgo (a partir del cual se activarán éstas). En global
-el \textit{perceptrón multicapa} se compone de tres partes: capa de entrada,
+\emph{neuronas}, y un sesgo (a partir del cual se activarán éstas). En global
+el \emph{perceptrón multicapa} se compone de tres partes: capa de entrada,
 capas ocultas (puede haber una sola) y capa de salida. Más adelante se
 explicará con detalle cada una de estas capas y sus conexiones.
 
-Otro de los subgrupos del \textit{aprendizaje automático} es el de los
-\textit{algoritmos evolutivos} (\textit{evolutionary algorithms} en inglés),
+Otro de los subgrupos del \emph{aprendizaje automático} es el de los
+\emph{algoritmos evolutivos} (\emph{evolutionary algorithms} en inglés),
 inspirados en los mecanismos de la evolución biológica. Esta serie de
-algoritmos (como los \textit{algoritmos genéticos}) tienen etapas comunes, como
+algoritmos (como los \emph{algoritmos genéticos}) tienen etapas comunes, como
 la inicialización de la población, la evaluación y selección, y la reproducción
 y variación \cite{evolutionary_computation}.
 
 \section{Objetivos}
 
-En este proyecto se pretende estudiar las distintas formas conseguidas de
-optimizar algunos parámetros de los \textit{perceptrones multicapa}, como el
-número de neuronas de cada capa y el número de capas, partiendo de la base del
-artículo G-Prop \cite{g-prop}.
+La finalidad principal de este trabajo es la de diseñar y construir un
+algoritmo genético tomando como referencia G-Prop\cite{g-prop} que permita
+evolucionar perceptrones multicapa con el fin de conseguir resultados iguales o
+mejores a los de éste. Partiendo de las operaciones ya presentes en G-Prop se
+añadirán nuevas mutaciones que generalicen aún más la solución final.
+
+Se puede considerar como sub objetivo para la programación del algoritmo el de
+encontrar un framework que satisfaga las cualidades necesarias para ser
+utilizado: que sea rápido y exponga parámetros internos que serán modificados.
+
+\section{Descripción del problema}
+
+Como se introdujo en las secciones anteriores, las \emph{redes neuronales
+artificiales} y en concreto los \emph{perceptrones multicapa} son un modelo
+computacional inspirado en las \emph{neuronas} biológicas. Este modelo es muy
+complejo dado que tiene una cantidad de parámetros configurables inmensa, como
+el número de capas de la red, el número de \emph{neuronas} de cada capa, la
+función de activación de cada \emph{neurona}... Lo cual conlleva a invertir
+una cantidad ingente de tiempo para poder configurar manualmente la red acorde
+al problema que se plantee.
+
+En las siguientes secciones, se explicará de forma más detallada los
+\emph{perceptrones multicapa} y los \emph{algoritmos genéticos}.
+
+\subsection{Perceptrón multicapa}
+
+Los \emph{perceptrones multicapa} son un tipo de \emph{redes neuronales}
+simples. Éstos están compuestos de distintas capas: una de entrada, una de
+salida y una o varias capas ocultas. Cada una a su vez está formada por un
+numero fijo de \emph{neuronas} (ver \autoref{tikz:mlp}).
+
+\begin{figure}[h!]
+    \centering
+
+    \caption{Diagrama de un perceptrón multicapa con cuatro \emph{neuronas}
+    de entrada, dos de salida y dos capas ocultas con cinco \emph{neuronas}
+    cada una.}\label{tikz:mlp}
+
+    \vspace*{0.5cm}
+    \includegraphics{mlp.pdf}
+    \vspace*{0.5cm}
+
+    \caption*{Versión modificada de un ejemplo de TEXample \cite{nn-diagram}.}
+\end{figure}
+
+Cada \emph{perceptrón} o \emph{neurona} tiene un valor de activación
+(normalmente incluido en el rango $[0, 1]$). En la primera capa, éste viene
+dado por los datos de entrada, como por ejemplo los píxeles de una imagen o las
+características de un ejemplo. Los valores de activación de las
+\emph{neuronas} de cada capa vienen dados por la siguiente función:
+
+\[
+a^{(L)}_{i} \equiv f(w^{(L)}_{0} a^{(L-1)}_{0} + w^{(L)}_{1} a^{(L-1)}_{1} +
+\cdots + w^{(L)}_{i} a^{(L-1)}_{i} + \cdots + w^{(L)}_{n} a^{(L-1)}_{n} +
+b^{(L)}_{i})
+\]
+
+ó
+
+\[
+a^{(L)}_{i} \equiv f(\sum_{j=0}^{n-1}(w^{(L)}_{j} a^{(L-1)}_{j}) + b^{(L)}_{i})
+\]
+
+\noindent donde $L$ es el índice de la capa, $i$ es el índice de la neurona
+dentro de dicha capa, $w^{(L)}_{n}$ es el peso que hay en la conexión entre la
+neurona $(L-1,j)$ y $(L,i)$, $b^{(L)}_{i}$ es el valor de sesgo que se le
+aplica al resultado de la suma de la multiplicación de pesos por las
+activaciones correspondientes y $f()$ es la función que define la activación de
+cada neurona. Existen distintos tipos de funciones utilizadas en este punto,
+como la lineal, sigmoide, rectificadora (ReLU), etc. La expresión anterior se
+puede resumir así:
+
+\[
+a^{(L)} \equiv f(W a^{(L-1)} + b)
+\]
+
+\noindent donde $a^{(L)}$ es el vector de valores de activación de cada
+\emph{neurona} en la capa $L$, $W$ es el vector de pesos de las uniones entre
+la capa $L-1$ y $L$, $b$ es el vector de sesgos que se le aplica al resultado y
+$f(x)$ es la función antes descrita.
+
+Una vez evaluadas todas las capas, las \emph{neuronas} de la capa de salida,
+éstas indican la certeza con la que el \emph{perceptrón multicapa} ha
+predicho cada una de las clases del problema (generalmente en el rango
+$[0.0, 1.0]$). En la \emph{clasificación supervisada} obteniendo el cuadrado
+de la diferencia entre del vector de salidas (los valores de activación de las
+\emph{neuronas} de la capa de salida) y lo etiquetado (valores que deberían
+de haberse obtenido) se obtiene el costo de cada ejemplo (véase
+\autoref{fig:mlp-cost}). Haciendo el promedio de todos estos valores de costo
+se obtiene el costo global del modelo.
+
+\begin{figure}[h!]
+    \centering
+    \caption{Obtención del coste de un ejemplo.}
+    \label{fig:mlp-cost}
+    \vspace*{0.5cm}
+    \includegraphics{mlp-cost.pdf}
+\end{figure}
+
+La forma óptima de mejorar el modelo es disminuyendo el costo ($C$), buscando
+obtener valores mínimos ($C \approx 0$). El costo variará dependiendo de los
+valores de los pesos correspondientes a cada union de \emph{neuronas} y los
+sesgos correspondientes a cada función de activación. Una aproximación estándar
+para llevar a cabo esta minimización se conoce como \emph{propagación hacia
+atrás} (\emph{backpropagation}) y suele utilizar el algoritmo de gradiente
+descendiente (o su variación estocástica), \emph{adam} (una variante del
+gradiente descendiente estocástico) o \emph{lbfgs} (BFGS de memoria limitada)
+entre otros. La fórmula con la que podemos describir el costo de todos los pesos
+y sesgos sería la siguiente:
+
+\[
+C(w,b) \equiv \frac{1}{2n} \sum_{x} \parallel y(x) - a \parallel^{2}
+\]
+
+$w$ denota el conjunto de pesos de la \emph{red}, $b$ el de sesgos, $n$ es el
+número total de ejemplos, $y(x)$ es el valor etiquetado del ejemplo y $a$ el
+obtenido. La sumatoria es sobre todos los ejemplos de entrenamiento. Esta
+función es conocida como \emph{error cuadrático medio} o \emph{MSE} (del
+inglés) y como se comentó en el párrafo anterior se busca minimizarla y hacer
+que $y(x)$ se aproxima a $a$ para todos los ejemplos de entrenamiento, ya que
+significaría que todos los ejemplos (o casi todos) se clasifican bien dando
+lugar a un modelo bien entrenado.
+
+\subsection{Algoritmo genético}
+
+Los \emph{algoritmos genéticos}\cite{ga-intro} son un unas metaheurísticas
+que se inspiran en la selección natural, y que forman parte del grupo de los
+\emph{algoritmos evolutivos}. Suelen utilizarse en problemas de optimización,
+como el que se trata aquí. Las características más destacables de estas
+metaheurísticas son sus funciones principales (ver \autoref{fig:ga-steps}):
 
 \begin{itemize}
 
-\item Estudiar la materia relacionada con optimización de parámetros de
-\textit{perceptrones multicapa} con \textit{algoritmos genéticos}.
+\item Iniciación de la población. La población está compuesta por cromosomas, y
+estos a su vez por genes. En el caso de la optimización de parámetros para
+\emph{perceptrones multicapa} podríamos considerar como genes: número de
+capas ocultas, número de neuronas en cada capa, vectores de inicialización de
+los pesos y los sesgos, función de activación...
 
-\item Obtener como salida del algoritmo un modelo optimizado en número de
-capas, neuronas y pesos para distintos problemas.
+\item Evaluación de la población. En esta etapa se comprueba la bondad de cada
+elemento de la población, es decir, se utilizan los cromosomas de la población
+para entrenar y testear redes neuronales y ver su rendimiento. Finalmente se
+obtiene un resultado y se guarda con el cromosoma, que servirá para elegir la
+siguiente población de individuos.
+
+\item Selección. Se eligen los individuos para su cruce de dos en dos. Existen
+varios métodos de selección, como la selección por torneo, por rango,
+aleatorio, etc.
+
+\item Cruce. Se obtienen nuevos individuos de la población (descendencia)
+mezclando atributos de supervivientes tras la selección. Se puede mantener una
+población estable teniendo descendencia hasta llegar al mismo número de
+cromosomas del principio.
+
+\item Mutación. En este último paso previo a la nueva evaluación se eligen
+aleatoriamente cromosomas dentro de la población y se realizan ciertas
+mutaciones en sus genes.
 
 \end{itemize}
 
+Hay que definir también un punto de parada, como un número fijo de iteraciones
+o que se la mejora entre una población y otra sea menor de un umbral.
+
+\begin{figure}[h!]
+    \centering
+    \caption{Diagrama del proceso de evolución de los algoritmos genéticos.}
+    \label{fig:ga-steps}
+    \vspace*{0.5cm}
+    \includegraphics{ga.pdf}
+\end{figure}
+
+Esta metaheurística se puede utilizar para solucionar nuestro problema
+principal: optimización de hiperparámetros para los \emph{perceptrones
+multicapa}. También existen otros métodos como \emph{grid search} o
+\emph{random search}.

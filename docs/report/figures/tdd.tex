@@ -8,7 +8,7 @@
         minimum height=1cm, text centered, font=\sffamily
     },
     startLoop/.style = {base, fill=blue!30},
-    repeat/.style = {base, fill=green!30},
+    transition/.style = {circle, draw, fill=green!30},
     process/.style = {base, minimum width=2.5cm, fill=orange!15, font=\ttfamily},
 }
 \begin{document}
@@ -22,18 +22,18 @@
                                 {Inicio};
         \node (addTest)       [process, below of=start, yshift=-0.5cm]
                                 {Añadir un test simple};
-        \node (addSimpleCode) [process, below of=addTest, yshift=-0.5cm]
-                                {Crear código para pasar el test};
-        \node (refactorCode)  [process, below of=addSimpleCode, yshift=-0.5cm]
-                                {Refactorizar el código};
-        \node (repeat)        [repeat, right of=addSimpleCode, xshift=5cm]
-                                {Volver a empezar};
-
+                                
+        \node (testFail)     [transition, below of=addTest, yshift=-20]
+                                {El test falla};
+                                
+        \node (makeChange)    [process, below of=testFail, yshift=-20]
+                                {Hacer un cambio en el test};
+                            
         % Arrow specification
         \draw[->]         (start) -- (addTest);
-        \draw[->]       (addTest) -- (addSimpleCode);
-        \draw[->] (addSimpleCode) -- (refactorCode);
-        \draw[->]  (refactorCode) -- (repeat);
-        \draw[->]        (repeat) -- (addTest);
+        \draw[->]       (addTest) -- (testFail);
+        \draw[->] (testFail) -- (makeChange);
+        \draw[->]  (makeChange) -- ++(3, 0) -- ++(0, 2.23) -- (testFail);
+        \draw[->]        (makeChange) -- ++(-3,0) -- ++(0, 4.35) -- (addTest);
     \end{tikzpicture}
 \end{document}

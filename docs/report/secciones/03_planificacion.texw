@@ -1,44 +1,7 @@
-\chapter{Planificación}
+\chapter{Planificación y metodología}
 
-En este capítulo se comentará la metodología usada para el desarrollo del
+En este capítulo se comentará la metodología usada durante el desarrollo del
 trabajo.
-
-\section{Metodología utilizada}
-
-Este proyecto se ha desarrollado con una metodología basada en tests conocida
-como TDD (\textit{test-driven development})\cite{tdd} que mediante la escritura
-de test unitarios se intenta alcanzar un código robusto y con buena cobertura.
-El procedimiento se puede resumir en los siguientes pasos:
-
-\begin{itemize}
-
-    \item \textit{Escritura del test} - el primer paso es escribir un test
-    relacionado con una funcionalidad del programa.
-
-    \item \textit{Fallo del test} - dado que aún no hemos codificado esa
-    funcionalidad antes nombrada, el test debe de fallar.
-
-    \item \textit{Escribir código para pasar el test} - lo más simple posible,
-    que permita la ejecución satisfactoria del test.
-
-    \item \textit{Refactorizar el código} - añadir lo necesario a la
-    funcionalidad.
-
-    \item \textit{Repetir} - los pasos anteriores acumulando test unitarios.
-
-\end{itemize}
-
-Los pasos se pueden reconocer sencillamente en la \autoref{fig:tdd}.
-
-\begin{figure}[h]
-    \centering
-    \caption{Diagrama del proceso de evolución de los algoritmos genéticos.}
-    \label{fig:tdd}
-    \vspace*{0.5cm}
-    \includegraphics{tdd.pdf}
-\end{figure}
-
-\section{Seguimiento del desarrollo}
 
 Para llevar a cabo un seguimiento del proyecto se ha utilizado la plataforma
 GitHub\cite{github}, donde se encuentra todo lo relacionado con el
@@ -47,7 +10,7 @@ de repositorios en 2019, posibilita un desarrollo cómodo gracias a la cantidad
 de herramientas que provee. Entre ellas, en este trabajo se utilizan los
 \textit{milestones}, los \textit{issues} y los proyectos de GitHub.
 
-\paragraph*{\textit{Issue}} Estos elementos asociados a los repositorios
+\paragraph*{Issue} Estos elementos asociados a los repositorios
 permiten publicar informes de errores, sugerir mejoras sobre el software,
 debatir temas... todo esto relacionado con el repositorio en cuestión.
 
@@ -76,4 +39,53 @@ el englobado por grupos de \textit{issues} similares.
     \label{char:gantt}
     \vspace*{0.5cm}
     \includegraphics{gantt.pdf}
+\end{figure}
+
+En cuanto a lo relacionado con el software he elegido la metodología basada en
+tests conocida como TDD (\textit{test-driven development})
+\cite{tdd-definition} \cite{tdd-use} que mediante la escritura de test
+unitarios se intenta alcanzar un código robusto y con buena cobertura. El
+procedimiento se puede resumir en los siguientes pasos:
+
+\begin{itemize}
+
+    \item \textit{Escritura del test} - el primer paso es escribir un test
+    relacionado con una funcionalidad del programa.
+
+    \item \textit{Fallo del test} - dado que aún no hemos codificado esa
+    funcionalidad antes nombrada, el test debe de fallar.
+
+    \item \textit{Escribir código para pasar el test} - lo más simple posible,
+    que permita la ejecución satisfactoria del test.
+
+    \item \textit{Refactorizar el código} - añadir lo necesario a la
+    funcionalidad.
+
+    \item \textit{Repetir} - los pasos anteriores acumulando test unitarios.
+
+\end{itemize}
+
+Con esta metodología de desarrollo se fuerza a planificar lo que se va a
+programar antes de hacerlo. La función se puede concebir como una ``caja
+negra'' que dada una entrada devuelve una salida la cual verificamos que sea
+válida.
+
+También permite simplificar el código, ya que se fuerza el ajustarse a los
+requisitos especificados en los test a la hora de programarlo. Siendo la
+depuración necesaria ante errores que ocurran en el código, deberían ser
+reducidos gracias a la metodología TDD.
+
+Haciendo uso de TDD se abren una serie de puertas que facilitan la integración
+con sistemas de integración continua (CI) y despliegue automático (CD). Esto
+permite lanzar de una forma instantánea una batería de tests que comprueben la
+integridad del código desarrollado.
+
+Los pasos se pueden reconocer sencillamente en la \autoref{fig:tdd}.
+
+\begin{figure}[h]
+    \centering
+    \caption{Diagrama de estados de TDD.}
+    \label{fig:tdd}
+    \vspace*{0.5cm}
+    \includegraphics{tdd.pdf}
 \end{figure}
