@@ -8,6 +8,8 @@ El formato se basa en
 
 ## [Cambios inéditos]
 
+## [1.0.0] - 2020-07-8
+
 ### Añadido
 
 - Añadidos operadores de agregar/quitar neuronas/capas.
@@ -21,6 +23,8 @@ El formato se basa en
   que transformará en configuraciones de capas.
 
 - Arreglado problema con la función de fintess y el cruce de individuos.
+
+- Finalizada memoria.
 
 ### Eliminado
 
@@ -95,7 +99,8 @@ El formato se basa en
 
 - Añadido Pipfile para controlar los paquetes de Python.
 
-[Cambios inéditos]: https://github.com/lulivi/deep-g-prop/compare/v0.0.3...HEAD
+[Cambios inéditos]: https://github.com/lulivi/deep-g-prop/compare/v1.0.0...HEAD
 [0.0.1]: https://github.com/lulivi/deep-g-prop/releases/tag/v0.0.1
 [0.0.2]: https://github.com/lulivi/deep-g-prop/releases/tag/v0.0.2
 [0.0.3]: https://github.com/lulivi/deep-g-prop/releases/tag/v0.0.3
+[1.0.0]: https://github.com/lulivi/deep-g-prop/releases/tag/v1.0.0

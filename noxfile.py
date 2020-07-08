@@ -142,6 +142,8 @@ def clean_docs(session: Session) -> None:
             *list(REPORT_DIR_PATH.glob("**/*.pkl")),
             *list(REPORT_DIR_PATH.glob("secciones/*.tex")),
             *list(FIGURES_DIR_PATH.glob("*.[!tex]*")),
+            REPORT_DIR_PATH / "presentation.nav",
+            REPORT_DIR_PATH / "presentation.snm",
             REPORT_DIR_PATH / "figures_pweave",
             REPORT_DIR_PATH / f"{REPORT_NAME}.bbl",
             REPORT_DIR_PATH / f"{REPORT_NAME}.blg",
@@ -263,6 +265,18 @@ def build_pdf(session: Session) -> None:
         session.run(*pdflatex_cmd, silent=True, external=True)
 
 
+@nox.session(name="build-presentation")
+def build_presentation(session: Session):
+    """Build the presentation document."""
+    with chdir(session, REPORT_DIR_PATH):
+        session.run(
+            "pdflatex",
+            "-interaction=nonstopmode",
+            "-shell-escape",
+            "presentation.tex",
+        )
+
+
 # -----------------------------------------------------------------------------
 # Tests
 # -----------------------------------------------------------------------------
@@ -333,7 +347,10 @@ def lint(session: Session) -> None:
         session.run("mypy", *python_files, silent=False)
         session.run("flake8", *python_files, silent=False)
         session.run(
-            "pycodestyle", "--ignore=E203,W503", *python_files, silent=False
+            "pycodestyle",
+            "--ignore=E203,W503,E231",
+            *python_files,
+            silent=False,
         )
         session.run("pydocstyle", *python_files, silent=False)
         session.run(

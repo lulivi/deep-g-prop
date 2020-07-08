@@ -48,11 +48,7 @@ class ReportTests(unittest.TestCase):
         """Check if report has the minimun number of pages."""
         number_of_pages = int(
             subprocess.run(
-                [
-                    "qpdf",
-                    "--show-npages",
-                    str(REPORT_DIR_PATH / "proyecto.pdf"),
-                ],
+                ["qpdf", "--show-npages", str(self.pdf_report_path),],
                 universal_newlines=True,
                 check=True,
                 stdout=subprocess.PIPE,
@@ -74,7 +70,7 @@ class ReportTests(unittest.TestCase):
                 "build-latex' before running the tests."
             )
 
-        cls.pdf_report_path = REPORT_DIR_PATH / "proyecto.pdf"
+        cls.pdf_report_path = REPORT_DIR_PATH / f"{REPORT_NAME}.pdf"
 
         if not cls.pdf_report_path.exists():
             sys.exit(
