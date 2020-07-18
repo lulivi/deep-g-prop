@@ -16,6 +16,7 @@
 - [Instalación](#instalación)
 - [Utilización](#utilización)
 - [Documentación](#documentación)
+- [Presentación](#presentación)
 - [Desarrollo](#desarrollo)
 - [Frameworks](#frameworks)
 - [Utilidades](#utilidades)
@@ -152,6 +153,25 @@ la documentación con el siguiente comando:
 nox -e build-pdf
 ```
 
+## Presentación
+
+La presentación está hecha en Markdown, con la herramienta [Marp]. Para poder
+obtener una visualización de la presentación es necesario instalar la interfaz
+de línea de comandos que este proyecto provee:
+
+```shell
+npm install @marp-team/marp-cli
+```
+
+Tras la instalación, es necesario ejecutar:
+
+```shell
+npx marp --preview docs/presentation/presentation.md
+```
+
+Para obtener la presentación en formato PDF, se pueden seguir las [instrucciones
+oficiales](https://github.com/marp-team/marp-cli#try-it-now).
+
 ## Desarrollo
 
 En este proyecto se usa un metodología de desarrollo basada en test.
@@ -227,6 +247,7 @@ El código de este repositorio está liberado bajo la licencia
 [PyPDF]: http://mstamy2.github.io/PyPDF2/
 [Pweave]: http://mpastell.com/pweave/
 [TexLive]: https://tug.org/texlive/
+[Marp]: https://marp.app/
 
 <!-- Insignias -->
 [travis-badge]: https://travis-ci.org/lulivi/deep-g-prop.svg?branch=master
