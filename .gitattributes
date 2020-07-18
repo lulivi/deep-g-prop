@@ -1,11 +1,12 @@
 # Pweave and latex files
 # ======================
 *.tex    text diff=tex
-*.texw   text diff=tex
+*.texw   text diff=tex linguist-language=TeX
 *.bib    text diff=bibtex
 
 # Misc
 # ====
+
 
 # Text files
 # ----------
@@ -15,6 +16,9 @@
 *.toml   text
 *.yaml   text
 *.csv    text
+*.tra    text diff=csv linguist-language=CSV
+*.val    text diff=csv linguist-language=CSV
+*.tst    text diff=csv linguist-language=CSV
 
 # Binary
 # ------
@@ -32,6 +36,7 @@
 *.pyx    text diff=python
 *.pyz    text diff=python
 *.pyi    text diff=python
+docs/filters/filters.py    -linguist-documentation
 
 # Binary files
 # ------------
