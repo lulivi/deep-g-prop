@@ -1,5 +1,4 @@
 """Multilayer perceptron testing with Keras."""
-from logging import DEBUG
 from typing import Tuple
 
 import click
@@ -7,7 +6,7 @@ import click
 from src.common import SEED
 from src.dgp_logger import DGPLOGGER
 from src.ga_optimizer import genetic_algorithm
-from src.types import Proben1Partition
+from src.proben import Proben1Partition
 from src.utils import (
     DatasetNotFoundError,
     print_data_summary,
@@ -219,7 +218,7 @@ def cli(
         log_stream_level=verbosity, log_file_stem_sufix=file_name
     )
 
-    DGPLOGGER.title(level=DEBUG, msg="Printing dataset sumary:")
+    DGPLOGGER.title(level="debug", msg="Printing dataset sumary:")
     print_data_summary(
         dataset.trn.X, dataset.trn.y, "Train", print_fn=DGPLOGGER.info
     )

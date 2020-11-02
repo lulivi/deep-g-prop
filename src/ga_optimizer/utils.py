@@ -10,7 +10,7 @@ from deap import base
 from src.dgp_logger import DGPLOGGER
 from src.ga_optimizer.toolbox import individual_evaluator
 from src.ga_optimizer.types import MLPIndividual
-from src.types import Proben1Partition
+from src.proben import Proben1Partition
 from src.utils import print_table
 
 

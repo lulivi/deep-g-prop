@@ -6,20 +6,34 @@ Setup the initializer, evaluator, crossover and mutation operators.
 import random
 import time
 
+from os import environ
 from typing import Callable, Tuple, Union
 
 import numpy as np
 
 from deap import base, creator, tools
-from keras.layers import Dense
-from keras.losses import BinaryCrossentropy, CategoricalCrossentropy
-from keras.models import Sequential
-from keras.optimizers import SGD
 from sklearn.metrics import accuracy_score, fbeta_score
 
 from src.dgp_logger import DGPLOGGER
 from src.ga_optimizer.types import Layer, MLPIndividual
 from src.utils import Proben1Partition, Proben1Split
+
+environ["KERAS_BACKEND"] = "theano"
+
+# pylint: disable=C0411,C0413
+from keras.layers import Dense  # noqa: E402  # isort:skip
+
+# pylint: disable=C0411,C0413
+from keras.losses import (  # noqa: E402  # isort:skip
+    BinaryCrossentropy,
+    CategoricalCrossentropy,
+)
+
+# pylint: disable=C0411,C0413
+from keras.models import Sequential  # noqa: E402  # isort:skip
+
+# pylint: disable=C0411,C0413
+from keras.optimizers import SGD  # noqa: E402  # isort:skip
 
 
 def individual_initializer(
@@ -49,7 +63,7 @@ def individual_initializer(
 
 
 def individual_evaluator(
-    individual: MLPIndividual, trn: Proben1Split, tst: Proben1Split, **kwargs,
+    individual: MLPIndividual, trn: Proben1Split, tst: Proben1Split, **kwargs
 ):
     """Evaluate an individual.
 
@@ -83,9 +97,7 @@ def individual_evaluator(
         else BinaryCrossentropy(),
     )
 
-    model.fit(
-        trn.X, trn.y_cat, epochs=100, batch_size=16, verbose=0,
-    )
+    model.fit(trn.X, trn.y_cat, epochs=100, batch_size=16, verbose=0)
 
     # Predict the scores
     predicted_y = model.predict_classes(tst.X)
