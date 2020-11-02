@@ -36,7 +36,6 @@ entorno virtual para aislar correctamente las versiones de los paquetes que se
 vayan a utilizar. Para más información sobre [pip] y [venv] consultar el
 [tutorial oficial][python-venv-pip-guide-url].
 
-
 ### Creación de un entorno virtual
 
 Para crear un entorno virtual, podemos usar el módulo que viene incorporado
