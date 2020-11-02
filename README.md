@@ -13,8 +13,12 @@
 
 ## Índice
 
+- [Índice](#índice)
 - [Instalación](#instalación)
-- [Utilización](#utilización)
+  - [Creación de un entorno virtual](#creación-de-un-entorno-virtual)
+  - [Instalación de la interfáz de línea de comandos](#instalación-de-la-interfáz-de-línea-de-comandos)
+  - [Instalación de módulos extras](#instalación-de-módulos-extras)
+- [Ejecución de test y otras utilidades](#ejecución-de-test-y-otras-utilidades)
 - [Documentación](#documentación)
 - [Presentación](#presentación)
 - [Desarrollo](#desarrollo)
@@ -32,64 +36,87 @@ entorno virtual para aislar correctamente las versiones de los paquetes que se
 vayan a utilizar. Para más información sobre [pip] y [venv] consultar el
 [tutorial oficial][python-venv-pip-guide-url].
 
-- Para crear un entorno virtual, podemos usar el módulo que viene incorporado
-  con la instalación de Python desde la versión `3.3`:
 
-  ```shell
-  python3.7 -m venv .venv
-  ```
+### Creación de un entorno virtual
 
-  Así habríamos creado un entorno virtual en el directorio `.venv`. Una vez
-  instalado el entorno virtual, deberemos activarlo. Para ello hay que ejecutar
-  uno de los siguientes comandos dependiendo del interprete de órdenes que se
-  use (tabla obtenida de la documentación oficial de [venv]):
+Para crear un entorno virtual, podemos usar el módulo que viene incorporado
+con la instalación de Python desde la versión `3.3`:
 
-  | Platform |      Shell      | Command to activate virtual environment |
-  | :------: | --------------: | --------------------------------------- |
-  |  POSIX   |        bash/zsh | `$ source <venv>/bin/activate`          |
-  |          |            fish | `$ . <venv>/bin/activate.fish`          |
-  |          |        csh/tcsh | `$ source <venv>/bin/activate.csh`      |
-  |          | PowerShell Core | `$ <venv>/bin/Activate.ps1`             |
-  | Windows  |         cmd.exe | `C:\> <venv>\Scripts\activate.bat`      |
-  |          |      PowerShell | `PS C:\> <venv>\Scripts\Activate.ps1`   |
+```shell
+python3.7 -m venv .venv
+```
 
-  Tabla 1.1: *Activación de entorno virtual.*
+Así habríamos creado un entorno virtual en el directorio `.venv`. Una vez
+instalado el entorno virtual, deberemos activarlo. Para ello hay que ejecutar
+uno de los siguientes comandos dependiendo del interprete de órdenes que se
+use (tabla obtenida de la documentación oficial de [venv]):
 
-- Para instalar los paquetes una vez activado el entorno virtual, deberemos
-  usar [pip]. He dividido los paquetes en distintos grupos:
+| Platform |      Shell      | Command to activate virtual environment |
+| :------: | --------------: | --------------------------------------- |
+|  POSIX   |        bash/zsh | `$ source <venv>/bin/activate`          |
+|          |            fish | `$ . <venv>/bin/activate.fish`          |
+|          |        csh/tcsh | `$ source <venv>/bin/activate.csh`      |
+|          | PowerShell Core | `$ <venv>/bin/Activate.ps1`             |
+| Windows  |         cmd.exe | `C:\> <venv>\Scripts\activate.bat`      |
+|          |      PowerShell | `PS C:\> <venv>\Scripts\Activate.ps1`   |
 
-  | Propósito                          | Ruta del archivo                     | Descripción                                                                                                             |
-  |------------------------------------|--------------------------------------|-------------------------------------------------------------------------------------------------------------------------|
-  | Producción                         | [`requirements/prod.txt`]            | Paquetes necesarios para ejecutar código asociado directamente a *DeepGProp*. El archivo [`requirements.txt`] de la raiz del repositorio símplemente instala los paquetes contenidos en este archivo. |
-  | Documentación                      | [`requirements/docs.txt`]            | Paquetes necesarios para construir la documentación. Si se usa [Nox], no será necesario instalar estos paquetes a mano. |
-  | Test                               | [`requirements/tests.txt`]           | Paquetes para ejecutar los tests. Si se usa [Nox], no será necesario instalar estos paquetes a mano.                    |
-  | Comparativa de Optimizadores       | [`requirements/hp_optimization.txt`] | Paquetes usados en la comparativa de optimizadores de hiper-parámetros.                                                 |
-  | Comparativa de Frameworks para MLP | [`requirements/mlp_frameworks.txt`]  | Paquetes usados en la comparativa de frameworks para redes neuronales.                                                  |
+Tabla 1.1: *Activación de entorno virtual.*
 
-  Para instalar cualquiera de los grupos de paquetes hay que ejecutar:
+### Instalación de la interfáz de línea de comandos
 
-  ```shell
-  pip install -r <nombre archivo>
-  ```
+Para ejecutar DeepGProp, primero hay que instalar su interfáz de línea de
+comandos. Para ello, tras crear el entorno virtual, ejecutaremos:
 
-  pudiendo sustituirse `<nombre archivo>` cualquiera de los anteriores. Si se
-  quisiera instalar los paquetes sin usar un entorno virtual (no recomendado)
-  se puede ejecutar el siguiente comando:
+```shell
+pip install .
+```
 
-  ```shell
-  python3.7 -m pip install --user -r <nombre archivo>
-  ```
+Si se quiere instalar en modo edición (para que los cambios realizados en el
+código tengan efecto en la interfáz) será necesario añadir el indicador `-e`:
 
-  Es el mismo comando pero precedido por `python3.7 -m` para evitar problemas
-  si tenemos otras versiones de Python instaladas en el sistema.
+```shell
+pip install -e .
+```
 
-Es necesario añadir la ruta al repositorio a la variable de entorno
-`PYTHONPATH`. También, si no se quiere preceder cada ejecución de
-`src/deep-g-prop.py` con `KERAS_BACKEND=theano`, se puede exportar esa
-variable. Si desea ejecutar la comparación de frameworks de perceptrones
-multicapa, tendrá que usar el primer método.
+Tras la instalación tendremos disponible el comando `dgp`. Puedes ejecutar lo
+siguiente para obtener las opciones existentes:
 
-## Utilización
+```shell
+dgp --help
+```
+
+### Instalación de módulos extras
+
+He dividido los paquetes utilizados en el proyecto en distintos grupos para
+evitar instalar librerías no deseadas si vamos a realizar tareas concretas
+(como construir la documentación o ejecutar cierto módulo):
+
+| Propósito                          | Ruta del archivo                     | Descripción                                                                                                             |
+|------------------------------------|--------------------------------------|-------------------------------------------------------------------------------------------------------------------------|
+| Producción                         | [`requirements/prod.txt`]            | Paquetes necesarios para ejecutar código asociado directamente a *DeepGProp*. El apartado anterior realiza esta acción. |
+| Documentación                      | [`requirements/docs.txt`]            | Paquetes necesarios para construir la documentación. Si se usa [Nox], no será necesario instalar estos paquetes a mano. |
+| Test                               | [`requirements/tests.txt`]           | Paquetes para ejecutar los tests. Si se usa [Nox], no será necesario instalar estos paquetes a mano.                    |
+| Comparativa de Optimizadores       | [`requirements/hp_optimization.txt`] | Paquetes usados en la comparativa de optimizadores de hiper-parámetros.                                                 |
+| Comparativa de Frameworks para MLP | [`requirements/mlp_frameworks.txt`]  | Paquetes usados en la comparativa de frameworks para redes neuronales.                                                  |
+
+Para instalar cualquiera de los grupos de paquetes hay que ejecutar:
+
+```shell
+pip install -r <nombre archivo>
+```
+
+pudiendo sustituirse `<nombre archivo>` cualquiera de los anteriores. Si se
+quisiera instalar los paquetes sin usar un entorno virtual (no recomendado)
+se puede ejecutar el siguiente comando:
+
+```shell
+python3.7 -m pip install --user -r <nombre archivo>
+```
+
+Es el mismo comando pero precedido por `python3.7 -m` para evitar problemas
+si tenemos otras versiones de Python instaladas en el sistema.
+
+## Ejecución de test y otras utilidades
 
 > **Nota:** Si se ha optado por usar un entorno virtual, debe ser activado
 > usando uno de los comandos mostrados en la tabla de la sección de
