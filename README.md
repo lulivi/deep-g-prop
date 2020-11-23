@@ -2,6 +2,8 @@
 
 > Optimización de Redes Neuronales con Algoritmos Genéticos
 
+
+[![DOI]][DOI-url]
 [![test_lint-badge]][test_lint-url]
 [![test_src-badge]][test_src-url]
 [![test_docs-badge]][test_docs-url]
@@ -276,6 +278,8 @@ El código de este repositorio está liberado bajo la licencia
 [Marp]: https://marp.app/
 
 <!-- Insignias -->
+[DOI]: https://zenodo.org/badge/150996778.svg
+[DOI-url]: https://zenodo.org/badge/latestdoi/150996778
 [travis-badge]: https://travis-ci.org/lulivi/deep-g-prop.svg?branch=master
 [travis-url]: https://travis-ci.org/lulivi/deep-g-prop
 [license-badge]: https://img.shields.io/github/license/lulivi/deep-g-prop
