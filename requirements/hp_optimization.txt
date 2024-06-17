@@ -1,4 +1,4 @@
 numpy==1.22.0
-scikit-learn==0.22.2.post1
+scikit-learn==1.5.0
 sklearn-deap==0.2.4
 tabulate==0.8.7
